@@ -10,4 +10,15 @@ idk how to do custom syntax highlighting
 
 # Features
 
+Comments:
+```
+~ this is a line comment 
+```
+```
+/~ 
+ ~ this is a block comment
+ ~/
+```
+
+
 # About Us
