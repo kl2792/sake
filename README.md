@@ -1,11 +1,11 @@
 # Saké
 
-A simple and powerful language for creating customizable visual simulations of finite-state automata.
+A simple and powerful language for creating and manipulating customizable visual simulations of finite-state automata including DFAs, NFAs, Moore, and Mealy machines.
 
 # Sample Code
 
 ```
-idk how to do custom syntax highlighting
+
 ```
 
 # Features
