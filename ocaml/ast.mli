@@ -26,14 +26,13 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Fsm_call of string * fsm_call * expr list
   | Tern of expr * expr * expr
   | Empty
-type fsm_stmt =
-  | Goto 
 type stmt = 
   | Block of stmt list
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
   | Expr of expr
+  | Goto of string
   | Return of expr (* an FSM may terminate by using 'return' *)
 type type_decl = {
   name  : string;
