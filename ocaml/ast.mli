@@ -3,18 +3,17 @@ type uop = Neg | Not
 type utype = (* user-defined types *)
   | Types of literal list (* arrays will be broken down *)
   | Enum of string list
-type dtype = (* built-in primitives *)
-  | Bool | Int | Char | Float
+type dtype = (* built-in primitives + custom user type *)
+  | Bool | Int | Char
   | Array of dtype * int
   | Custom of utype
 type lvalue = dtype * string
 type literal = (* literal that is optionally an array; note that strings are arrays *)
-  | Bool of bool
-  | Char of char
-  | Int of int
-  | Float of float
+  | BoolLit of bool
+  | CharLit of char
+  | IntLit of int
   | Range of literal * literal * literal (* only valid for bool, char, int *)
-  | Array of literal list (* arrays may not have arrays as members *)
+  | ArrayLit of literal list
 type fsm_call = Create | Sim | Reach | Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Literal of literal
@@ -32,8 +31,8 @@ type stmt =
   | For of expr * expr * expr * stmt
   | While of expr * stmt
   | Expr of expr
-  | Goto of string
-  | Return of expr (* an FSM may terminate by using 'return' *)
+  | Goto of string (* for FSM transitions *)
+  | Return of expr (* for functions *)
 type type_decl = {
   name  : string;
   types : utype;
