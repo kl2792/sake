@@ -3,8 +3,11 @@
 A simple and powerful language for creating and manipulating customizable visual simulations of finite-state automata including DFAs, NFAs, Moore, and Mealy machines.
 
 Manager: Arunavha Chanda
+
 Language Guru: Shalva Kohen
+
 System Architect: Kai-Zhan Lee
+
 Tester: Emma Etherington
 
 # Sample Code
