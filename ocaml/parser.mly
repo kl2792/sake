@@ -1,6 +1,6 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT
 %token RETURN IF ELSE FOR WHILE
@@ -21,7 +21,7 @@
 
 %%
 literal:
- literal literal literal { Range($1, $2, $3) }
+ literal COLON literal COLON literal { Range($1, $3, $5) }
 
 utype:
 
