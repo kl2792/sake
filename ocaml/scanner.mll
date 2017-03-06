@@ -16,6 +16,20 @@ rule token = parse
   | dgt+'.'dgt*|'.'dgt+ { FLOATLIT }
   | dgt+ { INTLIT }
   | "fsm" { FSM }
+  | "type" { TYPE }
+  | "switch" { CASE }
+  | "goto" { GOTO }
+  | "state" { STATE }
+  | "type" { TYPE }
+  | "switch" { SWITCH } 
+  | "case" { CASE } 
+  | "goto" { GOTO }
+  | "fsm"  { FSM }
+  | "state" { STATE }
+  | "start" { START }
+  | "input" { INPUT }
+  | "output" { OUTPUT }
+  | "sysin" { SYSIN }
 and comment = parse
     "~)" { token lexbuf }
   | _    { comment lexbuf }
