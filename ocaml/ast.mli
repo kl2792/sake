@@ -1,12 +1,9 @@
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
-type utype = (* user-defined types *)
-  | Types of literal list (* arrays will be broken down *)
-  | Enum of string list
 type dtype = (* built-in primitives + custom user type *)
   | Bool | Int | Char
   | Array of dtype * int
-  | Custom of utype
+  | Enum of string (* just the name of the enum *)
 type lvalue = dtype * string
 type literal = (* literal that is optionally an array; note that strings are arrays *)
   | BoolLit of bool
@@ -17,13 +14,13 @@ type literal = (* literal that is optionally an array; note that strings are arr
 type fsm_call = Create | Sim | Reach | Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Literal of literal
-  | Variable of lvalue
+  | Variable of string
   | Uop of uop * expr
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
   | Fsm_call of string * fsm_call * expr list
-  | Tern of expr * expr * expr
+  | Cond of expr * expr * expr
   | Empty
 type stmt = 
   | Block of stmt list
@@ -35,7 +32,7 @@ type stmt =
   | Return of expr (* for functions *)
 type type_decl = {
   name  : string;
-  types : utype;
+  types : string list;
 }
 type state_decl = {
   name : string;
