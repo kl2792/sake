@@ -35,8 +35,9 @@ type type_decl = {
   types : string list;
 }
 type state_decl = {
-  name : string;
-  body : stmt list;
+  name  : string;
+  start : bool;
+  body  : stmt list;
 }
 type fsm_decl = {
   name   : string;
