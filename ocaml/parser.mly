@@ -1,6 +1,6 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT
 %token RETURN IF ELSE FOR WHILE
@@ -9,28 +9,29 @@
 %token EOF
 
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
+%token CREATE SIM REACH TICK RESET
 
 (* literals *)
 %token <int> INTLIT
 %token <bool> BOOLIT
 %token <char> CHARLIT
 %token <string> STRINGLIT
+%token <string> ID
 
 %start expr
 %type < Ast.expr> expr
 
 %%
-literal:
- literal COLON literal COLON literal { Range($1, $3, $5) }
 
-utype:
-
+(* note: this is for hello world, so we are starting small *)
 
 expr:
  INTLIT { Literal($1) }
 | BOOLIT { Literal($1) }
 | CHARLIT { Literal($1) }
-| STRINGLIT { Literal($1) } (* confused about range and array *)
+| QUOTES STRINGLIT QUOTES { Literal($1) } (* surrounding string with double quotes *)
+
+| ID { Variable($1) }
 
 | NEG expr { Uop(Neg, $2)}
 | NOT expr { Uop(Not, $2)}
@@ -48,6 +49,6 @@ expr:
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 
-| STRINGLIT ASSIGN expr { Assign($1, $3) }
+| ID ASSIGN expr { Assign($1, $3) }
 
-| expr expr expr { Tern($1, $2, $3) }
+| expr expr expr { Cond($1, $2, $3) }
