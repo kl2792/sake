@@ -1,4 +1,3 @@
- v|
 { type token =  }
 
 let spc = [' ' '\t']
