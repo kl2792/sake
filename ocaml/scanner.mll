@@ -30,6 +30,7 @@ rule token = parse
   | "input" { INPUT }
   | "output" { OUTPUT }
   | "sysin" { SYSIN }
+  | "void" {VOID}
 and comment = parse
     "~)" { token lexbuf }
   | _    { comment lexbuf }
