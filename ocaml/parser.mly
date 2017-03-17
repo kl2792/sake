@@ -24,15 +24,12 @@
 
 %%
 
-(* note: this is for hello world, so we are starting small *)
-
 literal:
-INTLIT { Literal($1) }
-| BOOLIT { Literal($1) }
-| CHARLIT { Literal($1) }
-| STRINGLIT { Literal($1) } (* surrounding string with double quotes, need to take into account? *)
-| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
-  (* will do list later, possibly tomorrow *)
+INTLIT { IntLit($1) }
+| BOOLIT { BoolLit($1) }
+| CHARLIT { CharLit($1) }
+| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) } (* Q: wouldn't this apply only to integers? *)
+| literal_opt { ArrayLit($1) } (* see list definitions below *)
 
 expr:
 literal { Literal($1) }
@@ -57,3 +54,20 @@ literal { Literal($1) }
 | ID ASSIGN expr { Assign($1, $3) }
 
 | expr expr expr { Cond($1, $2, $3) }
+
+(* list definitions *)
+expr_opt:
+  /*nothing*/ { [] }
+| expr_list { List.rev $1 }
+
+expr_list:
+  expr { [$1] }
+| expr_list COMMA expr { $3 :: $1}
+
+literal_opt:
+  /*nothing*/ { [] }
+| literal_list { List.rev $1 }
+
+literal_list:
+  literal { [$1] }
+| literal_list BAR literal { $3 :: $1 }
