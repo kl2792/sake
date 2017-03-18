@@ -9,7 +9,7 @@
 %token EOF
 
 (* tokens specific to our language *)
-%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN 
+%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
 %token CREATE SIM REACH TICK RESET
 
 (* literals *)
@@ -79,8 +79,41 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | GOTO ID { Goto ($2) } (* DO SWITCH LATER *)
 | RETURN expr { Return($2) }
 
+type_decl:
+  TYPE ID ASSIGN string_list  (* should these be strings? *)
+  {{
+    name = $2
+    types = $4
+  }}
 
-(* list definitions *)
+state_decl:
+  START ID LBRACE stmt_list RBRACE (* Q: confused about the bool part for START *)
+  {{
+    name = $2
+    start = true (* Q: pretty sure this is wrong :) *)
+    body = List.rev $4
+  }}
+| ID LBRACE stmt_list RBRACE
+  {{
+    name = $1
+    start = false (* Q: probably wrong *)
+    body = List.rev $3
+  }}
+
+fsm_decl:
+  FSM ID LBRACE lvalue_list lvalue_list lvalue_list state_list RBRACE  (* Q:What about statements? *)
+  {{
+    name = $2
+    locals = $4
+    input = $5
+    output = $6
+    body = $7
+  }}
+
+
+
+
+(* list definitions, need to define lvalue_list, state_list, type_list, fsm_list, func_list *)
 expr_opt:
   (* nothing *) { [] }
 | expr_list { List.rev $1 }
@@ -100,3 +133,11 @@ literal_list:
 stmt_list:
   (* nothing *) { [] }
 | stmt_list stmt { $2 :: $1 }
+
+string_opt:
+  (* nothing *) { [] }
+| string_list { List.rev $1 }
+
+string_list:
+  STRINGLIT { [$1] }
+| string_list BAR STRINGLIT { $3 :: $1 }
