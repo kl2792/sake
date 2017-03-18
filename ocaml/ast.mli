@@ -5,12 +5,14 @@ type dtype = (* built-in primitives + custom user type *)
   | Array of dtype * int
   | Enum of string (* just the name of the enum *)
 type lvalue = dtype * string
+type array =
+  | Range of literal * literal * literal (* only valid for bool, char, int *)
+  | List of literal list
 type literal = (* literal that is optionally an array; note that strings are arrays *)
   | BoolLit of bool
   | CharLit of char
   | IntLit of int
-  | Range of literal * literal * literal (* only valid for bool, char, int *)
-  | ArrayLit of literal list
+  | ArrayLit of array
 type fsm_call = Create | Sim | Reach | Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Literal of literal
