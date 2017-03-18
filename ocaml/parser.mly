@@ -1,6 +1,6 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT
 %token RETURN IF ELSE FOR WHILE
@@ -23,6 +23,16 @@
 %type < Ast.expr> expr
 
 %%
+(*grammar *)
+dtype:
+BOOL RBRACE INTLIT LBRACE { Array($1, $3) }
+| INT RBRACE INTLIT LBRACE { Array($1, $3) }
+| CHAR RBRACE INTLIT LBRACE { Array($1, $3) }
+| dtype RBRACE INTLIT LBRACE { Array($1, $3) }
+| ID { Enum($1) }  (*Q: Not sure if this is correct *)
+
+lvalue:
+dtype ID { $1, $2 }
 
 literal:
 INTLIT { IntLit($1) }
@@ -34,10 +44,8 @@ INTLIT { IntLit($1) }
 expr:
 literal { Literal($1) }
 | ID { Variable($1) }
-
 | NEG expr { Uop(Neg, $2)}
 | NOT expr { Uop(Not, $2)}
-
 | expr PLUS   expr { Binop($1, Add, $3) }
 | expr MINUS  expr { Binop($1, Sub, $3) }
 | expr TIMES  expr { Binop($1, Mul, $3) }
@@ -50,10 +58,14 @@ literal { Literal($1) }
 | expr GE expr { Binop($1, Ge, $3) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
-
 | ID ASSIGN expr { Assign($1, $3) }
-
-| expr expr expr { Cond($1, $2, $3) }
+| ID LPAREN expr_list RPAREN { call($1, $3) }
+| ID DOT CREATE LPAREN expr_list RPAREN { Fsm_call($1, $3, $5) } (* When did we define create? What doth this do? *)
+| ID DOT SIM LPAREN expr_list RPAREN { Fsm_call($1, $3, $5) }
+| ID DOT REACH LPAREN expr_list RPAREN { Fsm_call($1, $3, $5) }
+| ID DOT TICK LPAREN expr_list RPAREN { Fsm_call($1, $3, $5) }
+| ID DOT RESET LPAREN expr_list RPAREN { Fsm_call($1, $3, $5) } (* Q: there shouldn't be anything in here. Potential for error *)
+| expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 (* list definitions *)
 expr_opt:
