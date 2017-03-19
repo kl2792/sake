@@ -107,7 +107,7 @@ fsm_decl:
     locals = $4
     input = $5
     output = $6
-    body = $7
+    body = List.rev $7
   }}
 
 func_decl:
@@ -123,13 +123,13 @@ func_decl:
 program:
   type_list fsm_list func_list
   {{
-    types = $1
-    fsms = $2
-    funcs = $3
+    types = List.rev $1
+    fsms = List.rev $2
+    funcs = List.rev $3
   }}
 
 
-(* list definitions, need to define lvalue_list, state_list, type_list, fsm_list, func_list *)
+(* list definitions*)
 expr_opt:
   (* nothing *) { [] }
 | expr_list { List.rev $1 }
@@ -160,8 +160,24 @@ string_list:
 
 lvalue_opt:
   (*nothing*) { [] }
-| lvalue_list { List.rev $1 }
+| LSQUARE lvalue_list RSQUARE { List.rev $2 }
 
 lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
+
+state_list:
+(* nothing *) { [] }
+| state_list state_decl { $2 :: $1}
+
+type_list:
+(* nothing *) { [] }
+| type_list type_decl { $2 :: $1}
+
+fsm_list:
+(* nothing *) { [] }
+| fsm_list fsm_decl { $2 :: $1}
+
+func_list:
+(* nothing *) { [] }
+| func_list func_decl { $2 :: $1}
