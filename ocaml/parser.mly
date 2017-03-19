@@ -25,9 +25,9 @@
 %%
 (*grammar *)
 dtype:
-BOOL LSQUARE INTLIT RSQUARE { Array(Bool, $3) }
-| INT LSQUARE INTLIT RSQUARE { Array(Int, $3) }
-| CHAR LSQUARE INTLIT RSQUARE { Array(Char, $3) }
+BOOL { Bool($1) }
+| INT { Int($1) }
+| Char { CHAR($1) }
 | dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }
 | ID { Enum($1) }  (* Q: Not sure if this is correct *)
 
@@ -60,11 +60,11 @@ literal { Literal($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID LPAREN expr_list RPAREN { call($1, $3) }
-| ID DOT CREATE LPAREN expr_list RPAREN { Fsm_call($1, Create, $5) } (* Q: When did we define create? What doth this do? *)
-| ID DOT SIM LPAREN expr_list RPAREN { Fsm_call($1, Sim, $5) }
-| ID DOT REACH LPAREN expr_list RPAREN { Fsm_call($1, Reach, $5) }
-| ID DOT TICK LPAREN expr_list RPAREN { Fsm_call($1, Tick, $5) }
-| ID DOT RESET LPAREN expr_list RPAREN { Fsm_call($1, Reset, $5) } (* Q: there shouldn't be anything in here. Potential for error *)
+| ID DOT CREATE LPAREN expr_opt RPAREN { Fsm_call($1, Create, $5) } (* Q: When did we define create? What doth this do? *)
+| ID DOT SIM LPAREN expr_opt RPAREN { Fsm_call($1, Sim, $5) }
+| ID DOT REACH LPAREN expr_opt RPAREN { Fsm_call($1, Reach, $5) }
+| ID DOT TICK LPAREN expr_opt RPAREN { Fsm_call($1, Tick, $5) }
+| ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } (* Q: there shouldn't be anything in here. Potential for error *)
 | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 | (* nothing *)
 
@@ -80,7 +80,7 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | RETURN expr { Return($2) }
 
 type_decl:
-  TYPE ID ASSIGN string_list  (* should these be strings? *)
+  TYPE ID ASSIGN string_opt  (* should these be strings? *)
   {{
     name = $2
     types = $4
@@ -101,7 +101,7 @@ state_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE lvalue_list lvalue_list lvalue_list state_list RBRACE  (* Q:What about statements? *)
+  FSM ID LBRACE lvalue_opt INPUT lvalue_opt OUTPUT lvalue_opt state_list RBRACE  (* Q:What about statements? *)
   {{
     name = $2
     locals = $4
@@ -110,7 +110,23 @@ fsm_decl:
     body = $7
   }}
 
+func_decl:
+  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_opt stmt_list RBRACE
+  {{
+    return = $1
+    name = $2
+    formals = $4
+    locals = $7
+    body = List.rev $8
+  }}
 
+program:
+  type_list fsm_list func_list
+  {{
+    types = $1
+    fsms = $2
+    funcs = $3
+  }}
 
 
 (* list definitions, need to define lvalue_list, state_list, type_list, fsm_list, func_list *)
@@ -141,3 +157,11 @@ string_opt:
 string_list:
   STRINGLIT { [$1] }
 | string_list BAR STRINGLIT { $3 :: $1 }
+
+lvalue_opt:
+  (*nothing*) { [] }
+| lvalue_list { List.rev $1 }
+
+lvalue_list:
+  lvalue { [$1] }
+| lvalue_list COMMA lvalue { $3 :: $1 }
