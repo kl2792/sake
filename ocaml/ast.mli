@@ -22,10 +22,10 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Fsm_call of string * fsm_call * expr list
   | Cond of expr * expr * expr
   | Empty
-type case = (* switch cases *)
-  | Tuple of case list
-  | Case of expr * stmt
-  | Any
+type case_expr = (* a case tuple *)
+  | CaseValue of expr
+  | CaseAny
+type case = case_expr list * stmt
 type stmt = 
   | Block of stmt list
   | If of expr * stmt * stmt
