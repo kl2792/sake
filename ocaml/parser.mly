@@ -2,7 +2,7 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE
 %token ADD SUB MUL DIV
-%token EQ NEQ LT LE GT GE AND OR NEG NOT
+%token EQ NEQ LT LE GT GE AND OR NEG NOT MINUS
 %token RETURN IF ELSE ELIF FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
 %token CONTINUE BREAK
@@ -44,7 +44,7 @@ INTLIT { IntLit($1) }
 expr:
 literal { Literal($1) }
 | ID { Variable($1) }
-| NEG expr { Uop(Neg, $2)}
+| MINUS expr %prec NED { Uop(Neg, $2)}
 | NOT expr { Uop(Not, $2)}
 | expr PLUS   expr { Binop($1, Add, $3) }
 | expr MINUS  expr { Binop($1, Sub, $3) }

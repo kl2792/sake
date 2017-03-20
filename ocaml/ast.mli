@@ -11,7 +11,7 @@ type literal = (* literal that is optionally an array; note that strings are arr
   | IntLit of int
   | Range of literal * literal * literal (* only valid for bool, char, int *)
   | ArrayLit of literal list
-type fsm_call = Create | Sim | Reach | Tick | Reset
+type fsm_call = Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Literal of literal
   | Variable of string
