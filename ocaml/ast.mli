@@ -22,12 +22,17 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Fsm_call of string * fsm_call * expr list
   | Cond of expr * expr * expr
   | Empty
+type case = (* switch cases *)
+  | Tuple of case list
+  | Case of expr * stmt
+  | Any
 type stmt = 
   | Block of stmt list
   | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt
+  | For of string * expr * stmt
   | While of expr * stmt
   | Expr of expr
+  | Switch of expr * case list
   | Goto of string (* for FSM transitions *)
   | Return of expr (* for functions *)
 type type_decl = {
