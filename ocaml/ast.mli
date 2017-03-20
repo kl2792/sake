@@ -23,6 +23,9 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Cond of expr * expr * expr
   | Empty
 type case = (* switch cases *)
+  | Tuple of case list
+  | Case of expr
+  | Any
 type stmt = 
   | Block of stmt list
   | If of expr * stmt * stmt
