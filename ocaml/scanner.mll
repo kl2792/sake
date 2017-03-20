@@ -11,6 +11,7 @@ rule token = parse
     spc { token lexbuf }
   | "(~" { comment lexbuf }
   | "~" { line_comment lexbuf }
+  | '|' { BAR }
   | '('      { LPAREN }
   | ')'      { RPAREN }
   | '{'      { LBRACE }
@@ -44,7 +45,6 @@ rule token = parse
   | "fsm" { FSM }
   | "type" { TYPE }
   | "goto" { GOTO }
-  | "state" { STATE }
   | "type" { TYPE }
   | "switch" { SWITCH } 
   | "case" { CASE } 
