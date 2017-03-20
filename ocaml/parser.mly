@@ -2,7 +2,7 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE
 %token ADD SUB MUL DIV
-%token EQ NEQ LT LE GT GE AND OR NEG NOT MINUS
+%token EQ NEQ LT LE GT GE AND OR NEG NOT MINUS?
 %token RETURN IF ELSE ELIF FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
 %token CONTINUE BREAK
@@ -17,7 +17,7 @@
 %token <bool> BOOLIT
 %token <char> CHARLIT
 %token <string> STRINGLIT
-%token <string> ID
+%token <string> ID (* why string? *)
 
 %start expr
 %type < Ast.expr> expr
@@ -28,7 +28,7 @@ dtype:
 BOOL { Bool($1) }
 | INT { Int($1) }
 | CHAR { Char($1) }
-| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }
+| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) } ?? (* ast as well *)
 | ID { Enum($1) }  (* Q: Not sure if this is correct *)
 
 lvalue:
@@ -70,7 +70,7 @@ literal { Literal($1) }
 
 stmt:
 LBRACE stmt_list RBRACE { Block(List.rev $2) }
-| IF expr LBRACE stmt RBRACE stmt { If($2, $4, $6) }  (* no else or elif *)
+| IF expr LBRACE stmt RBRACE stmt { If($2, $4, $6) }  (* no else or elif *) (* is this needed? *)
 | IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  (* with else *)
 | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  (* with elif *)
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
