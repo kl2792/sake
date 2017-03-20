@@ -131,7 +131,7 @@ program:
 
 (* list definitions*)
 expr_opt:
-  (* nothing *) { [] }
+  /* nothing */ { [] }
 | expr_list { List.rev $1 }
 
 expr_list:
@@ -139,27 +139,27 @@ expr_list:
 | expr_list COMMA expr { $3 :: $1}
 
 literal_opt:
-  (* nothing *) { [] }
+  /* nothing */ { [] }
 | literal_list { List.rev $1 }
 
 literal_list:
-  literal { [$1] }
+  literal { $1 }
 | literal_list BAR literal { $3 :: $1 }
 
 stmt_list:
-  (* nothing *) { [] }
+  /* nothing */ { [] }
 | stmt_list stmt { $2 :: $1 }
 
 string_opt:
-  (* nothing *) { [] }
+  /* nothing */ { [] }
 | string_list { List.rev $1 }
 
 string_list:
-  STRINGLIT { [$1] }
+  STRINGLIT { $1 }
 | string_list BAR STRINGLIT { $3 :: $1 }
 
 lvalue_opt:
-  (*nothing*) { [] }
+  /*nothing*/ { [] }
 | LSQUARE lvalue_list RSQUARE { List.rev $2 }
 
 lvalue_list:
@@ -167,17 +167,17 @@ lvalue_list:
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 state_list:
-(* nothing *) { [] }
+/* nothing */ { [] }
 | state_list state_decl { $2 :: $1}
 
 type_list:
-(* nothing *) { [] }
+/* nothing */ { [] }
 | type_list type_decl { $2 :: $1}
 
 fsm_list:
-(* nothing *) { [] }
+/* nothing */ { [] }
 | fsm_list fsm_decl { $2 :: $1}
 
 func_list:
-(* nothing *) { [] }
+/* nothing */ { [] }
 | func_list func_decl { $2 :: $1}
