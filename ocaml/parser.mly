@@ -27,7 +27,7 @@
 dtype:
 BOOL { Bool($1) }
 | INT { Int($1) }
-| Char { CHAR($1) }
+| CHAR { Char($1) }
 | dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }
 | ID { Enum($1) }  (* Q: Not sure if this is correct *)
 
