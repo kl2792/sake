@@ -1,4 +1,4 @@
-{ type token =  }
+{ open Parser }
 
 let spc = [' ' '\t']
 let cap = ['A'-'Z']
@@ -11,26 +11,60 @@ rule token = parse
     spc { token lexbuf }
   | "(~" { comment lexbuf }
   | "~" { line_comment lexbuf }
-  | cap aln* { ENUM }
-  | low aln* { VARIABLE }
-  | dgt+'.'dgt*|'.'dgt+ { FLOATLIT }
-  | dgt+ { INTLIT }
+  | '('      { LPAREN }
+  | ')'      { RPAREN }
+  | '{'      { LBRACE }
+  | '}'      { RBRACE }
+  | ';'      { SEMI }
+  | ','      { COMMA }
+  | '+'      { PLUS }
+  | '-'      { MINUS }
+  | '*'      { TIMES }
+  | '/'      { DIVIDE }
+  | '='      { ASSIGN }
+  | "=="     { EQ }
+  | "!="     { NEQ }
+  | '<'      { LT }
+  | "<="     { LEQ }
+  | ">"      { GT }
+  | ">="     { GEQ }
+  | "&&"     { AND }
+  | "||"     { OR }
+  | "!"      { NOT }
+  | "if"     { IF }
+  | "else"   { ELSE }
+  | "for"    { FOR }
+  | "while"  { WHILE }
+  | "return" { RETURN }
+  | "int"    { INT }
+  | "bool"   { BOOL }
+  | "void"   { VOID }
+  | "true"   { TRUE }
+  | "false"  { FALSE }
   | "fsm" { FSM }
   | "type" { TYPE }
-  | "switch" { CASE }
   | "goto" { GOTO }
   | "state" { STATE }
   | "type" { TYPE }
   | "switch" { SWITCH } 
   | "case" { CASE } 
   | "goto" { GOTO }
-  | "fsm"  { FSM }
   | "state" { STATE }
   | "start" { START }
   | "input" { INPUT }
   | "output" { OUTPUT }
   | "sysin" { SYSIN }
-  | "void" {VOID}
+  | cap aln* { ENUM }
+  | low aln* { VARIABLE }
+  | dgt+ { INTLIT }
+(* 
+  | dgt+ as lxm { INTLIT(int_of_string lxm) }
+  | cap axn* as lxm { ENUM(lxm) }
+  | low aln* as lxm { VARIABLE(lxm) }  
+  *)
+  | eof { EOF }
+  | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
+
 and comment = parse
     "~)" { token lexbuf }
   | _    { comment lexbuf }
