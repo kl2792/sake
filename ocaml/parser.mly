@@ -2,34 +2,34 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE
 %token ADD SUB MUL DIV
-%token EQ NEQ LT LE GT GE AND OR NEG NOT MINUS?
+%token EQ NEQ LT LE GT GE AND OR NEG NOT MINUS /*? */
 %token RETURN IF ELSE ELIF FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
 %token CONTINUE BREAK
 %token EOF
 
-(* tokens specific to our language *)
+/*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
 %token CREATE SIM REACH TICK RESET
 
-(* literals *)
+/*literals */
 %token <int> INTLIT
 %token <bool> BOOLIT
 %token <char> CHARLIT
 %token <string> STRINGLIT
-%token <string> ID (* why string? *)
+%token <string> ID /*why string? */
 
 %start expr
-%type < Ast.expr> expr
+%type <Ast.expr> expr
 
 %%
-(*grammar *)
+/* grammar */
 dtype:
-BOOL { Bool($1) }
-| INT { Int($1) }
-| CHAR { Char($1) }
-| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) } ?? (* ast as well *)
-| ID { Enum($1) }  (* Q: Not sure if this is correct *)
+BOOL { Bool }
+| INT { Int }
+| CHAR { Char }
+| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) } /*??  ast as well */
+| ID { Enum($1) }  /*Q: Not sure if this is correct */
 
 lvalue:
 dtype ID { $1, $2 }
@@ -38,8 +38,8 @@ literal:
 INTLIT { IntLit($1) }
 | BOOLIT { BoolLit($1) }
 | CHARLIT { CharLit($1) }
-| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) } (* Q: wouldn't this apply only to integers? *)
-| literal_opt { ArrayLit($1) } (* see list definitions below *)
+| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) } /*Q: wouldn't this apply only to integers? */
+| literal_opt { ArrayLit($1) } /*see list definitions below */
 
 expr:
 literal { Literal($1) }
@@ -60,48 +60,48 @@ literal { Literal($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID LPAREN expr_list RPAREN { call($1, $3) }
-| ID DOT CREATE LPAREN expr_opt RPAREN { Fsm_call($1, Create, $5) } (* Q: When did we define create? What doth this do? *)
+| ID DOT CREATE LPAREN expr_opt RPAREN { Fsm_call($1, Create, $5) } /*Q: When did we define create? What doth this do? */
 | ID DOT SIM LPAREN expr_opt RPAREN { Fsm_call($1, Sim, $5) }
 | ID DOT REACH LPAREN expr_opt RPAREN { Fsm_call($1, Reach, $5) }
 | ID DOT TICK LPAREN expr_opt RPAREN { Fsm_call($1, Tick, $5) }
-| ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } (* Q: there shouldn't be anything in here. Potential for error *)
+| ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
 | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
-| (* nothing *)
+| /*nothing */
 
 stmt:
 LBRACE stmt_list RBRACE { Block(List.rev $2) }
-| IF expr LBRACE stmt RBRACE stmt { If($2, $4, $6) }  (* no else or elif *) (* is this needed? *)
-| IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  (* with else *)
-| IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  (* with elif *)
+| IF expr LBRACE stmt RBRACE stmt { If($2, $4, $6) }  /*no else or elif */ /*is this needed? */
+| IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
+| IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
 | expr { Expr($1) }
-| GOTO ID { Goto ($2) } (* DO SWITCH LATER *)
+| GOTO ID { Goto ($2) } /*DO SWITCH LATER */
 | RETURN expr { Return($2) }
 
 type_decl:
-  TYPE ID ASSIGN string_opt  (* should these be strings? *)
+  TYPE ID ASSIGN string_opt  /*should these be strings? */
   {{
     name = $2
     types = $4
   }}
 
 state_decl:
-  START ID LBRACE stmt_list RBRACE (* Q: confused about the bool part for START *)
+  START ID LBRACE stmt_list RBRACE /*Q: confused about the bool part for START */
   {{
     name = $2
-    start = true (* Q: pretty sure this is wrong :) *)
+    start = true /*Q: pretty sure this is wrong :) */
     body = List.rev $4
   }}
 | ID LBRACE stmt_list RBRACE
   {{
     name = $1
-    start = false (* Q: probably wrong *)
+    start = false /*Q: probably wrong */
     body = List.rev $3
   }}
 
 fsm_decl:
-  FSM ID LBRACE lvalue_opt INPUT lvalue_opt OUTPUT lvalue_opt state_list RBRACE  (* Q:What about statements? *)
+  FSM ID LBRACE lvalue_opt INPUT lvalue_opt OUTPUT lvalue_opt state_list RBRACE  /*Q:What about statements? */
   {{
     name = $2
     locals = $4
@@ -129,7 +129,7 @@ program:
   }}
 
 
-(* list definitions*)
+/*list definitions */
 expr_opt:
   /* nothing */ { [] }
 | expr_list { List.rev $1 }
