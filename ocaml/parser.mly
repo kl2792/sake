@@ -66,7 +66,7 @@ literal { Literal($1) }
 | ID DOT TICK LPAREN expr_opt RPAREN { Fsm_call($1, Tick, $5) }
 | ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
 | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
-| /*nothing */
+| /* nothing */ {Empty}
 
 stmt:
 LBRACE stmt_list RBRACE { Block(List.rev $2) }
@@ -105,9 +105,9 @@ fsm_decl:
   {{
     name = $2
     locals = $4
-    input = $5
-    output = $6
-    body = List.rev $7
+    input = $6
+    output = $8
+    body = List.rev $9
   }}
 
 func_decl:
@@ -131,7 +131,7 @@ program:
 
 /*list definitions */
 expr_opt:
-  /* nothing */ { [] }
+  /* nothing */ { Empty }
 | expr_list { List.rev $1 }
 
 expr_list:
