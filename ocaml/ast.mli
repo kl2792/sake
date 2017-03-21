@@ -23,7 +23,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Cond of expr * expr * expr
   | Empty
 type case =
-  | CaseValue of expr
+  | CaseValue of expr (* Q: should expr be expr list? *)
   | CaseAny
 type stmt =
   | Block of stmt list
@@ -31,7 +31,7 @@ type stmt =
   | For of string * expr * stmt
   | While of expr * stmt
   | Expr of expr
-  | Switch of expr * (case * stmt) list
+  | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
   | Goto of string (* for FSM transitions *)
   | Return of expr (* for functions *)
 type type_decl = {

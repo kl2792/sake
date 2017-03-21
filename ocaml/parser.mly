@@ -2,7 +2,7 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE
 %token ADD SUB MUL DIV
-%token EQ NEQ LT LE GT GE AND OR NEG NOT
+%token EQ NEQ LT LE GT GE AND OR NEG NOT TRUE FALSE
 %token RETURN IF ELSE ELIF FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
 %token CONTINUE BREAK
@@ -20,6 +20,7 @@
 %token <char> CHARLIT
 %token <string> STRINGLIT
 %token <string> ID /*why string? */
+%token <string> TYPENAME
 
 %start expr
 %type <Ast.expr> expr
@@ -65,7 +66,11 @@ literal { Literal($1) }
 | ID DOT TICK LPAREN expr_opt RPAREN { Fsm_call($1, Tick, $5) }
 | ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
 | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
-| /* nothing */ {Empty}
+| /* nothing */ { Empty }
+
+case:
+CASE expr COLON { CaseValue($2) }
+| /* nothing */ { CaseAny }
 
 stmt:
 LBRACE stmt_list RBRACE { Block(List.rev $2) }
@@ -75,6 +80,7 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
 | expr { Expr($1) }
+| SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE { Switch($3, List.rev $6) }
 | GOTO ID { Goto ($2) } /*DO SWITCH LATER */
 | RETURN expr { Return($2) }
 
@@ -149,13 +155,16 @@ stmt_list:
   /* nothing */ { [] }
 | stmt_list stmt { $2 :: $1 }
 
+cstmt_list:
+cstmt_list case stmt {  ($2, $3) :: $1 } /* Q: a little confused how to go about this */
+
 string_opt:
   /* nothing */ { [] }
 | string_list { List.rev $1 }
 
 string_list:
-  STRINGLIT { [$1] }
-| string_list BAR STRINGLIT { $3 :: $1 }
+  TYPENAME { [$1] }
+| string_list BAR TYPENAME { $3 :: $1 }
 
 lvalue_opt:
   /*nothing*/ { [] }
