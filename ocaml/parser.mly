@@ -2,7 +2,7 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE
 %token ADD SUB MUL DIV
-%token EQ NEQ LT LE GT GE AND OR NEG NOT MINUS /*? */
+%token EQ NEQ LT LE GT GE AND OR NEG NOT
 %token RETURN IF ELSE ELIF FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
 %token CONTINUE BREAK
@@ -11,6 +11,8 @@
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
 %token CREATE SIM REACH TICK RESET
+
+/* PUT ASSOCIATIVITY */
 
 /*literals */
 %token <int> INTLIT
@@ -38,18 +40,18 @@ literal:
 INTLIT { IntLit($1) }
 | BOOLIT { BoolLit($1) }
 | CHARLIT { CharLit($1) }
-| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) } /*Q: wouldn't this apply only to integers? */
+| literal COLON literal COLON literal { Range($1, $3, $5) } /*Q: wouldn't this apply only to integers? */
 | literal_opt { ArrayLit($1) } /*see list definitions below */
 
 expr:
 literal { Literal($1) }
 | ID { Variable($1) }
-| MINUS expr %prec NED { Uop(Neg, $2)}
+| NEG expr %prec SUB { Uop(Neg, $2)}
 | NOT expr { Uop(Not, $2)}
-| expr PLUS   expr { Binop($1, Add, $3) }
-| expr MINUS  expr { Binop($1, Sub, $3) }
-| expr TIMES  expr { Binop($1, Mul, $3) }
-| expr DIVIDE expr { Binop($1, Div, $3) }
+| expr ADD expr { Binop($1, Add, $3) }
+| expr SUB expr { Binop($1, Sub, $3) }
+| expr MUL expr { Binop($1, Mul, $3) }
+| expr DIV expr { Binop($1, Div, $3) }
 | expr EQ expr { Binop($1, Eq, $3) }
 | expr NEQ expr { Binop($1, Neq, $3) }
 | expr LT expr { Binop($1, Lt, $3) }
@@ -59,10 +61,7 @@ literal { Literal($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-| ID LPAREN expr_list RPAREN { call($1, $3) }
-| ID DOT CREATE LPAREN expr_opt RPAREN { Fsm_call($1, Create, $5) } /*Q: When did we define create? What doth this do? */
-| ID DOT SIM LPAREN expr_opt RPAREN { Fsm_call($1, Sim, $5) }
-| ID DOT REACH LPAREN expr_opt RPAREN { Fsm_call($1, Reach, $5) }
+| ID LPAREN expr_opt RPAREN { Call($1, $3) }
 | ID DOT TICK LPAREN expr_opt RPAREN { Fsm_call($1, Tick, $5) }
 | ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
 | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
@@ -82,56 +81,56 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 type_decl:
   TYPE ID ASSIGN string_opt  /*should these be strings? */
   {{
-    name = $2
-    types = $4
+    name = $2;
+    types = $4;
   }}
 
 state_decl:
-  START ID LBRACE stmt_list RBRACE /*Q: confused about the bool part for START */
+  START ID LBRACE stmt_list RBRACE
   {{
-    name = $2
-    start = true /*Q: pretty sure this is wrong :) */
-    body = List.rev $4
+    name = $2;
+    start = true;
+    body = List.rev $4;
   }}
 | ID LBRACE stmt_list RBRACE
   {{
-    name = $1
-    start = false /*Q: probably wrong */
-    body = List.rev $3
+    name = $1;
+    start = false;
+    body = List.rev $3;
   }}
 
 fsm_decl:
   FSM ID LBRACE lvalue_opt INPUT lvalue_opt OUTPUT lvalue_opt state_list RBRACE  /*Q:What about statements? */
   {{
-    name = $2
-    locals = $4
-    input = $6
-    output = $8
-    body = List.rev $9
+    name = $2;
+    locals = $4;
+    input = $6;
+    output = $8;
+    body = List.rev $9;
   }}
 
 func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_opt stmt_list RBRACE
   {{
-    return = $1
-    name = $2
-    formals = $4
-    locals = $7
-    body = List.rev $8
+    return = $1;
+    name = $2;
+    formals = $4;
+    locals = $7;
+    body = List.rev $8;
   }}
 
 program:
   type_list fsm_list func_list
   {{
-    types = List.rev $1
-    fsms = List.rev $2
-    funcs = List.rev $3
+    types = List.rev $1;
+    fsms = List.rev $2;
+    funcs = List.rev $3;
   }}
 
 
 /*list definitions */
 expr_opt:
-  /* nothing */ { Empty }
+  /* nothing */ { [] }
 | expr_list { List.rev $1 }
 
 expr_list:
@@ -143,7 +142,7 @@ literal_opt:
 | literal_list { List.rev $1 }
 
 literal_list:
-  literal { $1 }
+  literal { [$1] }
 | literal_list BAR literal { $3 :: $1 }
 
 stmt_list:
@@ -155,7 +154,7 @@ string_opt:
 | string_list { List.rev $1 }
 
 string_list:
-  STRINGLIT { $1 }
+  STRINGLIT { [$1] }
 | string_list BAR STRINGLIT { $3 :: $1 }
 
 lvalue_opt:
