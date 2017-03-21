@@ -18,17 +18,17 @@ rule token = parse
   | '}'      { RBRACE }
   | ';'      { SEMI }
   | ','      { COMMA }
-  | '+'      { PLUS }
-  | '-'      { MINUS }
-  | '*'      { TIMES }
-  | '/'      { DIVIDE }
+  | '+'      { ADD }
+  | '-'      { SUB }
+  | '*'      { MUL }
+  | '/'      { DIV }
   | '='      { ASSIGN }
   | "=="     { EQ }
   | "!="     { NEQ }
   | '<'      { LT }
-  | "<="     { LEQ }
+  | "<="     { LE }
   | ">"      { GT }
-  | ">="     { GEQ }
+  | ">="     { GE }
   | "&&"     { AND }
   | "||"     { OR }
   | "!"      { NOT }
@@ -46,8 +46,8 @@ rule token = parse
   | "type" { TYPE }
   | "goto" { GOTO }
   | "type" { TYPE }
-  | "switch" { SWITCH } 
-  | "case" { CASE } 
+  | "switch" { SWITCH }
+  | "case" { CASE }
   | "goto" { GOTO }
   | "state" { STATE }
   | "start" { START }
@@ -57,10 +57,10 @@ rule token = parse
   | cap aln* { ENUM }
   | low aln* { VARIABLE }
   | dgt+ { INTLIT }
-(* 
+(*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
-  | low aln* as lxm { VARIABLE(lxm) }  
+  | low aln* as lxm { VARIABLE(lxm) }
   *)
   | eof { EOF }
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
