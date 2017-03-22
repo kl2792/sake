@@ -27,7 +27,7 @@ type case =
   | CaseAny
 type stmt =
   | Block of stmt list
-  | If of expr * stmt (* Q: CHANGED THIS *)
+  | If of expr * stmt * stmt
   | For of string * expr * stmt
   | While of expr * stmt
   | Expr of expr
