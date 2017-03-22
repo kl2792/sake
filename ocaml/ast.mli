@@ -9,7 +9,7 @@ type literal = (* literal that is optionally an array; note that strings are arr
   | BoolLit of bool
   | CharLit of char
   | IntLit of int
-  | Range of literal * literal * literal (* only valid for bool, char, int *)
+  | Range of int * int * int (* only valid for bool, char, int *)
   | ArrayLit of literal list
 type fsm_call = Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)

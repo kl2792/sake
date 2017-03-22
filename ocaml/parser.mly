@@ -27,7 +27,6 @@
 
 /*literals */
 %token <int> INTLIT
-%token <bool> BOOLIT
 %token <char> CHARLIT
 %token <string> STRINGLIT
 %token <string> ID /*why string? */
@@ -42,24 +41,25 @@ dtype:
 BOOL { Bool }
 | INT { Int }
 | CHAR { Char }
-| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) } /*??  ast as well */
+| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
 | ID { Enum($1) }  /*Q: Not sure if this is correct */
 
 lvalue:
-dtype ID { $1, $2 }
+ dtype ID { $1, $2 }
 
 literal:
 INTLIT { IntLit($1) }
-| BOOLIT { BoolLit($1) }
+| TRUE { BoolLit(true) }
+| FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
-| literal COLON literal COLON literal { Range($1, $3, $5) } /*Q: wouldn't this apply only to integers? */
-| literal_opt { ArrayLit($1) } /*see list definitions below */
+| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
+/* DON'T NEED FOR HELLO WORLD | literal_opt { ArrayLit($1) } *//*see list definitions below */
 
 expr:
 literal { Literal($1) }
-/*| ID { Variable($1) } */
-| SUB expr %prec NEG { Uop(Neg, $2)}
-| NOT expr { Uop(Not, $2)}
+| ID { Variable($1) }
+| SUB expr %prec NEG { Uop(Neg, $2) }
+| NOT expr { Uop(Not, $2) }
 | expr ADD expr { Binop($1, Add, $3) }
 | expr SUB expr { Binop($1, Sub, $3) }
 | expr MUL expr { Binop($1, Mul, $3) }
@@ -73,10 +73,10 @@ literal { Literal($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-| ID LPAREN expr_opt RPAREN { Call($1, $3) }
-| ID DOT TICK LPAREN expr_opt RPAREN { Fsm_call($1, Tick, $5) }
-| ID DOT RESET LPAREN expr_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
-| expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
+| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
+| ID DOT TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
+| ID DOT RESET LPAREN actuals_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
+/* DON'T NEED FOR HELLO WORLD | expr QUESMARK expr COLON expr { Cond($1, $3, $5) } */
 | /* nothing */ { Empty }
 
 case:
@@ -85,9 +85,9 @@ CASE expr COLON { CaseValue($2) }
 
 stmt:
 LBRACE stmt_list RBRACE { Block(List.rev $2) }
-| IF expr LBRACE stmt RBRACE stmt { If($2, $4, $6) }  /*no else or elif */ /*is this needed? */
+| IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
-| IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
+/* | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) } */ /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
 | expr { Expr($1) }
@@ -95,7 +95,7 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | GOTO ID { Goto ($2) }
 | RETURN expr { Return($2) }
 
-type_decl:
+ type_decl:
   TYPE ID ASSIGN string_opt
   {{
     name = $2;
@@ -126,7 +126,7 @@ fsm_decl:
     body = List.rev $9;
   }}
 
-func_decl:
+ func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_opt stmt_list RBRACE
   {{
     return = $1;
@@ -136,7 +136,7 @@ func_decl:
     body = List.rev $8;
   }}
 
-program:
+ program:
   type_list fsm_list func_list
   {{
     types = List.rev $1;
@@ -147,12 +147,16 @@ program:
 
 /*list definitions */
 expr_opt:
-  /* nothing */ { [] }
-| expr_list { List.rev $1 }
+  /* nothing */ { Empty }
+| expr { $1 }
 
-expr_list:
+actuals_opt:
+  /* nothing */ { [] }
+| actuals_list { List.rev $1 }
+
+actuals_list:
   expr { [$1] }
-| expr_list COMMA expr { $3 :: $1}
+| actuals_list COMMA expr { $3 :: $1}
 
 literal_opt:
   /* nothing */ { [] }
@@ -160,7 +164,7 @@ literal_opt:
 
 literal_list:
   literal { [$1] }
-| literal_list BAR literal { $3 :: $1 }
+| literal_list COMMA literal { $3 :: $1 }
 
 stmt_list:
   /* nothing */ { [] }
