@@ -10,9 +10,20 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
-%token CREATE SIM REACH TICK RESET
+%token TICK RESET
 
-/* PUT ASSOCIATIVITY */
+/* ASSOCIATIVITY */
+%nonassoc NOELSE
+%nonassoc ELSE ELIF
+%left COMMA
+%right ASSIGN
+%left OR
+%left AND
+%left EQ NEQ
+%left LT GT LE GE
+%left ADD SUB
+%left MUL DIV
+%right NOT NEG
 
 /*literals */
 %token <int> INTLIT
@@ -46,8 +57,8 @@ INTLIT { IntLit($1) }
 
 expr:
 literal { Literal($1) }
-| ID { Variable($1) }
-| NEG expr %prec SUB { Uop(Neg, $2)}
+/*| ID { Variable($1) } */
+| SUB expr %prec NEG { Uop(Neg, $2)}
 | NOT expr { Uop(Not, $2)}
 | expr ADD expr { Binop($1, Add, $3) }
 | expr SUB expr { Binop($1, Sub, $3) }
@@ -81,11 +92,11 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
 | expr { Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE { Switch($3, List.rev $6) }
-| GOTO ID { Goto ($2) } /*DO SWITCH LATER */
+| GOTO ID { Goto ($2) }
 | RETURN expr { Return($2) }
 
 type_decl:
-  TYPE ID ASSIGN string_opt  /*should these be strings? */
+  TYPE ID ASSIGN string_opt
   {{
     name = $2;
     types = $4;
