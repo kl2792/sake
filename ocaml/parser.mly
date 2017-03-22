@@ -32,8 +32,8 @@
 %token <string> ID /*why string? */
 %token <string> TYPENAME
 
-%start expr
-%type <Ast.expr> expr
+%start program
+%type <Ast.program> program
 
 %%
 /* grammar */

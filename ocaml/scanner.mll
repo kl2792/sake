@@ -11,11 +11,15 @@ rule token = parse
     spc { token lexbuf }
   | "(~" { comment lexbuf }
   | "~" { line_comment lexbuf }
+  | '.' { DOT }
   | '|' { BAR }
+  | '?' { QUESMARK }
   | '('      { LPAREN }
   | ')'      { RPAREN }
   | '{'      { LBRACE }
   | '}'      { RBRACE }
+  | '['      { LSQUARE }
+  | ']'      { RSQUARE }
   | ';'      { SEMI }
   | ','      { COMMA }
   | '+'      { ADD }
@@ -23,6 +27,7 @@ rule token = parse
   | '*'      { MUL }
   | '/'      { DIV }
   | '='      { ASSIGN }
+  | '"'      { QUOTES }
   | "=="     { EQ }
   | "!="     { NEQ }
   | '<'      { LT }
@@ -35,17 +40,23 @@ rule token = parse
   | "if"     { IF }
   | "else"   { ELSE }
   | "for"    { FOR }
+  | "in"     { IN }
   | "while"  { WHILE }
   | "return" { RETURN }
+  | "continue"   { CONTINUE }
+  | "break"   { BREAK }
   | "int"    { INT }
   | "bool"   { BOOL }
   | "void"   { VOID }
+  | "char"   { CHAR }
+  | "string"   { STRING }
   | "true"   { TRUE }
   | "false"  { FALSE }
   | "fsm" { FSM }
+  | "tick"   { TICK }
+  | "reset"   { RESET }
   | "type" { TYPE }
   | "goto" { GOTO }
-  | "type" { TYPE }
   | "switch" { SWITCH }
   | "case" { CASE }
   | "goto" { GOTO }
