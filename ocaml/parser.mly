@@ -75,9 +75,8 @@ literal { Literal($1) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 | ID DOT TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| ID DOT RESET LPAREN actuals_opt RPAREN { Fsm_call($1, Reset, $5) } /*Q: there shouldn't be anything in here. Potential for error */
-/* DON'T NEED FOR HELLO WORLD | expr QUESMARK expr COLON expr { Cond($1, $3, $5) } */
-| /* nothing */ { Empty }
+| ID DOT RESET LPAREN actuals_opt RPAREN { Fsm_call($1, Reset, $5) }  /*Q: there shouldn't be anything in here. Potential for error */
+//DON'T NEED FOR HELLO WORLD | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
 CASE expr COLON { CaseValue($2) }
