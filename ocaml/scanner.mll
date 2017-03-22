@@ -54,9 +54,9 @@ rule token = parse
   | "input" { INPUT }
   | "output" { OUTPUT }
   | "sysin" { SYSIN }
-  | cap aln* { ENUM }
-  | low aln* { VARIABLE }
-  | dgt+ { INTLIT }
+  | cap aln*  as lxm { TYPENAME (lxm) }
+  | low aln* as lxm { ID (lxm) }
+  | dgt+ as num { INTLIT (int_of_string num) }
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
