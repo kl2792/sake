@@ -14,7 +14,8 @@
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
-%nonassoc ELSE ELIF
+%nonassoc ELSE
+%left RETURN
 %left COMMA
 %right ASSIGN
 %left OR
@@ -27,6 +28,7 @@
 
 /*literals */
 %token <int> INTLIT
+%token <int> RANGELEM
 %token <char> CHARLIT
 %token <string> STRINGLIT
 %token <string> ID /*why string? */
@@ -52,8 +54,8 @@ INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
-| INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
-/* DON'T NEED FOR HELLO WORLD | literal_opt { ArrayLit($1) } *//*see list definitions below */
+// DON'T NEED FOR HELLO WORLD | INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
+// DON'T NEED FOR HELLO WORLD | literal_opt { ArrayLit($1) } /*see list definitions below */
 
 expr:
 literal { Literal($1) }
@@ -76,7 +78,7 @@ literal { Literal($1) }
 | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 | ID DOT TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 | ID DOT RESET LPAREN actuals_opt RPAREN { Fsm_call($1, Reset, $5) }  /*Q: there shouldn't be anything in here. Potential for error */
-//DON'T NEED FOR HELLO WORLD | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
+// Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
 CASE expr COLON { CaseValue($2) }
@@ -86,7 +88,7 @@ stmt:
 LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
-/* | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) } */ /*with elif */
+// Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
 | expr { Expr($1) }
@@ -170,7 +172,8 @@ stmt_list:
 | stmt_list stmt { $2 :: $1 }
 
 cstmt_list:
-cstmt_list case stmt {  ($2, $3) :: $1 } /* Q: a little confused how to go about this */
+/* nothing */ { [] }
+| cstmt_list case stmt {  ($2, $3) :: $1 } /* Q: a little confused how to go about this */
 
 string_opt:
   /* nothing */ { [] }
