@@ -12,7 +12,7 @@ struct name_input { /* input definition */ }
 struct name_output { /* output definition */ }
 
 struct name_state { 
-    enum name_fsmName_state_t _current_fsmName; /* Will hold current state of the fsm */
+    enum name_fsmName_state_t fsmName; /* Will hold current state of the fsm */
     ... /* do this for all fsm in file */
 
     /* ALL LOCAL VARAIBLES THAT EXISTS IN ALL FSM 
