@@ -147,9 +147,9 @@ fsm_decl:
 
 
 /*list definitions */
-expr_opt:
-  /* nothing */ { Empty }
-| expr { $1 }
+//expr_opt:
+//  /* nothing */ { Empty }
+//| expr { $1 }
 
 actuals_opt:
   /* nothing */ { [] }
