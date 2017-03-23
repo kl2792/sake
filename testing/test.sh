@@ -50,9 +50,9 @@ Compare() {
     }                                
 }
 
-# Run functions
+# TODO Run functions -> how we want run it and then report errors 
 
-# Check functions
+# TODO Check functions -> should be calling run() funcs and compare() funcs 
 
 
 # TODO uncomment so it checks for LLVM 
@@ -78,9 +78,6 @@ else
 fi
 
 # TODO CODE TO CALL FUNCTIONS ON FILES 
-
-
-
 
 
 
