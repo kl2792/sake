@@ -56,13 +56,13 @@ Compare() {
 
 
 # TODO uncomment so it checks for LLVM 
-#LLIFail() {  
-#    echo "Could not find the LLVM interpreter \"$LLI\"." 
-#    echo "Check your LLVM installation and/or modify the LLI variable in testall.sh"
-#    exit 1
-#}
+LLIFail() {  
+    echo "Could not find the LLVM interpreter \"$LLI\"." 
+    echo "Check your LLVM installation and/or modify the LLI variable in testall.sh"
+    exit 1
+}
 
-#which "$LLI" >> $globallog || LLIFail
+which "$LLI" >> $globallog || LLIFail
 
 
 # TODO 
