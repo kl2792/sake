@@ -11,7 +11,6 @@ type literal = (* literal that is optionally an array; note that strings are arr
   | IntLit of int
   | Range of int * int * int (* only valid for bool, char, int *)
   | ArrayLit of literal list
-type fsm_call = Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Literal of literal
   | Variable of string
@@ -19,7 +18,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
-  | Fsm_call of string * fsm_call * expr list
+  | Tick of string * expr list
   | Cond of expr * expr * expr
   | Empty
 type case =
