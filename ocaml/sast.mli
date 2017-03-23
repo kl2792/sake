@@ -32,7 +32,7 @@ type stmt =
   | While of expr * stmt
   | Expr of expr
   | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
-  | Goto of (* for FSM transitions *)
+  | Goto of string (* for FSM transitions *)
   | Return of expr (* for functions *)
 type type_decl = {
   name  : string;
@@ -60,5 +60,5 @@ type func_decl = {
 type program = {
   types : type_decl list;
   fsms  : fsm_decl list;
-  funcs : func_decl list;
+(*  funcs : func_decl list; *) (* not necessary for now *)
 }
