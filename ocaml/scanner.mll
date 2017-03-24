@@ -14,6 +14,7 @@ rule token = parse
   | '.' { DOT }
   | '|' { BAR }
   | '?' { QUESMARK }
+  | '\n'     { NLINE }
   | '('      { LPAREN }
   | ')'      { RPAREN }
   | '{'      { LBRACE }

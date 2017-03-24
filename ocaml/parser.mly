@@ -85,7 +85,7 @@ CASE expr COLON { CaseValue($2) }
 | /* nothing */ { CaseAny }
 
 stmt:
-LBRACE stmt_list RBRACE { Block(List.rev $2) }
+LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
 | IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
@@ -93,11 +93,11 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE { Switch($3, List.rev $6) }
-| GOTO ID { Goto ($2) }
-| RETURN expr { Return($2) }
+| GOTO ID NLINE { Goto ($2) }
+| RETURN expr NLINE { Return($2) }
 
  type_decl:
-  TYPE ID ASSIGN string_opt
+  TYPE ID ASSIGN string_opt NLINE
   {{
     name = $2;
     types = $4;
