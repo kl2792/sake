@@ -1,6 +1,6 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE NLINE
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT TRUE FALSE
 %token RETURN IF ELSE ELIF FOR WHILE IN
@@ -91,7 +91,7 @@ LBRACE stmt_list RBRACE { Block(List.rev $2) }
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
-| expr { Expr($1) }
+| expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE { Switch($3, List.rev $6) }
 | GOTO ID { Goto ($2) }
 | RETURN expr { Return($2) }
