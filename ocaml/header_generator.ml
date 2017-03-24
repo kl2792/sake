@@ -74,7 +74,7 @@ let tick_prototype name =
 
 (* the ifdef ... endif guard *)
 let header_guard name macros structs tick =
-  let upper = String.uppercase_ascii name in
+  let upper = name in
   Printf.sprintf "#ifndef __%s_H__\n#define __%s_H__\n\n%s\n%s\n%s\n#endif" 
     upper upper macros structs tick
 
