@@ -1,5 +1,5 @@
 (* Generating the C header file and C++ LLVM code *)
-let name = Sys.argv.(1) in 
+let name = String.lowercase_ascii Sys.argv.(1) in 
   let header_name = name ^ ".h" and llvm_name = name ^ ".cpp" in 
   let in_channel = open_in Sys.argv.(1) in
   let lexbuf = Lexing.from_channel in_channel in 

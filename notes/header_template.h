@@ -5,7 +5,7 @@ enum name_fsmName_state_t { /* STATES in this fsm */ }
 enum name_fsmName2_state_t { /* etc for all fsms in the file */ } 
 ...
 
-enum name_enum_[enum_name]_t { /* enum types user defined in sk file */ } 
+enum name_[enum_name]_enum_t { /* enum types user defined in sk file */ } 
 ...
 
 struct name_input { /* input definition */ }
