@@ -1,7 +1,7 @@
 OBJS = ast.cmx header_generator.cmx llvm_generator.cmx parser.cmx scanner.cmx sake.cmx
 
 sake : $(OBJS)
-	#ocamlc -o sake $(OBJS)
+	# ocamlc -o sake $(OBJS)
 	ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis $(OBJS) -o sake 
 
 scanner.ml : scanner.mll
@@ -15,6 +15,9 @@ parser.ml parser.mli : parser.mly
 
 %.cmi : %.mli
 	ocamlc -c $<
+
+%.cmx : %.ml
+	ocamlfind ocamlopt -c -package llvm $<
 
 hello : #TODO this needs to somehow be linked to ll file 
 	llvm-as hello.ll
