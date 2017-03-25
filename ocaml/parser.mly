@@ -185,7 +185,7 @@ string_list:
 
 lvalue_opt:
   /*nothing*/ { [] }
-| LSQUARE lvalue_list RSQUARE { List.rev $2 }
+| lvalue_list { List.rev $1 }
 
 lvalue_list:
   lvalue { [$1] }
