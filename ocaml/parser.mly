@@ -138,7 +138,7 @@ fsm_decl:
   }}
 
  program:
-  type_list fsm_list func_list
+  type_list fsm_list func_list EOF
   {{
     types = List.rev $1;
     fsms = List.rev $2;
