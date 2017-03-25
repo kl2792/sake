@@ -132,8 +132,24 @@ fsm_decl:
     locals = $4;
     input = [];
     output = $7;
-    body = List.rev $9; 
+    body = List.rev $9;
   }}
+| FSM ID LBRACE lvalue_opt state_list RBRACE  /*Q:What about statements? */
+  {{
+    name = $2;
+    locals = $4;
+    input = [];
+    output = [];
+    body = List.rev $5;
+  }}
+| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_opt RSQUARE state_list RBRACE  /*Q:What about statements? */
+{{
+  name = $2;
+  locals = $4;
+  input = [];
+  output = $7;
+  body = List.rev $9;
+}}
 
 
  func_decl:
@@ -143,7 +159,7 @@ fsm_decl:
     name = $2;
     formals = $4;
     locals = $7;
-    body = List.rev $8;
+    body = List.rev $9;
   }}
 
  program:
@@ -199,6 +215,13 @@ lvalue_opt:
 lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
+
+lvalue_opt_two:
+
+
+lvalue_list_two:
+   lvalue NLINE { [$1] }
+| lvalue_list lvalue
 
 state_list:
 /* nothing */ { [] }
