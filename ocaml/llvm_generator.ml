@@ -42,8 +42,8 @@ let translate (utypes, fsms, functions) =
   (* Fill in the body of the given function *)
   let build_fsm_body fsmdecl =
     let (the_fsm, _) = StringMap.find fsmdecl.A.name fsm_decls in
-    let builder = L.builder_at_end context (L.entry_block the_function) in
-
+    let builder = L.builder_at_end context (L.entry_block the_fsm) in
+  (*****  Include struct for FSM states  *****)
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
     
     (* Construct the function's "locals": formal arguments and locally
@@ -69,7 +69,7 @@ let translate (utypes, fsms, functions) =
     in
 
 
-(*******************************************)
+(********************NOTHING BELOW THIS IS REAL***********************)
 
 
   (* Declare printf(), which the print built-in function will call *)
