@@ -118,20 +118,20 @@ state_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_opt RSQUARE OUTPUT LSQUARE lvalue_opt RSQUARE state_list RBRACE  /*Q:What about statements? */
+  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
   {{
     name = $2;
     locals = $4;
-    input = $7;
-    output = $11;
-    body = List.rev $13;
+    input = List.rev $8;
+    output = List.rev $12;
+    body = List.rev $14;
   }}
-| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_opt RSQUARE state_list RBRACE  /*Q:What about statements? */
+| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
   {{
     name = $2;
     locals = $4;
     input = [];
-    output = $7;
+    output = List.rev $7;
     body = List.rev $9;
   }}
 | FSM ID LBRACE lvalue_opt state_list RBRACE  /*Q:What about statements? */
@@ -142,25 +142,33 @@ fsm_decl:
     output = [];
     body = List.rev $5;
   }}
-| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_opt RSQUARE state_list RBRACE  /*Q:What about statements? */
+| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
 {{
   name = $2;
   locals = $4;
   input = [];
-  output = $7;
+  output = List.rev $7;
   body = List.rev $9;
 }}
 
 
  func_decl:
-  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_opt stmt_list RBRACE
+  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list RBRACE
   {{
     return = $1;
     name = $2;
     formals = $4;
-    locals = $7;
-    body = List.rev $9;
+    locals = List.rev $7;
+    body = List.rev $8;
   }}
+| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list RBRACE
+{{
+  return = $1;
+  name = $2;
+  formals = $4;
+  locals = [];
+  body = List.rev $7;
+}}
 
  program:
   type_list fsm_list func_list EOF
@@ -216,12 +224,9 @@ lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
-lvalue_opt_two:
-
-
-lvalue_list_two:
+lvalue_list2: /* alternative way to list lvalues */
    lvalue NLINE { [$1] }
-| lvalue_list lvalue
+| lvalue_list lvalue { $2 :: $1 }
 
 state_list:
 /* nothing */ { [] }
