@@ -118,14 +118,23 @@ state_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE lvalue_opt INPUT lvalue_opt OUTPUT lvalue_opt state_list RBRACE  /*Q:What about statements? */
+  FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_opt RSQUARE OUTPUT LSQUARE lvalue_opt RSQUARE state_list RBRACE  /*Q:What about statements? */
   {{
     name = $2;
     locals = $4;
-    input = $6;
-    output = $8;
-    body = List.rev $9;
+    input = $7;
+    output = $11;
+    body = List.rev $13;
   }}
+| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_opt RSQUARE state_list RBRACE  /*Q:What about statements? */
+  {{
+    name = $2;
+    locals = $4;
+    input = [];
+    output = $7;
+    body = List.rev $9; 
+  }}
+
 
  func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_opt stmt_list RBRACE
