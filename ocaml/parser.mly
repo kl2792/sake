@@ -85,7 +85,7 @@ CASE expr COLON { CaseValue($2) }
 | /* nothing */ { CaseAny }
 
 stmt:
-LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
+LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
@@ -104,13 +104,13 @@ LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
   }}
 
 state_decl:
-  START ID LBRACE stmt_list RBRACE
+  START ID LBRACE stmt_list2 RBRACE
   {{
     name = $2;
     start = true;
     body = List.rev $4;
   }}
-| ID LBRACE stmt_list RBRACE
+| ID LBRACE stmt_list2 RBRACE
   {{
     name = $1;
     start = false;
@@ -118,13 +118,13 @@ state_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
+  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
   {{
     name = $2;
     locals = $4;
     input = List.rev $8;
-    output = List.rev $12;
-    body = List.rev $14;
+    output = List.rev $13;
+    body = List.rev $15;
   }}
 | FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
   {{
@@ -153,7 +153,7 @@ fsm_decl:
 
 
  func_decl:
-  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list RBRACE
+  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE
   {{
     return = $1;
     name = $2;
@@ -161,7 +161,7 @@ fsm_decl:
     locals = List.rev $7;
     body = List.rev $8;
   }}
-| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list RBRACE
+| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list2 RBRACE
 {{
   return = $1;
   name = $2;
@@ -204,6 +204,10 @@ stmt_list:
   /* nothing */ { [] }
 | stmt_list stmt { $2 :: $1 }
 
+stmt_list2:
+  NLINE { [] }
+| stmt_list2 stmt { $2 :: $1 }
+
 cstmt_list:
 /* nothing */ { [] }
 | cstmt_list case stmt {  ($2, $3) :: $1 } /* Q: a little confused how to go about this */
@@ -217,7 +221,7 @@ string_list:
 | string_list BAR TYPENAME { $3 :: $1 }
 
 lvalue_opt:
-  /*nothing*/ { [] }
+  NLINE { [] }  /* So it's not empty */
 | lvalue_list { List.rev $1 }
 
 lvalue_list:
