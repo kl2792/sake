@@ -1,25 +1,14 @@
 (* Code generation: translate takes a semantically checked AST and
-produces LLVM IR
-
-LLVM tutorial: Make sure to read the OCaml version of the tutorial
-
-http://llvm.org/docs/tutorial/index.html
-
-Detailed documentation on the OCaml LLVM library:
-
-http://llvm.moe/
-http://llvm.moe/ocaml/
-
-*)
+produces LLVM IR *)
 
 module L = Llvm
 module A = Ast
 
 module StringMap = Map.Make(String)
 
-let translate (globals, functions) =
+let translate (utypes, fsms, functions) =
   let context = L.global_context () in
-  let the_module = L.create_module context "MicroC"
+  let the_module = L.create_module context "Sake"
   and i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context
   and i1_t   = L.i1_type   context
@@ -27,15 +16,61 @@ let translate (globals, functions) =
 
   let ltype_of_typ = function
       A.Int -> i32_t
-    | A.Bool -> i1_t
-    | A.Void -> void_t in
+    | A.Char -> i8_t
+    | A.Bool -> i1_t in
+(*    | A.Void -> void_t in *)
 
-  (* Declare each global variable; remember its value in a map *)
-  let global_vars =
-    let global_var m (t, n) =
+  (* Declare each user defined type; remember its value in a map *)
+  (* Not done *)
+  let utypes =
+    let utype m (t, e) =
       let init = L.const_int (ltype_of_typ t) 0
-      in StringMap.add n (L.define_global n init the_module) m in
+      in StringMap.add e (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
+
+  (* Define each fsm so we can use it *)
+  let fsm_decls =
+    let fsm_decl m fsmdecl =
+      let name = fsmdecl.A.name
+      and inputs = 
+  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.input)
+      and outputs = 
+  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.output)
+      in StringMap.add name (L.define_global name init the_module, fsmdecl) m in
+    List.fold_left fsm_decl StringMap.empty fsms in
+  
+  (* Fill in the body of the given function *)
+  let build_fsm_body fsmdecl =
+    let (the_fsm, _) = StringMap.find fsmdecl.A.name fsm_decls in
+    let builder = L.builder_at_end context (L.entry_block the_function) in
+
+    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    
+    (* Construct the function's "locals": formal arguments and locally
+       declared variables.  Allocate each on the stack, initialize their
+       value, if appropriate, and remember their values in the "locals" map *)
+    let local_vars =
+      let add_formal m (t, n) p = L.set_value_name n p;
+  let local = L.build_alloca (ltype_of_typ t) n builder in
+  ignore (L.build_store p local builder);
+  StringMap.add n local m in
+
+      let add_local m (t, n) =
+  let local_var = L.build_alloca (ltype_of_typ t) n builder
+  in StringMap.add n local_var m in
+
+      let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
+          (Array.to_list (L.params the_function)) in
+      List.fold_left add_local formals fdecl.A.locals in
+
+    (* Return the value for a variable or formal argument *)
+    let lookup n = try StringMap.find n local_vars
+                   with Not_found -> StringMap.find n global_vars
+    in
+
+
+(*******************************************)
+
 
   (* Declare printf(), which the print built-in function will call *)
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
