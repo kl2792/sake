@@ -144,6 +144,12 @@ fsm_decl:
     fsms = List.rev $2;
     funcs = List.rev $3;
   }}
+  | EOF
+  {{
+    types = [];
+    fsms = [];
+    funcs = []; 
+  }}
 
 
 /*list definitions */
