@@ -57,7 +57,7 @@ type fsm_decl = {
 type program = {
   input : lvalue list;
   output: lvalue list;
-  locals: expr list;
+  locals: lvalue list;
   types : type_decl list;
   fsms  : fsm_decl list;
   (*funcs : func_decl list;*)
