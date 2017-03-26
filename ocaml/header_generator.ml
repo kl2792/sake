@@ -26,31 +26,44 @@ let enums_of_sast name sast =
       and states = enums_of_fsms name sast.fsms in
     types ^ "\n" ^ states
 
-let string_of_type name = function
+let string_of_types name = function
   | A.Int -> "int"
   | A.Char -> "char"
   | A.Bool -> "int"
   | A.Array -> "DON'T USE THIS"
-  | A.Enum(string) -> Printf.sprintf "enum %s_%s_enum_t" name 
+  | A.Enum(string) -> Printf.sprintf "enum %s_%s_enum_t" name name 
 
 (* generate input struct declarations *)
-let input_struct_of_sast name fsms =  (* your work here, please, emma *)
+  (*
+let input_struct_of_sast name fsms =  
   let input_of_fsm name fsm = 
-    let input_internals = List.map (fun s -> s.input.type ^ " " ^ s.input.name) fsm.input in 
-    let input_internals = String.concat ";\n" input_internals in
-       Printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals
+    let input_internals = list.map (fun s -> s.input.types ^ " " ^ s.input.name) fsm.input in 
+    let input_internals = string.concat ";\n" input_internals in
+       printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals *)
+
+let input_struct_of_sast name fsms =  
+    let input_internals = list.map (fun s -> s.input.types ^ " " ^ s.input.name) fsms.input in 
+    let input_internals = string.concat ";\n" input_internals in
+       printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals
 
 (* generate output struct declations *)
-let output_struct_of_sast name fsms =  (* your work here, please, emma *)
-  let output_of_fsm name fsm = 
-    let output_internals = List.map (fun s -> s.output.type ^ " " ^ s.output.name) fsm.input in 
+       (*
+let output_struct_of_sast name fsms =  
+  let output_of_fsm name fsm =
+    let output_internals = List.map (fun s -> s.output.types ^ " " ^ s.output.name) fsm.output in 
+    let output_internals = String.concat ";\n" output_internals in
+       Printf.sprintf "struct %s_output {\n%s;\n};\n" name output_internals *)
+
+let output_struct_of_sast name fsms =  
+    let output_internals = List.map (fun s -> s.output.types ^ " " ^ s.output.name) fsms.output in 
     let output_internals = String.concat ";\n" output_internals in
        Printf.sprintf "struct %s_output {\n%s;\n};\n" name output_internals
-       
+
+    
 (* generate state struct declarations *)
 let state_struct_of_sast name fsms = 
   let state_of_fsm name fsm =
-    let fsm_local_vars = List.map (fun s -> s.locals.type ^ " " ^ fsm.name ^ "_" ^  s.locals.name) fsm.locals
+    let fsm_local_vars = List.map (fun s -> s.locals.types ^ " " ^ fsm.name ^ "_" ^  s.locals.name) fsm.locals in 
     let fsm_local_vars = String.concat ";\n" fsm_local_vars in
        Printf.sprintf "enum %s_%s_state_t %s;\n %s;\n" name fsm.name fsm.name fsm_local_vars
   in
@@ -60,8 +73,8 @@ let state_struct_of_sast name fsms =
 
 (* generate the struct declarations from fsms in sast *) 
 let structs_of_sast name sast = 
-  let input_struct = input_struct_of_sast name sast.fsms 
-    and output_struct = output_struct_of_sast name sast.fsms
+  let input_struct = input_struct_of_sast name sast 
+    and output_struct = output_struct_of_sast name sast
     and state_struct = state_struct_of_sast name sast.fsms
   in 
     input_struct ^ "\n" ^ output_struct ^ "\n" ^ state_struct
