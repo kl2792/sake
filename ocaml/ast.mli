@@ -60,5 +60,5 @@ type func_decl = {
 type program = {
   types : type_decl list;
   fsms  : fsm_decl list;
-  funcs : func_decl list;
+  (*funcs : func_decl list;*)
 }
