@@ -16,7 +16,7 @@ let translate program = (* translate an A.program to LLVM *)
     | A.Int -> L.const_int i32_t 0
     | A.Char -> L.const_int i8_t 0
     | A.Bool -> L.const_int i1_t 0
-    | A.Array -> (* TODO: something to do with L.array_type : lltype -> int -> lltype *) ()
+    (* | A.Array -> (* TODO: something to do with L.array_type : lltype -> int -> lltype *) () *)
     | A.Enum -> (* TODO: something to do with enums; need to research *)() in 
   let map_init lvalues = (* function for generating StringMaps from lvalue lists*)
     let iter (dtype, name) = StringMap.add name (L.define_global name var_init sake) map in
