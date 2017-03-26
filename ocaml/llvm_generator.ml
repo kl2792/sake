@@ -6,9 +6,6 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
-let primitive_init = L.const_int (ltype_of_typ t) 0
-let struct_init = L.const_struct (ltype_of_typ t) (* replace with generated llvalue array *)[0]
-
 let translate program = (* translate an A.program to LLVM *)
   let context = L.global_context () in
   let sake = L.create_module context "Sake"
@@ -16,29 +13,20 @@ let translate program = (* translate an A.program to LLVM *)
       and i8_t   = L.i8_type   context
       and i1_t   = L.i1_type   context
       and void_t = L.void_type context in
-  let ltype_of_typ = function
-      A.Int -> i32_t
-    | A.Char -> i8_t
-    | A.Bool -> i1_t
+	let var_init = function
+    | A.Int -> L.const_int i32_t 0
+    | A.Char -> L.const_int i8_t 0
+    | A.Bool -> L.const_int i1_t 0
     | A.Array -> (* probably also something to do with L.struct_type : llcontext -> lltype array -> lltype *) ()
     | A.Enum -> (* something to do with L.struct_type : llcontext -> lltype array -> lltype *)() in 
-  let enums = (* each user-defined type *)
-    let enum map (dtype, name) = StringMap.add name (L.define_global name struct_init sake) map
-  in List.fold_left enum StringMap.empty program.types in
-  let inputs = (* global inputs for concurrent FSM collection *)
-		let input map (dtype, name) = StringMap.add name (L.define_global name primitive_init sake) map
-	in List.fold_left
-  let outputs = (* global outputs for concurrent FSM collection *)
-		let output m (dtype, name 
-  let statevariables = (* fsm-write-local state variables *)
-		let fsm m fsmdecl =
-      (*let name = fsmdecl.A.name
-      		and inputs = 
-  					Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.input)
-      		and outputs = 
-  					Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.output)
-			in StringMap.add name (L.define_global name init the_module, fsmdecl) m*)
-		in List.fold_left fsm StringMap.empty program.fsms in
+	let map_init lvalues = (* function for generating StringMaps from lvalue lists*)
+		let iter (dtype, name) = StringMap.add name (L.define_global name var_init sake) map in
+			List.fold_left iter StringMap.empty lvalues
+  let types = map_init program.types in (* user-defined types *)
+  let inputs = map_init program.inputs (* global inputs for concurrent FSM collection *)
+  let outputs = map_init program.outputs (* global outputs for concurrent FSM collection *)
+  let locals = map_init program.locals (* fsm write-local state variables *)
+	
   (* Fill in the body of the given function *)
   let build_fsm_body fsmdecl =
     let (the_fsm, _) = StringMap.find fsmdecl.A.name fsm_decls in
