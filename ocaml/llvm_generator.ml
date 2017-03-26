@@ -6,39 +6,34 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
-let translate (utypes, fsms, functions) =
+let init = L.const_int (ltype_of_typ t) 0
+
+let translate program = (* translate an A.program to LLVM *)
   let context = L.global_context () in
   let the_module = L.create_module context "Sake"
-  and i32_t  = L.i32_type  context
-  and i8_t   = L.i8_type   context
-  and i1_t   = L.i1_type   context
-  and void_t = L.void_type context in
-
+      and i32_t  = L.i32_type  context
+      and i8_t   = L.i8_type   context
+      and i1_t   = L.i1_type   context
+      and void_t = L.void_type context in
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Char -> i8_t
-    | A.Bool -> i1_t in
-(*    | A.Void -> void_t in *)
-
-  (* Declare each user defined type; remember its value in a map *)
-  (* Not done *)
-  let utypes =
-    let utype m (t, e) =
-      let init = L.const_int (ltype_of_typ t) 0
-      in StringMap.add e (L.define_global n init the_module) m in
-    List.fold_left global_var StringMap.empty globals in
-
-  (* Define each fsm so we can use it *)
-  let fsm_decls =
-    let fsm_decl m fsmdecl =
-      let name = fsmdecl.A.name
-      and inputs = 
-  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.input)
-      and outputs = 
-  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.output)
-      in StringMap.add name (L.define_global name init the_module, fsmdecl) m in
-    List.fold_left fsm_decl StringMap.empty fsms in
-  
+    | A.Bool -> i1_t
+    | A.Array -> ()
+    | A.Enum -> i8_t in 
+  let enums = (* each user-defined type *)
+    let enum m (t, e) = StringMap.add n (L.define_global n init the_module) m in
+			StringMap.add e (L.define_global n init the_module) m
+  in List.fold_left utype StringMap.empty program.types in
+  let fsms = (* fsm-write-local state variables *)
+		let fsm m fsmdecl =
+      (*let name = fsmdecl.A.name
+      		and inputs = 
+  					Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.input)
+      		and outputs = 
+  					Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fsmdecl.A.output)
+			in StringMap.add name (L.define_global name init the_module, fsmdecl) m*)
+		in List.fold_left fsm StringMap.empty program.fsms in
   (* Fill in the body of the given function *)
   let build_fsm_body fsmdecl =
     let (the_fsm, _) = StringMap.find fsmdecl.A.name fsm_decls in
