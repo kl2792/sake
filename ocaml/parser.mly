@@ -178,13 +178,13 @@ fsm_decl:
 }} */
 
 program:
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE lvalue_list2 type_list NLINE fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE lvalue_list2 type_list NLINE fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    locals = List.rev $11;
-    types = List.rev $12;
-    fsms = List.rev $14;
+    locals = List.rev $10;
+    types = List.rev $11;
+    fsms = List.rev $13;
   }}
 
 
@@ -238,8 +238,8 @@ lvalue_list:
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 lvalue_list2: /* alternative way to list lvalues, line by line */
-   lvalue NLINE { [$1] }
-| lvalue_list lvalue { $2 :: $1 }
+   NLINE { [] }
+| lvalue_list NLINE lvalue { $3 :: $1 }
 
 state_list:
 /* nothing */ { [] }
