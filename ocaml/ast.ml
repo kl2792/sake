@@ -11,6 +11,7 @@ type literal = (* literal that is optionally an array; note that strings are arr
   | IntLit of int
   | Range of int * int * int (* only valid for bool, char, int *)
   | ArrayLit of literal list
+  | String of char list
 type fsm_call = Tick | Reset
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Literal of literal
@@ -34,7 +35,7 @@ type stmt =
   | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
   | Goto of string (* for FSM transitions *)
   | Return of expr (* for functions *)
-type cstmt = case * stmt 
+type cstmt = case * stmt
 type type_decl = {
   name  : string;
   types : string list;

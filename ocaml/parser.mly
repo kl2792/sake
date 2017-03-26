@@ -55,7 +55,8 @@ INTLIT { IntLit($1) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 // DON'T NEED FOR HELLO WORLD | INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
-// DON'T NEED FOR HELLO WORLD | literal_opt { ArrayLit($1) } /*see list definitions below */
+//| literal_opt { ArrayLit($1) } /*see list definitions below */
+| QUOTES char_opt QUOTES { String(List.rev $2)} // array of characters (string)
 
 expr:
 literal { Literal($1) }
@@ -77,7 +78,6 @@ literal { Literal($1) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| ID UNDER RESET LPAREN actuals_opt RPAREN { Fsm_call($1, Reset, $5) }  /*Q: there shouldn't be anything in here. Potential for error */
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
@@ -192,9 +192,9 @@ program:
 
 
 /*list definitions */
-//expr_opt:
-//  /* nothing */ { Empty }
-//| expr { $1 }
+char_opt:
+  /* nothing */ { [] }
+| char_opt CHARLIT { $2 :: $1 }
 
 actuals_opt:
   /* nothing */ { [] }
