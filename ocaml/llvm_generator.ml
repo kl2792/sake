@@ -13,20 +13,20 @@ let translate program = (* translate an A.program to LLVM *)
       and i8_t   = L.i8_type   context
       and i1_t   = L.i1_type   context
       and void_t = L.void_type context in
-	let var_init = function
+  let var_init = function
     | A.Int -> L.const_int i32_t 0
     | A.Char -> L.const_int i8_t 0
     | A.Bool -> L.const_int i1_t 0
     | A.Array -> (* probably also something to do with L.struct_type : llcontext -> lltype array -> lltype *) ()
     | A.Enum -> (* something to do with L.struct_type : llcontext -> lltype array -> lltype *)() in 
-	let map_init lvalues = (* function for generating StringMaps from lvalue lists*)
-		let iter (dtype, name) = StringMap.add name (L.define_global name var_init sake) map in
-			List.fold_left iter StringMap.empty lvalues
+  let map_init lvalues = (* function for generating StringMaps from lvalue lists*)
+    let iter (dtype, name) = StringMap.add name (L.define_global name var_init sake) map in
+      List.fold_left iter StringMap.empty lvalues
   let types = map_init program.types in (* user-defined types *)
   let inputs = map_init program.inputs (* global inputs for concurrent FSM collection *)
   let outputs = map_init program.outputs (* global outputs for concurrent FSM collection *)
   let locals = map_init program.locals (* fsm write-local state variables *)
-	
+
   (* Fill in the body of the given function *)
   let build_fsm_body fsmdecl =
     let (the_fsm, _) = StringMap.find fsmdecl.A.name fsm_decls in
