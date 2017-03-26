@@ -26,10 +26,28 @@ let translate program = (* translate an A.program to LLVM *)
   let outputs = map_init program.outputs in (* global outputs for concurrent FSM collection *)
   let locals = map_init program.locals in (* fsm write-local state variables *)
   let states =
-    let iter fsm =
-      let fsm = () in (* TODO: fsm gen code *)
+    let iter m fsm =
+    let name = fsm_decl.A.name
+      let fsm = 
+        let states s_map state =
+           in (* TODO: fsm gen code *)
         StringMap.add name fsm map
     in List.fold_left iter StringMap.empty program.fsms
+
+
+
+    and states = Array.of_list(List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
+
+  let function_decls =
+    let function_decl m fdecl =
+      let name = fdecl.A.fname
+      and formal_types =
+  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
+      in let ftype = L.function_type (ltype_of_typ fdecl.A.typ) formal_types in
+      StringMap.add name (L.define_function name ftype the_module, fdecl) m in
+    List.fold_left function_decl StringMap.empty functions in
+
+
   let build_tick program =
     let build_fsm fsm_decl = () (* TODO: builds fsm-updating functions function *)
     in List.[] (* TODO: builds function for calling all the fsm-updating functions,
@@ -68,6 +86,142 @@ let translate program = (* translate an A.program to LLVM *)
     let lookup n = try StringMap.find n local_vars
                    with Not_found -> StringMap.find n global_vars
     in
+
+
+
+
+
+
+  | Call of string * expr list
+  | Fsm_call of string * fsm_call * expr list
+  | Cond of expr * expr * expr
+
+
+
+
+    let rec expr builder = function
+  A.Literal.IntLit i -> L.const_int i32_t i
+      | A.Literal.CharLit c -> L.const_int i8_t c
+      | A.Literal.BoolLit b -> L.const_int i1_t (if b="true" then 1 else 0)
+      | A.Empty -> L.const_int i32_t 0
+      | A.Variable s -> L.build_load (lookup s) s builder
+      | A.Binop (e1, op, e2) ->
+    let e1' = expr builder e1
+    and e2' = expr builder e2 in
+    (match op with
+      A.Add     -> L.build_add
+    | A.Sub     -> L.build_sub
+    | A.Mult    -> L.build_mul
+          | A.Div     -> L.build_sdiv
+    | A.And     -> L.build_and
+    | A.Or      -> L.build_or
+    | A.Equal   -> L.build_icmp L.Icmp.Eq
+    | A.Neq     -> L.build_icmp L.Icmp.Ne
+    | A.Less    -> L.build_icmp L.Icmp.Slt
+    | A.Leq     -> L.build_icmp L.Icmp.Sle
+    | A.Greater -> L.build_icmp L.Icmp.Sgt
+    | A.Geq     -> L.build_icmp L.Icmp.Sge
+    ) e1' e2' "tmp" builder
+      | A.Uop(op, e) ->
+    let e' = expr builder e in
+    (match op with
+      A.Neg     -> L.build_neg
+          | A.Not     -> L.build_not) e' "tmp" builder
+      | A.Assign (s, e) -> let e' = expr builder e in
+                     ignore (L.build_store e' (lookup s) builder); e'
+(*      | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
+    L.build_call printf_func [| int_format_str ; (expr builder e) |]
+      "printf" builder
+      | A.Call ("printbig", [e]) ->
+    L.build_call printbig_func [| (expr builder e) |] "printbig" builder
+      | A.Call (f, act) ->
+         let (fdef, fdecl) = StringMap.find f function_decls in
+   let actuals = List.rev (List.map (expr builder) (List.rev act)) in
+   let result = (match fdecl.A.typ with A.Void -> ""
+                                            | _ -> f ^ "_result") in
+         L.build_call fdef (Array.of_list actuals) result builder
+    in
+
+    (* Invoke "f builder" if the current block doesn't already
+       have a terminal (e.g., a branch). *)
+    let add_terminal builder f =
+      match L.block_terminator (L.insertion_block builder) with
+  Some _ -> ()
+      | None -> ignore (f builder) in *)
+  
+    (* Build the code for the given statement; return the builder for
+       the statement's successor *)
+    let rec stmt builder = function
+  A.Block sl -> List.fold_left stmt builder sl
+      | A.Expr e -> ignore (expr builder e); builder
+      | A.Return e -> ignore (match fdecl.A.typ with
+    A.Void -> L.build_ret_void builder
+  | _ -> L.build_ret (expr builder e) builder); builder
+      | A.If (predicate, then_stmt, else_stmt) ->
+         let bool_val = expr builder predicate in
+   let merge_bb = L.append_block context "merge" the_function in
+
+   let then_bb = L.append_block context "then" the_function in
+   add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+     (L.build_br merge_bb);
+
+   let else_bb = L.append_block context "else" the_function in
+   add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
+     (L.build_br merge_bb);
+
+   ignore (L.build_cond_br bool_val then_bb else_bb builder);
+   L.builder_at_end context merge_bb
+
+
+
+      | A.Switch (expr, list_cases) ->
+
+
+      | A.Goto (dest) ->
+
+
+
+
+      | A.While (predicate, body) ->
+    let pred_bb = L.append_block context "while" the_function in
+    ignore (L.build_br pred_bb builder);
+
+    let body_bb = L.append_block context "while_body" the_function in
+    add_terminal (stmt (L.builder_at_end context body_bb) body)
+      (L.build_br pred_bb);
+
+    let pred_builder = L.builder_at_end context pred_bb in
+    let bool_val = expr pred_builder predicate in
+
+    let merge_bb = L.append_block context "merge" the_function in
+    ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
+    L.builder_at_end context merge_bb
+
+      | A.For (e1, e2, e3, body) -> stmt builder
+      ( A.Block [A.Expr e1 ; A.While (e2, A.Block [body ; A.Expr e3]) ] )
+    in
+
+    (* Build the code for each statement in the function *)
+    let builder = stmt builder (A.Block fdecl.A.body) in
+
+    (* Add a return if the last block falls off the end *)
+    add_terminal builder (match fdecl.A.typ with
+        A.Void -> L.build_ret_void
+      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+  in
+
+  List.iter build_function_body functions;
+  the_module
+
+
+
+
+
+
+
+
+
+
 
 
 (********************NOTHING BELOW THIS IS REAL***********************)
