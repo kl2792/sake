@@ -6,11 +6,12 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
-let init = L.const_int (ltype_of_typ t) 0
+let primitive_init = L.const_int (ltype_of_typ t) 0
+let struct_init = L.const_struct (ltype_of_typ t) (* replace with generated llvalue array *)[0]
 
 let translate program = (* translate an A.program to LLVM *)
   let context = L.global_context () in
-  let the_module = L.create_module context "Sake"
+  let sake = L.create_module context "Sake"
       and i32_t  = L.i32_type  context
       and i8_t   = L.i8_type   context
       and i1_t   = L.i1_type   context
@@ -19,13 +20,17 @@ let translate program = (* translate an A.program to LLVM *)
       A.Int -> i32_t
     | A.Char -> i8_t
     | A.Bool -> i1_t
-    | A.Array -> ()
-    | A.Enum -> i8_t in 
+    | A.Array -> (* probably also something to do with L.struct_type : llcontext -> lltype array -> lltype *) ()
+    | A.Enum -> (* something to do with L.struct_type : llcontext -> lltype array -> lltype *)() in 
   let enums = (* each user-defined type *)
-    let enum m (t, e) = StringMap.add n (L.define_global n init the_module) m in
-			StringMap.add e (L.define_global n init the_module) m
-  in List.fold_left utype StringMap.empty program.types in
-  let fsms = (* fsm-write-local state variables *)
+    let enum map (dtype, name) = StringMap.add name (L.define_global name struct_init sake) map
+  in List.fold_left enum StringMap.empty program.types in
+  let inputs = (* global inputs for concurrent FSM collection *)
+		let input map (dtype, name) = StringMap.add name (L.define_global name primitive_init sake) map
+	in List.fold_left
+  let outputs = (* global outputs for concurrent FSM collection *)
+		let output m (dtype, name 
+  let statevariables = (* fsm-write-local state variables *)
 		let fsm m fsmdecl =
       (*let name = fsmdecl.A.name
       		and inputs = 
