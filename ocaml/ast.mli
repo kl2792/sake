@@ -34,6 +34,7 @@ type stmt =
   | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
   | Goto of string (* for FSM transitions *)
   | Return of expr (* for functions *)
+type cstmt = case * stmt 
 type type_decl = {
   name  : string;
   types : string list;
