@@ -44,20 +44,20 @@ type state_decl = {
   body  : stmt list;
 }
 type fsm_decl = {
-  name   : string;
-  locals : lvalue list;
-  input  : lvalue list;
-  output : lvalue list;
-  body   : state_decl list;
+  name : string;
+  body : state_decl list;
 }
-type func_decl = {
+(*type func_decl = {
   return  : dtype;
   name    : string;
   formals : lvalue list;
   locals  : lvalue list;
   body    : stmt list;
-}
+}*)
 type program = {
+  input : lvalue list;
+  output: lvalue list;
+  locals: lvalue list;
   types : type_decl list;
   fsms  : fsm_decl list;
   (*funcs : func_decl list;*)

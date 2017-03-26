@@ -117,8 +117,8 @@ state_decl:
     body = List.rev $3;
   }}
 
-fsm_decl:
-  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
+/* fsm_decl:
+  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
   {{
     name = $2;
     locals = $4;
@@ -126,7 +126,7 @@ fsm_decl:
     output = List.rev $13;
     body = List.rev $15;
   }}
-| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
+| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
   {{
     name = $2;
     locals = $4;
@@ -134,7 +134,7 @@ fsm_decl:
     output = List.rev $7;
     body = List.rev $9;
   }}
-| FSM ID LBRACE lvalue_opt state_list RBRACE  /*Q:What about statements? */
+| FSM ID LBRACE lvalue_opt state_list RBRACE
   {{
     name = $2;
     locals = $4;
@@ -142,17 +142,24 @@ fsm_decl:
     output = [];
     body = List.rev $5;
   }}
-| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_list RSQUARE state_list RBRACE  /*Q:What about statements? */
+| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
 {{
   name = $2;
   locals = $4;
   input = [];
   output = List.rev $7;
   body = List.rev $9;
+}} */
+
+fsm_decl:
+  FSM ID LBRACE NLINE state_list RBRACE
+{{
+  name = $2;
+  body = List.rev $5;
 }}
 
 
- func_decl:
+ /* func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE
   {{
     return = $1;
@@ -168,14 +175,16 @@ fsm_decl:
   formals = $4;
   locals = [];
   body = List.rev $7;
-}}
+}} */
 
- program:
-  type_list fsm_list func_list EOF
+program:
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE lvalue_list2 type_list NLINE fsm_list EOF
   {{
-    types = List.rev $1;
-    fsms = List.rev $2;
-    funcs = List.rev $3;
+    input = List.rev $3;
+    output = List.rev $8;
+    locals = List.rev $10;
+    types = List.rev $11;
+    fsms = List.rev $13;
   }}
 
 
@@ -228,9 +237,9 @@ lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
-lvalue_list2: /* alternative way to list lvalues */
-   lvalue NLINE { [$1] }
-| lvalue_list lvalue { $2 :: $1 }
+lvalue_list2: /* alternative way to list lvalues, line by line */
+   NLINE { [] }
+| lvalue_list NLINE lvalue { $3 :: $1 }
 
 state_list:
 /* nothing */ { [] }
@@ -244,6 +253,6 @@ fsm_list:
 /* nothing */ { [] }
 | fsm_list fsm_decl { $2 :: $1}
 
-func_list:
-/* nothing */ { [] }
-| func_list func_decl { $2 :: $1}
+//func_list:
+///* nothing */ { [] }
+//| func_list func_decl { $2 :: $1}
