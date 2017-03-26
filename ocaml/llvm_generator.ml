@@ -30,6 +30,10 @@ let translate program = (* translate an A.program to LLVM *)
       let fsm = () in (* TODO: fsm gen code *)
         StringMap.add name fsm map
     in List.fold_left iter StringMap.empty program.fsms
+  let build_tick program =
+    let build_fsm fsm_decl = () (* TODO: builds fsm-updating functions function *)
+    in List.[] (* TODO: builds function for calling all the fsm-updating functions,
+                  uses alloca to allocate save-space for next state *)
   
   
   
