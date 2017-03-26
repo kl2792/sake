@@ -1,10 +1,9 @@
-(* Code generation: translate takes a semantically checked AST and
-produces LLVM IR *)
-
 module L = Llvm
 module A = Ast
 
 module StringMap = Map.Make(String)
+
+(* Note: () means "We have to write code here" *)
 
 let translate program = (* translate an A.program to LLVM *)
   let context = L.global_context () in
@@ -17,8 +16,8 @@ let translate program = (* translate an A.program to LLVM *)
     | A.Int -> L.const_int i32_t 0
     | A.Char -> L.const_int i8_t 0
     | A.Bool -> L.const_int i1_t 0
-    | A.Array -> (* TODO: probably also something to do with L.struct_type : llcontext -> lltype array -> lltype *) ()
-    | A.Enum -> (* TODO: something to do with L.struct_type : llcontext -> lltype array -> lltype *)() in 
+    | A.Array -> (* TODO: something to do with L.array_type : lltype -> int -> lltype *) ()
+    | A.Enum -> (* TODO: something to do with enums; need to research *)() in 
   let map_init lvalues = (* function for generating StringMaps from lvalue lists*)
     let iter (dtype, name) = StringMap.add name (L.define_global name var_init sake) map in
       List.fold_left iter StringMap.empty lvalues
@@ -26,11 +25,12 @@ let translate program = (* translate an A.program to LLVM *)
   let inputs = map_init program.inputs in (* global inputs for concurrent FSM collection *)
   let outputs = map_init program.outputs in (* global outputs for concurrent FSM collection *)
   let locals = map_init program.locals in (* fsm write-local state variables *)
-  let fsms fsm_decls =
+  let states =
     let iter fsm =
       let fsm = () in (* TODO: fsm gen code *)
         StringMap.add name fsm map
-    in List.fold_left iter StringMap.empty fsm_decls
+    in List.fold_left iter StringMap.empty program.fsms
+  
   
   
   
