@@ -12,6 +12,7 @@ rule token = parse
   | "(~" { comment lexbuf }
   | "~" { line_comment lexbuf }
   | '.' { DOT }
+  | '_' { UNDER }
   | '|' { BAR }
   | '?' { QUESMARK }
   | '\n'     { NLINE }
