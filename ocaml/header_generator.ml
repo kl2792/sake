@@ -1,22 +1,26 @@
 module A = Ast
 
 (* generate enum declaration with newlines for all types *)
+
 let enums_of_types name types = 
 	let enum_of_type name dtype = 
-		let values = List.map String.uppercase_ascii dtype.A.type_values in
-		let values = String.concat ", " values in
-			Printf.sprintf "enum %s_%s_enum_t {%s};\n" name dtype.A.type_name values
-	in let enums = List.map (enum_of_type name) types in String.concat "" enums 
+		let values = List.map (fun s -> "#define " ^ name ^ "_" ^ dtype.A.type_name ^ "_" ^ s) dtype.A.type_values in
+                let values = String.concat ";\n" values in
+		Printf.sprintf "%s;\n" values
+	in 
+        let enums = List.map (enum_of_type name) types in 
+        String.concat "" enums 
 
 (* generate string of enum declaration for all fsms' state variables *)
 let enums_of_fsms name fsms =
 	let enum_of_fsm name fsm = 
-		let string_of_state s = String.uppercase_ascii s.A.state_name in
+		let string_of_state s = "#define " ^ name ^ "_" ^ fsm.A.fsm_name  ^ "_" ^ s.A.state_name in
 		let states = List.map string_of_state fsm.A.fsm_body in
-		let states = String.concat ", " states in
-			Printf.sprintf "enum %s_%s_state_t {%s};\n" name fsm.A.fsm_name states
-		in
-	let enums = List.map (enum_of_fsm name) fsms in String.concat "" enums
+                let states = String.concat ";\n " states in
+		Printf.sprintf "%s;\n" states
+	in
+	let enums = List.map (enum_of_fsm name) fsms in 
+        String.concat "" enums
 
 (* generate enum declarations from named SAST *)
 let enums_of_sast name sast =
