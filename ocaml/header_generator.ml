@@ -25,7 +25,7 @@ let enums_of_sast name sast =
 		types ^ "\n" ^ states
 
 let string_of_type name = function
-	|	A.Int -> "int"
+        | A.Int -> "int"
 	| A.Char -> "char"
 	| A.Bool -> "int"
 	| A.Array(array_name, length) -> "DON'T USE THIS" (* TODO: implement array *)
@@ -35,14 +35,13 @@ let string_of_type name = function
 
 (* generate input struct declarations *)
 let input_struct_of_sast name fsms =  
-	(*let input_internals = List.map (fun s -> s.input.ty ^ " " ^ s.input.name) fsms.input in *)
-	let input_internals = List.map (fun s -> (*(string_of_ty s.A.output) ^*) " " ^ s.A.input.A.name) fsms.A.input in 
+	let input_internals = List.map (fun s -> (string_of_type name (fst s)) ^ " " ^ (snd s)) fsms.A.input in 
 	let input_internals = String.concat ";\n" input_internals in
-	printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals
+	Printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals
 
 (* generate output struct declations *)
 let output_struct_of_sast name fsms =  
-	let output_internals = List.map (fun s -> (*s.output.ty ^*) " " ^ s.A.output.A.name) fsms.A.output in 
+	let output_internals = List.map (fun s -> (string_of_type name (fst s)) ^ " " ^ (snd s)) fsms.A.output in 
 	let output_internals = String.concat ";\n" output_internals in
 	Printf.sprintf "struct %s_output {\n%s;\n};\n" name output_internals
 
@@ -50,19 +49,19 @@ let output_struct_of_sast name fsms =
 (* generate state struct declarations *)
 let state_struct_of_sast name fsms = 
 	let state_of_fsm name fsm =
-		let fsm_local_vars = List.map (fun s -> (*s.locals.types ^*) " " ^ fsm.A.name ^ "_" ^  s.A.locals.A.name) fsm.A.locals in 
-		let fsm_local_vars = String.concat ";\n" fsm_local_vars in
-		Printf.sprintf "enum %s_%s_state_t %s;\n %s;\n" name fsm.A.name fsm.A.name fsm_local_vars
-		in
-	let state_internals = List.map (state_of_fsm name) fsms in
-	let state_internals = String.concat "" state_internals in
-	Printf.sprintf "struct %s_name {\n%s};\n" name state_internals 
+            Printf.sprintf "int %s;\n" fsm.A.fsm_name 
+	in
+	    let state_internals = List.map (state_of_fsm name) fsms.A.fsms in
+	    let state_internals = String.concat "" state_internals in
+            let fsm_local_vars = List.map (fun s -> (*s.locals.types ^*) " " ^  (snd s)) fsms.A.locals in 
+            let fsm_local_vars = String.concat ";\n" fsm_local_vars in
+	        Printf.sprintf "struct %s_name {\n%s\n%s};\n" name state_internals fsm_local_vars
 
 (* generate the struct declarations from fsms in sast *) 
 let structs_of_sast name sast = 
 	let input_struct = input_struct_of_sast name sast 
 		and output_struct = output_struct_of_sast name sast
-		and state_struct = state_struct_of_sast name sast.fsms
+		and state_struct = state_struct_of_sast name sast
 	in 
 		input_struct ^ "\n" ^ output_struct ^ "\n" ^ state_struct
 
