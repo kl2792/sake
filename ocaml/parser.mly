@@ -81,7 +81,7 @@ literal { Literal($1) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
-CASE expr COLON{ CaseValue($2) }
+CASE expr { CaseValue($2) }
 | /* nothing */ { CaseAny }
 
 stmt:
@@ -97,7 +97,7 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | RETURN expr NLINE { Return($2) }
 
 cstmt:
-  case stmt {$1, $2}
+  case COLON stmt {$1, $3}
 
  type_decl:
   TYPE ID ASSIGN string_opt NLINE
