@@ -34,20 +34,19 @@ type stmt =
   | Expr of expr
   | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
   | Goto of string (* for FSM transitions *)
-  | Return of expr (* for functions *)
-type cstmt = case * stmt
+(*  | Return of expr (* for functions, but we're not doing functions *) *)
 type type_decl = {
-  name  : string;
-  types : string list;
+  type_name  : string;
+  type_values : string list;
 }
 type state_decl = {
-  name  : string;
-  start : bool;
-  body  : stmt list;
+  state_name  : string;
+  state_start : bool;
+  state_body  : stmt list;
 }
 type fsm_decl = {
-  name : string;
-  body : state_decl list;
+  fsm_name : string;
+  fsm_body : state_decl list;
 }
 (*type func_decl = {
   return  : dtype;
