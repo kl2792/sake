@@ -20,11 +20,6 @@ Comments:
  ~/
 ```
 
-## To be implemented
-
-- Switch statements
-- FSMs with no input
-
 # About Us
 
 Role             | Member
