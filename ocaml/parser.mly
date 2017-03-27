@@ -103,8 +103,8 @@ cstmt:
   }}
 
 state_decl:
-/*Bug: */
-  START ID LBRACE stmt_list2 RBRACE
+/*Bug: extra NLINE could cause problems*/
+  START ID LBRACE stmt_list2 NLINE RBRACE
   {{
     state_name = $2;
     state_start = true;
