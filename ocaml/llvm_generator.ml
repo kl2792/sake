@@ -16,6 +16,7 @@ let translate program = (* translate an A.program to LLVM *)
     and void_t = L.void_type context in
   let init = function (* initialize primitive *)
   | A.Int -> L.const_int i32_t 0
+  | A.Enum -> L.const_int i32_t 0
   | A.Char -> L.const_int i8_t 0
   | A.Bool -> L.const_int i1_t 0
   | _ -> raise (Error "init is for primitives, dude") in
@@ -26,15 +27,16 @@ let translate program = (* translate an A.program to LLVM *)
   let map init types = (* function for generating StringMaps from lists *)
     let iter (dtype, name) = StringMap.add name (L.define_global name init sake) map in
       List.fold_left iter StringMap.empty lvalues in
-  let types = map enum_init program.types in (* user-defined types *)
   let inputs = map init program.inputs in (* global inputs for concurrent FSM collection *)
   let outputs = map init program.outputs in (* global outputs for concurrent FSM collection *)
   let locals = map init program.locals in (* fsm write-local state variables *)
+  let types = map init program.types in (* user-defined types *)
   let states =
     let iter map fsm =
       let state =  in (* TODO: state gen code *)
         StringMap.add fsm.fsm_name name fsm map in
     List.fold_left iter StringMap.empty program.fsms in
+  let lookup_enum enum name = (* TODO: lookup enums' value's integral representations *) in
   let lookup name = try StringMap.find name with Not_found -> StringMap.find name in
   let build_fsm fsm_decl = (* TODO: builds fsm-updating functions function *)
       let fsm = L.entry_block in
