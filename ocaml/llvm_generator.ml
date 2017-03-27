@@ -42,12 +42,12 @@ let translate program = (* translate an A.program to LLVM *)
       | A.IntLit i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.CharLit c -> L.const_int i8_t c
-      (* DON'T NEED FOR HELLO WORLD
-      | A.Range
-      | A.ArrayLit
-      | A.StringLit
-      | A.Fsm_call
-      *)
+      (* DON'T NEED FOR HELLO WORLD *)
+      | A.Range -> ()
+      | A.ArrayLit -> ()
+      | A.StringLit -> ()
+      | A.Fsm_call -> ()
+      
       | A.Empty -> L.const_int i32_t 0
       | A.Variable s -> L.build_load (lookup s) s builder
       | A.Uop (uop, e) ->
