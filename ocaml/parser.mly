@@ -49,17 +49,14 @@ BOOL { Bool }
 lvalue:
  dtype ID { $1, $2 }
 
-literal:
+expr:
 INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 // DON'T NEED FOR HELLO WORLD | INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
-//| literal_opt { ArrayLit($1) } /*see list definitions below */
+//| { ArrayLit($1) } /*see list definitions below */
 | QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
-
-expr:
-literal { Literal($1) }
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
@@ -76,7 +73,6 @@ literal { Literal($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
@@ -203,14 +199,6 @@ actuals_opt:
 actuals_list:
   expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1}
-
-literal_opt:
-  /* nothing */ { [] }
-| literal_list { List.rev $1 }
-
-literal_list:
-  literal { [$1] }
-| literal_list COMMA literal { $3 :: $1 }
 
 stmt_list:
   /* nothing */ { [] }
