@@ -82,8 +82,8 @@ CASE expr { CaseValue($2) }
 
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
-| IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
+| IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([])) }  /*no else or elif */ /*is this needed? */
+| IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE stmt { If($3, $6, $9) }  /*with else */
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
 | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
