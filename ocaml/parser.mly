@@ -83,7 +83,7 @@ CASE expr { CaseValue($2) }
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE ELSE stmt { If($3, $7, $10) }  /*with else */
+| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
 | WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
@@ -104,7 +104,7 @@ cstmt:
 
 state_decl:
 /*Bug: extra NLINE could cause problems*/
-  START ID LBRACE stmt_list2 NLINE RBRACE
+  START ID LBRACE stmt_list2 RBRACE  //testing
   {{
     state_name = $2;
     state_start = true;
