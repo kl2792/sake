@@ -31,17 +31,53 @@ let translate program = (* translate an A.program to LLVM *)
   let outputs = map init program.outputs in (* global outputs for concurrent FSM collection *)
   let locals = map init program.locals in (* fsm write-local state variables *)
   let states =
-    let iter map fsm = 
+    let iter map fsm =
       let state =  in (* TODO: state gen code *)
         StringMap.add fsm.fsm_name name fsm map in
     List.fold_left iter StringMap.empty program.fsms in
   let lookup name = try StringMap.find name with Not_found -> StringMap.find name in
   let build_fsm fsm_decl = (* TODO: builds fsm-updating functions function *)
-      let fsm = L.entry_block in 
+      let fsm = L.entry_block in
       let rec expr builder = function
+      | A.IntLit i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-      | A.Noexpr -> L.const_int i32_t 0
-      | _ -> (* TODO: remainder of expression builder *)() in
+      | A.CharLit c -> L.const_int i8_t c
+      (* DON'T NEED FOR HELLO WORLD *)
+      | A.Range -> ()
+      | A.ArrayLit -> ()
+      | A.StringLit -> ()
+      | A.Fsm_call -> ()
+      
+      | A.Empty -> L.const_int i32_t 0
+      | A.Variable s -> L.build_load (lookup s) s builder
+      | A.Uop (uop, e) ->
+        let e' = expr builder e in
+        (match uop with
+          A.Neg -> L.build_neg
+        | A.Not -> L.build_not
+        ) e' "tmp" builder
+      | A.Binop (e1, op, e2) ->
+        let e1' = expr builder e1 and
+        let e2' = expr builder e2 in
+        (match op with
+          A.Add -> L.build_add
+        | A.Sub -> L.build_sub
+        | A.Mult -> L.build_mul
+        | A.Div -> L.build_sdiv
+        | A.Eq -> L.build_icmp L.Icmp.Eq
+        | A.Neq -> L.build_icmp L.Icmp.Ne
+        | A.Lt -> L.build_icmp L.Icmp.Slt
+        | A.Le -> L.build_icmp L.Icmp.Sle
+        | A.Gt -> L.build_icmp L.Icmp.Sgt
+        | A.Ge -> L.build_icmp L.Icmp.Sge
+        | A.And -> L.build_and
+        | A.Or -> L.build_or
+        ) e1' e2' "tmp" builder
+      | A.Assign (s, e) ->
+        let e' = expr builder e in
+        ignore (L.build_store e' (lookup s) builder); e'
+      in
+
       let rec stmt builder = function
       | A.Block body -> List.fold_left stmt builder body
       | A.Expr e -> let _ = expr builder e in builder
