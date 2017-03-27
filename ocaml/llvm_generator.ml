@@ -24,19 +24,26 @@ let translate program = (* translate an A.program to LLVM *)
    * (* TODO: something to do with L.array_type : lltype -> int -> lltype *)
    *)
   (* let enum_init types = (* TODO: enums have to do with integers *)() (* *) in *)
-  let map init types = (* function for generating StringMaps from lists *)
-    let iter (dtype, name) = StringMap.add name (L.define_global name init sake) map in
-      List.fold_left iter StringMap.empty lvalues in
-  let inputs = map init program.inputs in (* global inputs for concurrent FSM collection *)
-  let outputs = map init program.outputs in (* global outputs for concurrent FSM collection *)
-  let locals = map init program.locals in (* fsm write-local state variables *)
-  let types = map init program.types in (* user-defined types *)
+  let map init lvalues = (* function for generating StringMaps from lists *)
+    let iter map (dtype, name) = StringMap.add name (L.define_global name (init dtype) sake) map in
+    List.fold_left iter StringMap.empty lvalues in
+  let inputs = map (init dtype) program.A.inputs in (* global inputs for concurrent FSM collection *)
+  let outputs = map (init dtype) program.A.outputs in (* global outputs for concurrent FSM collection *)
+  let locals = map (init dtype) program.A.locals in (* fsm write-local state variables *)
+  let types = map (init dtype) program.A.types in (* user-defined types *)
   let states =
-    let iter map fsm =
-      let state =  in (* TODO: state gen code *)
-        StringMap.add fsm.fsm_name name fsm map in
-    List.fold_left iter StringMap.empty program.fsms in
-  let lookup_enum enum name = (* TODO: lookup enums' value's integral representations *) in
+    let iter map fsm =(* TODO: state gen code *)
+      let init fsm = (**)
+        let rec iter_state map count = function
+        | [] -> map
+        | state::tl -> StringMap.add state.A.state_name (L.const_int i32_t count) map; f map count+1 tl in
+      List.fold_left iter_state StringMap.empty 0 fsm.A.fsm_body in
+    StringMap.add fsm.A.fsm_name (L.define_global fsm.A.fsm_name (init fsm) sake) map in
+  List.fold_left iter StringMap.empty program.A.fsms in
+  let lookup_enum enum name = 
+      let name_map = StringMap.find states enum in
+    StringMap.find name name_map
+  (* TODO: lookup enums' value's integral representations *) in
   let lookup name = try StringMap.find name with Not_found -> StringMap.find name in
   let build_fsm fsm_decl = (* TODO: builds fsm-updating functions function *)
       let fsm = L.entry_block in
