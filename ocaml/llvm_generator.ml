@@ -36,14 +36,14 @@ let translate program = (* translate an A.program to LLVM *)
 
 
 
-    and states = Array.of_list(List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
+    and states = Array.of_list(List.map (fun (t,_) -> var_init t) fdecl.A.formals)
 
   let function_decls =
     let function_decl m fdecl =
       let name = fdecl.A.fname
       and formal_types =
-  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
-      in let ftype = L.function_type (ltype_of_typ fdecl.A.typ) formal_types in
+  Array.of_list (List.map (fun (t,_) -> var_init t) fdecl.A.formals)
+      in let ftype = L.function_type (var_init fdecl.A.typ) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
 
@@ -207,7 +207,7 @@ let translate program = (* translate an A.program to LLVM *)
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.A.typ with
         A.Void -> L.build_ret_void
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+      | t -> L.build_ret (var_init t))
   in
 
   List.iter build_function_body functions;
