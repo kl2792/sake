@@ -1,15 +1,14 @@
 module A = Ast
 
-
 (* generate enum declaration with newlines for all types *)
-let enums_of_types name types =
+let enums_of_types name types = 
   let enum_of_type name typ = 
     let values = List.map (fun s -> s.A.name) typ.A.types in
     let values = String.concat ", " values in
       Printf.sprintf "enum %s_%s_enum_t {%s};\n" name typ.name types
   in
-  let enums = List.map enum_of_type name types in
-    String.concat "" enums
+  let enums = List.map (enum_of_type name) types in
+    String.concat "" enums 
 
 (* generate string of enum declaration for all fsms' state variables *)
 let enums_of_fsms name fsms =
@@ -35,14 +34,6 @@ let string_of_ty name = function
   | A.Enum(string) -> Printf.sprintf "enum %s_%s_enum_t" name name 
 
 (* generate input struct declarations *)
-  (*
-let input_struct_of_sast name fsms =  
-  let input_of_fsm name fsm = 
-    let input_internals = list.map (fun s -> s.input.types ^ " " ^ s.input.name) fsm.input in 
-    let input_internals = string.concat ";\n" input_internals in
-       printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals *)
-
-  
 let input_struct_of_sast name fsms =  
     (*let input_internals = List.map (fun s -> s.input.ty ^ " " ^ s.input.name) fsms.input in *)
     let input_internals = List.map (fun s -> (*(string_of_ty s.A.output) ^*) " " ^ s.A.input.A.name) fsms.A.input in 
@@ -50,13 +41,6 @@ let input_struct_of_sast name fsms =
        printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals
 
 (* generate output struct declations *)
-       (*
-let output_struct_of_sast name fsms =  
-  let output_of_fsm name fsm =
-    let output_internals = List.map (fun s -> s.output.types ^ " " ^ s.output.name) fsm.output in 
-    let output_internals = String.concat ";\n" output_internals in
-       Printf.sprintf "struct %s_output {\n%s;\n};\n" name output_internals *)
-
 let output_struct_of_sast name fsms =  
     let output_internals = List.map (fun s -> (*s.output.ty ^*) " " ^ s.A.output.A.name) fsms.A.output in 
     let output_internals = String.concat ";\n" output_internals in
