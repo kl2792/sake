@@ -1,9 +1,9 @@
 input = [int i]
-output = [string o]
+output = [int o]
 
 fsm f1{
 	start s0{
-		o = "zero"
+		o = 0
 		if (i==0){
 			goto s0
 		}
@@ -13,7 +13,7 @@ fsm f1{
 	}
 
 	s1{
-		o = "one"
+		o = 1
 		if (i==0){
 			goto s1
 		}
@@ -23,7 +23,7 @@ fsm f1{
 	}
 
 	s2{
-		o = "two"
+		o = 2
 		if (i==0){
 			goto s2
 		}
@@ -33,7 +33,7 @@ fsm f1{
 	}
 
 	s3{
-		o = "three"
+		o = 3
 		if (i==0){
 			goto s3
 		}
@@ -43,7 +43,7 @@ fsm f1{
 	}
 
 	s4{
-		o = "four"
+		o = 4
 		if (i==0){
 			goto s4
 		}
@@ -53,7 +53,7 @@ fsm f1{
 	}
 
 	s5{
-		o = "five"
+		o = 5
 		if (i==0){
 			goto s5
 		}
@@ -63,7 +63,7 @@ fsm f1{
 	}
 
 	s6{
-		o = "six"
+		o = 6
 		if (i==0){
 			goto s6
 		}
@@ -73,7 +73,7 @@ fsm f1{
 	}
 
 	s7{
-		o = "seven"
+		o = 7
 		if (i==0){
 			goto s7
 		}
