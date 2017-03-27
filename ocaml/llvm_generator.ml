@@ -17,7 +17,7 @@ let translate program = (* translate an A.program to LLVM *)
     | A.Char -> L.const_int i8_t 0
     | A.Bool -> L.const_int i1_t 0
     (* | A.Array -> (* TODO: something to do with L.array_type : lltype -> int -> lltype *) () *)
-    | A.Enum -> (* TODO: something to do with enums; need to research *)() in 
+    | A.Enum -> (* TODO: something to do with enums; need to research *)() in
   let map_init lvalues = (* function for generating StringMaps from lvalue lists*)
     let iter (dtype, name) = StringMap.add name (L.define_global name var_init sake) map in
       List.fold_left iter StringMap.empty lvalues
@@ -28,7 +28,7 @@ let translate program = (* translate an A.program to LLVM *)
   let states =
     let iter m fsm =
     let name = fsm_decl.A.name
-      let fsm = 
+      let fsm =
         let states s_map state =
            in (* TODO: fsm gen code *)
         StringMap.add name fsm map
@@ -52,19 +52,19 @@ let translate program = (* translate an A.program to LLVM *)
     let build_fsm fsm_decl = () (* TODO: builds fsm-updating functions function *)
     in List.[] (* TODO: builds function for calling all the fsm-updating functions,
                   uses alloca to allocate save-space for next state *)
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
   (* Fill in the body of the given function *)
   let build_fsm_body fsmdecl =
     let (the_fsm, _) = StringMap.find fsmdecl.A.name fsm_decls in
     let builder = L.builder_at_end context (L.entry_block the_fsm) in
   (*****  Include struct for FSM states  *****)
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    
+
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
@@ -149,7 +149,7 @@ let translate program = (* translate an A.program to LLVM *)
       match L.block_terminator (L.insertion_block builder) with
   Some _ -> ()
       | None -> ignore (f builder) in *)
-  
+
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
     let rec stmt builder = function
@@ -175,7 +175,19 @@ let translate program = (* translate an A.program to LLVM *)
 
 
 
-      | A.Switch (expr, list_cases) ->
+      | A.Switch (predicate, list_cases) -> (* not done yet *)
+
+      let switch_val = expr builder predicate
+      in
+      let switch = L.build_switch switch_val elsebb (List.length list_cases) builder;;
+
+      let helper case_num = function
+	     let stmt_bb = (L.append_block context "case_num" the_function)
+	     in
+	     add_terminal (stmt (L.builder_at_end context ) stmt_num) (L.build_br
+	     in
+	     L.add_case switch case_num stmt_bb
+      in  List.iter helper list_cases
 
 
       | A.Goto (dest) ->
@@ -245,14 +257,14 @@ let translate program = (* translate an A.program to LLVM *)
       in let ftype = L.function_type (ltype_of_typ fdecl.A.typ) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
-  
+
   (* Fill in the body of the given function *)
   let build_function_body fdecl =
     let (the_function, _) = StringMap.find fdecl.A.fname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    
+
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
@@ -324,7 +336,7 @@ let translate program = (* translate an A.program to LLVM *)
       match L.block_terminator (L.insertion_block builder) with
   Some _ -> ()
       | None -> ignore (f builder) in
-  
+
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
     let rec stmt builder = function
