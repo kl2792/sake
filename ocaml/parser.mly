@@ -30,7 +30,7 @@
 %token <int> INTLIT
 %token <int> RANGELEM
 %token <char> CHARLIT
-%token <string> STRINGLIT
+/* %token <string> STRINGLIT */
 %token <string> ID /*why string? */
 %token <string> TYPENAME
 
@@ -56,7 +56,7 @@ INTLIT { IntLit($1) }
 | CHARLIT { CharLit($1) }
 // DON'T NEED FOR HELLO WORLD | INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
 //| literal_opt { ArrayLit($1) } /*see list definitions below */
-| QUOTES char_opt QUOTES { String(List.rev $2)} // array of characters (string)
+| QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
 
 expr:
 literal { Literal($1) }
