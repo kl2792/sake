@@ -31,6 +31,29 @@ let translate program = (* translate an A.program to LLVM *)
   let outputs = map (init dtype) program.A.outputs in (* global outputs for concurrent FSM collection *)
   let locals = map (init dtype) program.A.locals in (* fsm write-local state variables *)
   let types = map (init dtype) program.A.types in (* user-defined types *)
+
+(* 
+
+  To Kai-Zhan:
+
+    Not 100% about what you intended, but this is what my code does:
+
+    states: Contains a StringMap of FSMs, which in turn points to StringMaps with
+    keys: states, values: numbers
+
+    lookup_enum: Loks into StringMap states for fsm called "enum" and gets a value
+    which is the StringMap of "enum"s states. Then, it looks into that StringMap for
+    state "name" and returns the number of that state from the map.
+
+    If you need to make any changes, feel free and inform me when I am back. I should
+    be back by 9/9:30 at the latest. If you are in doubt about the code or anything,
+    we can wait. Also, look through all the code before it. I made the slight changes
+    we spoke about, but it would help to have you review it once as well.
+
+  - Arunavha
+
+*)
+
   let states =
     let iter map fsm =(* TODO: state gen code *)
       let init fsm = (**)
