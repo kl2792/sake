@@ -12,7 +12,8 @@ enum name_[enum_name]_enum_t { /* enum types user defined in sk file */ }
 #define name_fsmName_stateName2 1
 ...
 
-
+#define name_typeName_typeValue 0
+...
 
 
 struct name_input { /* input definition */ 
