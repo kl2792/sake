@@ -94,7 +94,7 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
 | GOTO ID NLINE { Goto ($2) }
-| RETURN expr NLINE { Return($2) }
+// NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
 
 cstmt:
   case COLON stmt {$1, $3}
@@ -102,22 +102,22 @@ cstmt:
  type_decl:
   TYPE ID ASSIGN string_opt NLINE
   {{
-    name = $2;
-    types = $4;
+      type_name = $2;
+      type_values = $4;
   }}
 
 state_decl:
   START ID LBRACE stmt_list2 RBRACE
   {{
-    name = $2;
-    start = true;
-    body = List.rev $4;
+    state_name = $2;
+    state_start = true;
+    state_body = List.rev $4;
   }}
 | ID LBRACE stmt_list2 RBRACE
   {{
-    name = $1;
-    start = false;
-    body = List.rev $3;
+    state_name = $1;
+    state_start = false;
+    state_body = List.rev $3;
   }}
 
 /* fsm_decl:
@@ -157,8 +157,8 @@ state_decl:
 fsm_decl:
   FSM ID LBRACE NLINE state_list RBRACE
 {{
-  name = $2;
-  body = List.rev $5;
+  fsm_name = $2;
+  fsm_body = List.rev $5;
 }}
 
 
