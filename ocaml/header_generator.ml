@@ -3,9 +3,9 @@ module A = Ast
 (* generate enum declaration with newlines for all types *)
 let enums_of_types name types = 
   let enum_of_type name typ = 
-    let values = List.map (fun s -> s.name) typ.types in
+    let values = List.map (fun s -> s.A.name) typ.A.types in
     let values = String.concat ", " values in
-      Printf.sprintf "enum %s_%s_enum_t {%s};\n" name typ.name values
+      Printf.sprintf "enum %s_%s_enum_t {%s};\n" name typ.A.name values
   in
   let enums = List.map (enum_of_type name) types in
     String.concat "" enums 
@@ -13,9 +13,9 @@ let enums_of_types name types =
 (* generate string of enum declaration for all fsms' state variables *)
 let enums_of_fsms name fsms =
   let enum_of_fsm name fsm = 
-    let states = List.map (fun s -> s.body.name) fsm.body in
+    let states = List.map (fun s -> s.A.body.A.name) fsm.A.body in
     let states = String.concat ", " states in
-      Printf.sprintf "enum %s_%s_state_t {%s};\n" name fsm.name states
+      Printf.sprintf "enum %s_%s_state_t {%s};\n" name fsm.A.name states
   in
   let enums = List.map (enum_of_fsm name) fsms in
     String.concat "" enums
