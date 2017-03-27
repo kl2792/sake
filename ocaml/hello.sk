@@ -1,5 +1,5 @@
-input = [int i]
-output = [int o]
+input [int i]
+output [int o]
 
 fsm f1{
 	start s0{
