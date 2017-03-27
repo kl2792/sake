@@ -103,6 +103,7 @@ cstmt:
   }}
 
 state_decl:
+/*Bug: */
   START ID LBRACE stmt_list2 RBRACE
   {{
     state_name = $2;
@@ -116,47 +117,12 @@ state_decl:
     state_body = List.rev $3;
   }}
 
-/* fsm_decl:
-  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
-  {{
-    name = $2;
-    locals = $4;
-    input = List.rev $8;
-    output = List.rev $13;
-    body = List.rev $15;
-  }}
-| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
-  {{
-    name = $2;
-    locals = $4;
-    input = [];
-    output = List.rev $7;
-    body = List.rev $9;
-  }}
-| FSM ID LBRACE lvalue_opt state_list RBRACE
-  {{
-    name = $2;
-    locals = $4;
-    input = [];
-    output = [];
-    body = List.rev $5;
-  }}
-| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
-{{
-  name = $2;
-  locals = $4;
-  input = [];
-  output = List.rev $7;
-  body = List.rev $9;
-}} */
-
 fsm_decl:
-  FSM ID LBRACE NLINE state_list RBRACE
+  FSM ID LBRACE NLINE state_list NLINE RBRACE
 {{
   fsm_name = $2;
   fsm_body = List.rev $5;
 }}
-
 
  /* func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE
@@ -177,6 +143,7 @@ fsm_decl:
 }} */
 
 program:
+/* Bug: if no type_list need NLINE NLINE */
   INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE lvalue_list2 type_list NLINE fsm_list EOF
   {{
     input = List.rev $3;
