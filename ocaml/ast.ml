@@ -12,7 +12,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | IntLit of int
   | RangeLit of int * int * int (* only valid for bool, char, int *)
   | ArrayLit of expr array
-  | StringLit of char array
+  | StringLit of char list
   | Variable of string
   | Uop of uop * expr
   | Binop of expr * op * expr
