@@ -26,14 +26,11 @@ parser.ml parser.mli : parser.mly
 	ocamlfind ocamlopt -c -package llvm $<
 
 printbig : printbig.c
-	cc -o printbig -DBUILD_TEST printbig.c
-
 
 #./sake hello.sk -> hello.ll
 #llc hello.ll -> hello.s
 
 printbig : printbig.c
-	cc -o printbig -DBUILD_TEST printbig.c
 
 .PHONY : hello
 hello:
