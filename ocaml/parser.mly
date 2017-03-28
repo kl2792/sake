@@ -129,7 +129,7 @@ fsm_decl:
   FSM ID LBRACE stmt_list2 RBRACE
 {{
   fsm_name = $2;
-  fsm_body = List.rev $5;
+  fsm_body = List.rev $4;
 }}
 
  /* func_decl:
