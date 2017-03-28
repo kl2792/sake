@@ -18,7 +18,7 @@ int main(){
         exit(1);
     }
 
-    struct name_output current_output = malloc(sizeof(struct name_output));
+    struct name_output *current_output = malloc(sizeof(struct name_output));
     if (current_output == NULL) {
         perror("malloc returned null");
         free(hello_fsm);
