@@ -32,7 +32,7 @@ let translate filename program = (* translate an A.program to LLVM *)
       | A.Fsm_call -> ()
 *)
       | A.Empty -> L.const_int i32_t 0
-(*)      | A.Variable s ->  L.build_load (lookup s) s builder *)
+(*      | A.Variable s ->  L.build_load (lookup s) s builder *)
       | A.Uop (uop, e) ->
         let e' = expr builder e in
           (match uop with
@@ -45,7 +45,7 @@ let translate filename program = (* translate an A.program to LLVM *)
           (match op with
           A.Add -> L.build_add
       | A.Sub -> L.build_sub
-        | A.Mult -> L.build_mul
+        | A.Mul -> L.build_mul
         | A.Div -> L.build_sdiv
         | A.Eq -> L.build_icmp L.Icmp.Eq
         | A.Neq -> L.build_icmp L.Icmp.Ne
