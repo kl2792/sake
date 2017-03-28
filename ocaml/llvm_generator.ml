@@ -17,7 +17,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let print_t =
     L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let print_func =
-    L.declare_function "printf" printf_t sake in
+    L.declare_function "printf" print_t sake in
   let add_terminal builder f = 
     match L.block_terminator (L.insertion_block builder) with
     Some _ -> () | None -> ignore (f builder) in
