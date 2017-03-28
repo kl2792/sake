@@ -20,10 +20,10 @@ let macros_of_fsms name fsms =
        macros_of_fsm (macro ^ result) (i + 1) fsms in
     macros_of_fsm "" 0 fsms
 
-(* generate macro definitions from named SAST *)
-let macros_of_sast name sast =
-  let types = macros_of_types name sast.A.types in
-  let states = macros_of_fsms name sast.A.fsms in
+(* generate macro definitions from named AST *)
+let macros_of_ast name ast =
+  let types = macros_of_types name ast.A.types in
+  let states = macros_of_fsms name ast.A.fsms in
     types ^ "\n" ^ states
 
 let string_of_type = function
@@ -34,20 +34,20 @@ let string_of_type = function
   | A.Enum(type_name) -> "int"
 
 (* generate input struct declarations *)
-let input_struct_of_sast name fsms =  
+let input_struct_of_ast name fsms =  
   let input_internals = List.map (fun s -> (string_of_type (fst s)) ^ " " ^ (snd s)) fsms.A.input in 
   let input_internals = String.concat ";\n" input_internals in
     Printf.sprintf "struct %s_input {\n%s;\n};\n" name input_internals
 
 (* generate output struct declations *)
-let output_struct_of_sast name fsms =  
+let output_struct_of_ast name fsms =  
   let output_internals = List.map (fun s -> (string_of_type (fst s)) ^ " " ^ (snd s)) fsms.A.output in 
   let output_internals = String.concat ";\n" output_internals in
     Printf.sprintf "struct %s_output {\n%s;\n};\n" name output_internals
 
 
 (* generate state struct declarations *)
-let state_struct_of_sast name fsms = 	
+let state_struct_of_ast name fsms = 	
   let state_of_fsm name fsm = 
       Printf.sprintf "int %s;\n" fsm.A.fsm_name 
   in 
@@ -57,11 +57,11 @@ let state_struct_of_sast name fsms =
   let fsm_local_vars = String.concat ";\n" fsm_local_vars in
     Printf.sprintf "struct %s_name {\n%s\n%s};\n" name state_internals fsm_local_vars
 
-(* generate the struct declarations from fsms in sast *) 
-let structs_of_sast name sast = 
-  let input_struct = input_struct_of_sast name sast 
-  and output_struct = output_struct_of_sast name sast
-  and state_struct = state_struct_of_sast name sast
+(* generate the struct declarations from fsms in ast *) 
+let structs_of_ast name ast = 
+  let input_struct = input_struct_of_ast name ast 
+  and output_struct = output_struct_of_ast name ast
+  and state_struct = state_struct_of_ast name ast
   in 
   input_struct ^ "\n" ^ output_struct ^ "\n" ^ state_struct
 
@@ -78,9 +78,9 @@ let header_guard name macros structs tick =
   Printf.sprintf "#ifndef __%s_H__\n#define __%s_H__\n\n%s\n%s\n%s\n#endif" 
     upper upper macros structs tick
 
-			(* convert named SAST to header file *)
-let string_of_sast name sast =
-  let macros = macros_of_sast name sast
-  and structs = structs_of_sast name sast 	
+			(* convert named AST to header file *)
+let string_of_ast name ast =
+  let macros = macros_of_ast name ast
+  and structs = structs_of_ast name ast 	
   and tick = tick_prototype name in
     header_guard name macros structs tick
