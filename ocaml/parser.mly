@@ -124,7 +124,7 @@ fsm_decl:
 }}
 
  /* func_decl:
-  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE
+  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE NLINE
   {{
     return = $1;
     name = $2;
@@ -132,7 +132,7 @@ fsm_decl:
     locals = List.rev $7;
     body = List.rev $8;
   }}
-| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list2 RBRACE
+| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list2 RBRACE NLINE
 {{
   return = $1;
   name = $2;
