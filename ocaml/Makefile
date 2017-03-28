@@ -2,7 +2,7 @@ OBJS = parser.cmx scanner.cmx header_generator.cmx llvm_generator.cmx sake.cmx
 
 sake : $(OBJS)
 	#ocamlc -o sake $(OBJS)
-	ocamlfind ocamlopt -linkpkg llvm -package llvm.analysis $(OBJS) -o sake 
+	ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis $(OBJS) -o sake 
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
