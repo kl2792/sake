@@ -16,7 +16,7 @@ let translate program = (* translate an A.program to LLVM *)
     and void_t = L.void_type context in
   let init = function (* initialize primitive *)
     | A.Int -> L.const_int i32_t 0
-  | A.Enum -> L.const_int i32_t 0
+  | A.Enum(type_name) -> L.const_int i32_t 0
   | A.Char -> L.const_int i8_t 0
   | A.Bool -> L.const_int i1_t 0
   | _ -> raise (Error "init is for primitives, dude") in (* let array_init length = () *)
