@@ -8,16 +8,24 @@ enum name_fsmName2_state_t { /* etc for all fsms in the file */ }
 enum name_[enum_name]_enum_t { /* enum types user defined in sk file */ } 
 ...
 
+#define name_fsmName_stateName1 0
+#define name_fsmName_stateName2 1
+#define name_fsmName2_stateName 0 
+
+#define name_typeName_typeValue 0
+...
+
+
 struct name_input { /* input definition */ 
-        inputType fsmName_variableName;
+        inputType variableName;
         ...
 }
 struct name_output { /* output definition */ 
-        outputType fsmName_variableName;
+        outputType variableName;
 }
 
 struct name_state { 
-    enum name_fsmName_state_t fsmName; /* Will hold current state of the fsm */
+    int fsmName; /* Will hold current state of the fsm */
     ... /* do this for all fsm in file */
 
     /* ALL LOCAL VARAIBLES THAT EXISTS IN ALL FSM 
