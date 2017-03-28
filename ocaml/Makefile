@@ -1,12 +1,12 @@
-all : sake.native hello printbig.o
+#all : sake.native hello printbig.o
 
-sake.native : 
-	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
+#sake.native :
+	#ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
 
 OBJS = ast.cmx llvm_generator.cmx parser.cmx scanner.cmx sake.cmx
 
 sake : $(OBJS)
-	ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis $(OBJS) -o sake 
+	ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis $(OBJS) -o sake
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
@@ -33,7 +33,7 @@ printbig : printbig.c
 .PHONY : hello
 hello:
 	./sake hello.sk
-	lli hello.ll 
+	lli hello.ll
 
 .PHONY : clean
 clean :
