@@ -21,7 +21,20 @@ let translate filename program = (* translate an A.program to LLVM *)
   let add_terminal builder f = 
     match L.block_terminator (L.insertion_block builder) with
     Some _ -> () | None -> ignore (f builder) in
-  let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+  let tick =
+    let ftype = L.function_type void_t [| |] in
+    L.define_function "tick" ftype sake in
+  let main =
+    let ftype = L.function_type i32_t [| |] in
+    L.define_function "main" ftype sake in
+  let tick_build = L.builder_at_end sake (L.entry_block tick) in
+  let tick_builder = stmt tick_build (A.Block (fst programs.A.fsms)) in
+  let tick_terminal = add_terminal tick_build L.build_ret_void in (* return void in tick *)
+  let main_build = L.builder_at_end sake (L.entry_block main) in
+  let main_tick_call = L.build_call tick [| |] "tick" main_build in
+  let main_terminal = add_terminal main_build (L.build_ret (L.const_int i32_t 0)) in
+
+  let int_format_str = L.build_global_stringptr "%d\n" "fmt" tick_builder in
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
@@ -102,19 +115,6 @@ let translate filename program = (* translate an A.program to LLVM *)
 
       | A.For (name, iter, body) -> ()
       | A.Goto state -> (* TODO: terminate state execution *)() in 
-  let tick =
-    let ftype = L.function_type void_t [| |] in
-    L.define_function "tick" ftype sake in
-  let main =
-    let ftype = L.function_type i32_t [| |] in
-    L.define_function "main" ftype sake in
-  let tick_build = L.builder_at_end sake (L.entry_block tick) in
-  let tick_builder = stmt tick_build (A.Block (fst programs.A.fsms)) in 
-  let tick_terminal = add_terminal tick_build L.build_ret_void in (* return void in tick *)
-  let main_build = L.builder_at_end sake (L.entry_block main) in
-  let main_tick_call = L.build_call tick [| |] "tick" main_build in
-  let main_terminal = add_terminal main_build (L.build_ret (L.const_int i32_t 0)) in
-
   (* let allocation = ()
     (* TODO: allocation block *) in
   let build_fsm = (* TODO: fsm_execution block *)() in
