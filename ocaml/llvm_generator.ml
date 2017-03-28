@@ -90,14 +90,49 @@ let translate program = (* translate an A.program to LLVM *)
       let rec stmt builder = function
       | A.Block body -> List.fold_left stmt builder body
       | A.Expr e -> let _ = expr builder e in builder
-      | A.If (cond, body, else_body) -> () (* build in order:
+      | A.If (predicate, then_stmt, else_stmt) ->    (* build in order:
                                             * - merge (the end of the statement)
                                             * - then (br merge)
                                             * - else (br merge)
                                             * - predicate (cond br: then/else)
                                             *)
+
+        let bool_val = expr builder predicate in
+        let merge_bb = L.append_block context "merge" the_function in
+        (*need to change the_function*)
+
+        let then_bb = L.append_block context "then" the_function in
+        add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+        (L.build_br merge_bb);
+        (*need to change the_function*)
+
+        let else_bb = L.append_block context "else" the_function in
+        add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
+        (L.build_br merge_bb);
+        (*need to change the_function*)
+
+        ignore (L.build_cond_br bool_val then_bb else_bb builder);
+        L.builder_at_end context merge_bb
+
+      | A.While (predicate, body) ->
+        let pred_bb = L.append_block context "while" the_function in
+        ignore (L.build_br pred_bb builder);
+        (*need to change the_function*)
+
+        let body_bb = L.append_block context "while_body" the_function in
+        add_terminal (stmt (L.builder_at_end context body_bb) body)
+        (L.build_br pred_bb);
+        (*need to change the_function*)
+
+        let pred_builder = L.builder_at_end context pred_bb in
+        let bool_val = expr pred_builder predicate in
+
+        let merge_bb = L.append_block context "merge" the_function in
+        ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
+        L.builder_at_end context merge_bb
+        (*need to change the_function*)
+
       | A.For (name, iter, body) -> ()
-      | A.While (cond, body) -> ()
       | A.Goto state -> () (* TODO: terminate state execution *)
       (* TODO: builds function for calling all the fsm-updating functions,
                uses alloca to allocate save-space for next state *)
