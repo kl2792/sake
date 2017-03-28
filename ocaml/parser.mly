@@ -126,7 +126,7 @@ state_decl:
 
 // how the mighty have fallen
 fsm_decl:
-  FSM ID LBRACE NLINE stmt_list2 RBRACE
+  FSM ID LBRACE stmt_list2 RBRACE
 {{
   fsm_name = $2;
   fsm_body = List.rev $5;
