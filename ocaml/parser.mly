@@ -82,11 +82,11 @@ CASE expr { CaseValue($2) }
 
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
-| IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
+| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
+| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
-| FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
-| WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
+| FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
+| WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
 | GOTO ID NLINE { Goto ($2) }
@@ -98,8 +98,8 @@ cstmt:
  type_decl:
   TYPE ID ASSIGN string_opt NLINE
   {{
-      type_name = $2;
-      type_values = $4;
+    type_name = $2;
+    type_values = $4;
   }}
 
 state_decl:
@@ -116,47 +116,12 @@ state_decl:
     state_body = List.rev $3;
   }}
 
-/* fsm_decl:
-  FSM ID LBRACE lvalue_opt NLINE INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
-  {{
-    name = $2;
-    locals = $4;
-    input = List.rev $8;
-    output = List.rev $13;
-    body = List.rev $15;
-  }}
-| FSM ID LBRACE lvalue_opt OUTPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
-  {{
-    name = $2;
-    locals = $4;
-    input = [];
-    output = List.rev $7;
-    body = List.rev $9;
-  }}
-| FSM ID LBRACE lvalue_opt state_list RBRACE
-  {{
-    name = $2;
-    locals = $4;
-    input = [];
-    output = [];
-    body = List.rev $5;
-  }}
-| FSM ID LBRACE lvalue_opt INPUT LSQUARE lvalue_list RSQUARE state_list RBRACE
-{{
-  name = $2;
-  locals = $4;
-  input = [];
-  output = List.rev $7;
-  body = List.rev $9;
-}} */
-
 fsm_decl:
-  FSM ID LBRACE NLINE state_list RBRACE
+  FSM ID LBRACE state_list NLINE RBRACE
 {{
   fsm_name = $2;
-  fsm_body = List.rev $5;
+  fsm_body = List.rev $4;
 }}
-
 
  /* func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE
@@ -177,6 +142,7 @@ fsm_decl:
 }} */
 
 program:
+/* Bug: if no type_list need NLINE NLINE */
   INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE lvalue_list2 type_list NLINE fsm_list EOF
   {{
     input = List.rev $3;
@@ -234,7 +200,7 @@ lvalue_list2: /* alternative way to list lvalues, line by line */
 
 state_list:
 /* nothing */ { [] }
-| state_list state_decl { $2 :: $1}
+| state_list NLINE state_decl { $3 :: $1}
 
 type_list:
 /* nothing */ { [] }
