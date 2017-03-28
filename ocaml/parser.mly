@@ -161,7 +161,7 @@ program:
     fsms = List.rev $13;
   }}
 /* MAXIMUM JANKNESS */
-| fsm_list EOF
+| fsm_list NLINE EOF
 {{
   input = [];
   output = [];
