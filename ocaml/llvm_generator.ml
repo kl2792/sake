@@ -56,13 +56,13 @@ let translate program = (* translate an A.program to LLVM *)
 
   let states =
     let iter map fsm =(* TODO: state gen code *)
-      let init fsm = (**)
+      let init_fsm fsm = (**)
         let rec iter_state map count = function
-        | [] -> map
-        | state::tl -> StringMap.add state.A.state_name (L.const_int i32_t count) map; f map count+1 tl in
-      List.fold_left iter_state StringMap.empty 0 fsm.A.fsm_body in
-    StringMap.add fsm.A.fsm_name (L.define_global fsm.A.fsm_name (init fsm) sake) map in
-  List.fold_left iter StringMap.empty program.A.fsms in
+          | [] -> map
+          | state::tl -> StringMap.add state.A.state_name (L.const_int i32_t count) map; f map count+1 tl in
+        List.fold_left iter_state StringMap.empty 0 fsm.A.fsm_body in
+      StringMap.add fsm.A.fsm_name (L.define_global fsm.A.fsm_name (init_fsm fsm) sake) map in
+    List.fold_left iter StringMap.empty program.A.fsms in
   let lookup_enum enum name = 
       let name_map = StringMap.find states enum in
     StringMap.find name name_map
