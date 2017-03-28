@@ -200,7 +200,7 @@ lvalue_list2: /* alternative way to list lvalues, line by line */
 
 state_list:
 /* nothing */ { [] }
-| state_list NLINE state_decl { $2 :: $1}
+| state_list NLINE state_decl { $3 :: $1}
 
 type_list:
 /* nothing */ { [] }
