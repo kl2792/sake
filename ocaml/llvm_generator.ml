@@ -63,7 +63,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let rec stmt builder = function
     A.Block body -> List.fold_left stmt builder body
         | A.Expr e -> let _ = expr builder e in builder
-      | A.If (predicate, then_stmt, else_stmt) -> () (*
+(*      | A.If (predicate, then_stmt, else_stmt) -> () 
           let bool_val = expr builder predicate in
           let merge_bb = L.append_block context "merge" the_function in
           (*need to change the_function*)
@@ -80,8 +80,8 @@ let translate filename program = (* translate an A.program to LLVM *)
 
         ignore (L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context merge_bb
-*)
-      | A.While (predicate, body) -> () (*
+
+      | A.While (predicate, body) -> () 
           let pred_bb = L.append_block context "while" the_function in
           ignore (L.build_br pred_bb builder);
         (*need to change the_function*)
@@ -98,9 +98,9 @@ let translate filename program = (* translate an A.program to LLVM *)
         ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
         L.builder_at_end context merge_bb
         (*need to change the_function*)
-*)
+
       | A.For (name, iter, body) -> ()
-      | A.Goto state -> (* TODO: terminate state execution *)() in 
+      | A.Goto state -> (* TODO: terminate state execution *)() *) in 
   let tick =
     let ftype = L.function_type void_t [| |] in
     L.define_function "tick" ftype sake in
