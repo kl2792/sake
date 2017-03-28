@@ -1,7 +1,7 @@
-#all : sake.native
+all : sake.native hello
 
-#sake.native : 
-#	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
+sake.native : 
+	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
 
 OBJS = ast.cmx llvm_generator.cmx parser.cmx scanner.cmx sake.cmx
 
@@ -26,6 +26,7 @@ parser.ml parser.mli : parser.mly
 #./sake hello.sk -> hello.ll
 #llc hello.ll -> hello.s
 
+.PHONY : hello
 hello:
 	lli hello.ll 
 
