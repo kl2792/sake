@@ -7,7 +7,7 @@ exception Error of string
 
 (* Note: () means "We have to write code here" *)
 
-let translate program = (* translate an A.program to LLVM *)
+let translate filename program = (* translate an A.program to LLVM *)
   let context = L.global_context () in
   let sake = L.create_module context "Sake"
     and i32_t  = L.i32_type  context
@@ -15,7 +15,7 @@ let translate program = (* translate an A.program to LLVM *)
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
   let init = function (* initialize primitive *)
-    | A.Int -> L.const_int i32_t 0
+    A.Int -> L.const_int i32_t 0
   | A.Enum(type_name) -> L.const_int i32_t 0
   | A.Char -> L.const_int i8_t 0
   | A.Bool -> L.const_int i1_t 0
@@ -24,33 +24,27 @@ let translate program = (* translate an A.program to LLVM *)
     let iter map (dtype, name) =
       StringMap.add name (L.define_global name (init dtype) sake) map in
     List.fold_left iter StringMap.empty lvalues in
-  let inputs = map init program.A.input in (* global inputs for concurrent FSM collection *)
-  let outputs = map init program.A.output in (* global outputs for concurrent FSM collection *)
+  let inputs = map init program.A.inputs in (* global inputs for concurrent FSM collection *)
+  let outputs = map init program.A.outputs in (* global outputs for concurrent FSM collection *)
   let locals = map init program.A.locals in (* fsm write-local state variables *)
-  (*let types = map init program.A.types in (* user-defined types *)*)
+  let types = map init program.A.types in (* user-defined types *)
   let states =
-    let iter map fsm =(* TODO: state gen code *)
-      let init_fsm fsm = (**)
-        let rec iter_state map count = function
-          | [] -> map
-          | state::tl -> ignore(StringMap.add state.A.state_name (L.const_int i32_t count) map);
-              iter_state map (count + 1) tl in
-        iter_state StringMap.empty 0 fsm.A.fsm_body in
-      StringMap.add fsm.A.fsm_name (L.define_global fsm.A.fsm_name (init_fsm fsm) sake) map in
+    let iter map fsm =
+      let name = fsm.A.fsm_name and value = L.const_int i32_t 0 in
+      StringMap.add name (L.define_global name value sake) map in
     List.fold_left iter StringMap.empty program.A.fsms in
-  let lookup_enum enum name = 
-    let name_map = StringMap.find states enum in
-    StringMap.find name name_map
-  (* TODO: lookup enums' value's integral representations *) in
-  let lookup name = try StringMap.find name with Not_found -> StringMap.find name in
-  let build_fsm fsm_decl = (* TODO: builds fsm-updating functions function *)
-    let fsm = L.entry_block in
-    let rec expr builder = function
-      | A.IntLit i -> L.const_int i32_t i
-      | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-      | A.CharLit c -> L.const_int i8_t c
-      (* DON'T NEED FOR HELLO WORLD *)
-      | A.Range -> ()
+  let enum_values enum name = (* TODO: map each element to its index in the list of possible values *) (*
+    let iter map fsm =
+      let name = fsm.A.fsm_name and value = () in 
+    StringMap.find name name_map in
+    () *) in
+  let lookup name map = StringMap.find name map in
+  let rec expr builder = function
+    A.IntLit i -> L.const_int i32_t i
+  | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
+  | A.CharLit c -> L.const_int i8_t c
+
+      | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
       | A.ArrayLit -> ()
       | A.StringLit -> ()
       | A.Fsm_call -> ()
@@ -58,7 +52,7 @@ let translate program = (* translate an A.program to LLVM *)
       | A.Empty -> L.const_int i32_t 0
       | A.Variable s -> L.build_load (lookup s) s builder
       | A.Uop (uop, e) ->
-          let e' = expr builder e in
+        let e' = expr builder e in
           (match uop with
           A.Neg -> L.build_neg
       | A.Not -> L.build_not
@@ -82,26 +76,18 @@ let translate program = (* translate an A.program to LLVM *)
       ) e1' e2' "tmp" builder
         | A.Assign (s, e) ->
             let e' = expr builder e in
-            ignore (L.build_store e' (lookup s) builder); e'
-            in
+            let _ = L.build_store e' (lookup s) builder in e' in
+  let rec stmt builder = function
+    A.Block body -> List.fold_left stmt builder body
+        | A.Expr e -> let _ = expr builder e in builder
+      | A.If (predicate, then_stmt, else_stmt) ->
+          let bool_val = expr builder predicate in
+          let merge_bb = L.append_block context "merge" the_function in
+          (*need to change the_function*)
 
-      let rec stmt builder = function
-        | A.Block body -> List.fold_left stmt builder body
-      | A.Expr e -> let _ = expr builder e in builder
-      | A.If (predicate, then_stmt, else_stmt) ->    (* build in order:
-        * - merge (the end of the statement)
-                                            * - then (br merge)
-                                            * - else (br merge)
-                                            * - predicate (cond br: then/else)
-                                            *)
-
-      let bool_val = expr builder predicate in
-      let merge_bb = L.append_block context "merge" the_function in
-      (*need to change the_function*)
-
-      let then_bb = L.append_block context "then" the_function in
-      add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
-      (L.build_br merge_bb);
+          let then_bb = L.append_block context "then" the_function in
+          add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+          (L.build_br merge_bb);
         (*need to change the_function*)
 
         let else_bb = L.append_block context "else" the_function in
@@ -132,10 +118,14 @@ let translate program = (* translate an A.program to LLVM *)
 
       | A.For (name, iter, body) -> ()
       | A.Goto state -> (* TODO: terminate state execution *)() in 
-      (* TODO: build function for calling all the fsm-updating functions,
-               use alloca to allocate save-space for next state *)() in
-  let tick = L.define_function  (* TODO: build tick function *)() in
-    sake
+  let tick =
+    let ftype = L.function_type void_t [| i8_t, i8_t, i8_t |] (* TODO: get correct types *) in
+    L.define_function (filename ^ "_tick") void_t sake in
+  let allocation = ()
+    (* TODO: allocation block *) in
+  let build_fsm = (* TODO: fsm_execution block *)() in
+  let writing = (* TODO: block for writing to pointer *)() in
+  sake
 
   (* L.function_type to create function (tick) *)
   (* L.insertion_block to indicate where to insert function blocks *)
