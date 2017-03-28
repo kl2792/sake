@@ -10,7 +10,7 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
-%token TICK RESET
+%token TICK RESET PRINT
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -30,7 +30,7 @@
 %token <int> INTLIT
 %token <int> RANGELEM
 %token <char> CHARLIT
-/* %token <string> STRINGLIT */
+// %token <string> STRINGLIT
 %token <string> ID /*why string? */
 %token <string> TYPENAME
 
@@ -90,6 +90,7 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
 | GOTO ID NLINE { Goto ($2) }
+| PRINT LPAREN expr RPAREN NLINE { Print($3) } //last minute
 // NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
 
 cstmt:
@@ -116,8 +117,16 @@ state_decl:
     state_body = List.rev $3;
   }}
 
-fsm_decl:
+/* fsm_decl:
   FSM ID LBRACE state_list NLINE RBRACE
+{{
+  fsm_name = $2;
+  fsm_body = List.rev $4;
+}} */
+
+// how the mighty have fallen
+fsm_decl:
+  FSM ID LBRACE stmt_list2 RBRACE
 {{
   fsm_name = $2;
   fsm_body = List.rev $4;
@@ -151,6 +160,15 @@ program:
     types = List.rev $11;
     fsms = List.rev $13;
   }}
+/* MAXIMUM JANKNESS */
+| fsm_list EOF
+{{
+  input = [];
+  output = [];
+  locals = [];
+  types = [];
+  fsms = List.rev $1;
+}}
 
 
 /*list definitions */
