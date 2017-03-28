@@ -7,7 +7,7 @@ exception Error of string
 
 (* Note: () means "We have to write code here" *)
 
-let translate filename program = (* translate an A.program to LLVM *)
+let translate program = (* translate an A.program to LLVM *)
   let context = L.global_context () in
   let sake = L.create_module context "Sake"
     and i32_t  = L.i32_type  context
