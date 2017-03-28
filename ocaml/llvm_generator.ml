@@ -15,16 +15,16 @@ let translate filename program = (* translate an A.program to LLVM *)
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
   let print_t =
-    L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+    L.function_type i32_t [| i32_t |] in
   let print_func =
-    L.declare_function "printf" print_t sake in
+    L.declare_function "printbig" printbig_t sake in
   let add_terminal builder f = 
     match L.block_terminator (L.insertion_block builder) with
     Some _ -> () | None -> ignore (f builder) in
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-  |  A.Print e -> L.build_call print_func [| (*"%d"*) int_format_str ;(expr builder e) |] "printf" builder
+  |  A.Print e -> L.build_call print_func [| (expr builder e) |] "printbig" builder
 (*  | A.CharLit c -> L.const_int i8_t c
 
       | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
