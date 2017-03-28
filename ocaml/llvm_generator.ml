@@ -102,7 +102,7 @@ let translate filename program = (* translate an A.program to LLVM *)
       | A.For (name, iter, body) -> ()
       | A.Goto state -> (* TODO: terminate state execution *)() *) in 
   let tick =
-    let ftype = L.function_type void_t [| |] in
+    let ftype = L.function_type i32_t [| |] in
     L.define_function "tick" ftype sake in
   let main =
     let ftype = L.function_type i32_t [| |] in
@@ -113,7 +113,7 @@ let translate filename program = (* translate an A.program to LLVM *)
         fst lst in
       (first x).A.fsm_body in *)
   let tick_builder = stmt tick_build (A.Block ((List.hd program.A.fsms).A.fsm_body)) in (*(body program.A.fsms)) in*)
-  let tick_terminal = add_terminal tick_build L.build_ret_void in (* return void in tick *)
+  let tick_terminal = add_terminal tick_build (L.build_ret (L.const_int i32_t 0))in (* return void in tick *)
   let main_build = L.builder_at_end context (L.entry_block main) in
   let main_tick_call = L.build_call tick [| |] "tick" main_build in
   let main_terminal = add_terminal main_build (L.build_ret (L.const_int i32_t 0)) in
