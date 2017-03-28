@@ -7,12 +7,18 @@ let macros_of_types name types =
     | [] -> result
     | dtype :: types ->
         let macro = Printf.sprintf "#define %s_%s_%s %d\n"
-            name dtype.A.type_name i in
+            name dtype.A.type_name (nth dtype.A.types i) i in
           macro_of_types (macro ^ result) (i + 1) types in
-  let types = List.map macros_of_type types in String.concat "\n" types
+  let types = List.map (macros_of_type [] 0) types in String.concat "\n" types
 
 (* generate string of macro declarations for all fsms' state variables *)
 let macros_of_fsms name fsms =
+  let rec macros_of_fsm result i function
+    | [] -> result
+    | fsm :: fsms ->
+        let macro = Print.sprintf "#define %s_%s_%s %d\n"
+          name fsm.A.fsm_name 
+
 	let enum_of_fsm name fsm = 
 		let string_of_state s = "#define " ^ name ^ "_" ^ fsm.A.fsm_name  ^ "_" ^ s.A.state_name in
 		let states = List.map string_of_state fsm.A.fsm_body in
