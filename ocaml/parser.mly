@@ -117,7 +117,7 @@ state_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE NLINE state_list NLINE RBRACE
+  FSM ID LBRACE state_list NLINE RBRACE
 {{
   fsm_name = $2;
   fsm_body = List.rev $5;
