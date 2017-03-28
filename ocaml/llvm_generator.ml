@@ -32,7 +32,7 @@ let translate filename program = (* translate an A.program to LLVM *)
       | A.Fsm_call -> ()
 *)
       | A.Empty -> L.const_int i32_t 0
-      | A.Variable s -> (* L.build_load (lookup s) s builder *) ()
+(*)      | A.Variable s ->  L.build_load (lookup s) s builder *)
       | A.Uop (uop, e) ->
         let e' = expr builder e in
           (match uop with
