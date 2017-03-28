@@ -24,7 +24,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-  |  A.Print e -> L.build_call print_func [| "%d" ;(expr builder e) |] "printf" builder
+  |  A.Print e -> L.build_call print_func [| (*"%d"*) int_format_str ;(expr builder e) |] "printf" builder
 (*  | A.CharLit c -> L.const_int i8_t c
 
       | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
