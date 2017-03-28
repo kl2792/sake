@@ -15,9 +15,9 @@ let translate filename program = (* translate an A.program to LLVM *)
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
   let print_t =
-    L.var_arg_function_type i32_t [| i32_t |] in
+    L.var_arg_function_type i32_t [| L.pointertype i8_t |] in
   let print_func =
-    L.declare_function "print" print_t sake in
+    L.declare_function "printf" printf_t sake in
   let add_terminal builder f = 
     match L.block_terminator (L.insertion_block builder) with
     Some _ -> () | None -> ignore (f builder) in
@@ -61,7 +61,7 @@ let translate filename program = (* translate an A.program to LLVM *)
             let _ = L.build_store e' (lookup s) builder in e' in
   let rec stmt builder = function
     A.Block body -> List.fold_left stmt builder body
-  |  A.Print e -> L.build_call print_func [| (expr builder e) |] "print" builder
+  |  A.Print e -> L.build_call printf_func [| "%d" ;(expr builder e) |] "printf" builder
         | A.Expr e -> let _ = expr builder e in builder
       | A.If (predicate, then_stmt, else_stmt) ->
           let bool_val = expr builder predicate in
@@ -109,10 +109,10 @@ let translate filename program = (* translate an A.program to LLVM *)
     L.define_function "main" ftype sake in
   let tick_build = L.builder_at_end sake (L.entry_block tick) in
   let tick_builder = stmt tick_build (A.Block (fst programs.A.fsms)) in 
-  let tick_terminal = add_terminal builder L.build_ret_void in (* return void in tick *)
+  let tick_terminal = add_terminal tick_build L.build_ret_void in (* return void in tick *)
   let main_build = L.builder_at_end sake (L.entry_block main) in
-  let main_tick_call = L.build_call tick [| |] "tick" builder in
-  let main_terminal = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
+  let main_tick_call = L.build_call tick [| |] "tick" main_build in
+  let main_terminal = add_terminal main_build (L.build_ret (L.const_int i32_t 0)) in
 
   (* let allocation = ()
     (* TODO: allocation block *) in
