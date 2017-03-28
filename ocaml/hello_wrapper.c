@@ -1,7 +1,7 @@
 #include <stdio.h>
-//#include <hello.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hello.h"
 
 int main(){
     
