@@ -19,10 +19,9 @@ parser.ml parser.mli : parser.mly
 	ocamlfind ocamlopt -c -package llvm $<
 
 hello : #TODO this needs to somehow be linked to ll file 
-	llvm-as hello.ll
-	llc *.bc
+	llc -o hello.s hello.ll 
 	gcc -c -o hello_wrapper.o hello_wrapper.c hello.h
-	gcc -o hello *.s hello_wrapper.o
+	gcc -o hello hello.s hello_wrapper.o
 
 # hello:
 # 	gcc -c -o hello_wrapper.o hello_wrapper.c hello.h 
