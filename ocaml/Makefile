@@ -1,8 +1,8 @@
-OBJS = parser.cmo scanner.cmo sake.cmo
+OBJS = parser.cmx scanner.cmx sake.cmx header_generator.cmx llvm_generator.cmx
 
 sake : $(OBJS)
-	ocamlc -o sake $(OBJS)
-	#ocamlfind ocamlopt -linkpkg llvm -package llvm.analysis $(OBJS) -o sake 
+	#ocamlc -o sake $(OBJS)
+	ocamlfind ocamlopt -linkpkg llvm -package llvm.analysis $(OBJS) -o sake 
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
@@ -39,8 +39,8 @@ ast.cmo :
 ast.cmx :
 header_generator.cmo : ast.cmo
 header_generator.cmx : ast.cmx
-# llvm_generator.cmo : ast.cmo
-# llvm_generator.cmo : ast.cmx	
+llvm_generator.cmo : ast.cmo
+llvm_generator.cmx : ast.cmx	
 sake.cmo: scanner.cmo parser.cmi header_generator.cmo llvm_generator.cmo ast.cmo
 sake.cmx: scanner.cmx parser.cmx header_generator.cmx llvm_generator.cmx ast.cmx
 parser.cmo: ast.cmo parser.cmi
