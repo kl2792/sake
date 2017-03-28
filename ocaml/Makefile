@@ -3,6 +3,8 @@
 #sake.native :
 	#ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
 
+all : sake printbig.o 
+
 OBJS = ast.cmx llvm_generator.cmx parser.cmx scanner.cmx sake.cmx
 
 sake : $(OBJS)
@@ -29,6 +31,8 @@ printbig : printbig.c
 
 #./sake hello.sk -> hello.ll
 #llc hello.ll -> hello.s
+
+printbig : printbig.c
 
 .PHONY : hello
 hello:
