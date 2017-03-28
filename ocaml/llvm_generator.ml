@@ -56,9 +56,9 @@ let translate filename program = (* translate an A.program to LLVM *)
         | A.And -> L.build_and
         | A.Or -> L.build_or
       ) e1' e2' "tmp" builder
-        | A.Assign (s, e) ->
+(*        | A.Assign (s, e) ->
             let e' = expr builder e in
-            (* let _ = L.build_store e' (lookup s) builder in e' *) () in
+             let _ = L.build_store e' (lookup s) builder in e' *) in
   let rec stmt builder = function
     A.Block body -> List.fold_left stmt builder body
   |  A.Print e -> L.build_call printf_func [| "%d" ;(expr builder e) |] "printf" builder
