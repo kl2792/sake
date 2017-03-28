@@ -50,9 +50,7 @@ static const char font[] = {
 
 void printbig(int c)
 {
-
-    printf("%d",c);
-/*  int index = 0;
+  int index = 0;
   int col, data;
   if (c >= '0' && c <= '9') index = 8 + (c - '0') * 8;
   else if (c >= 'A' && c <= 'Z') index = 88 + (c - 'A') * 8;
@@ -64,7 +62,6 @@ void printbig(int c)
     }
     putchar('\n');
   } while (index & 0x7); 
-  */
 }
 
 
