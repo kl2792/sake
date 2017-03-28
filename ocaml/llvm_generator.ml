@@ -17,7 +17,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let print_t =
     L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let print_func =
-    L.declare_function "printf" printf_t sake in
+    L.declare_function "printf" print_t sake in
   let add_terminal builder f = 
     match L.block_terminator (L.insertion_block builder) with
     Some _ -> () | None -> ignore (f builder) in
@@ -32,7 +32,7 @@ let translate filename program = (* translate an A.program to LLVM *)
       | A.Fsm_call -> ()
 *)
       | A.Empty -> L.const_int i32_t 0
-      | A.Variable s -> (* L.build_load (lookup s) s builder *) ()
+(*)      | A.Variable s ->  L.build_load (lookup s) s builder *)
       | A.Uop (uop, e) ->
         let e' = expr builder e in
           (match uop with
@@ -58,7 +58,7 @@ let translate filename program = (* translate an A.program to LLVM *)
       ) e1' e2' "tmp" builder
         | A.Assign (s, e) ->
             let e' = expr builder e in
-            (* let _ = L.build_store e' (lookup s) builder in e' in *)
+            (* let _ = L.build_store e' (lookup s) builder in e' *) () in
   let rec stmt builder = function
     A.Block body -> List.fold_left stmt builder body
   |  A.Print e -> L.build_call printf_func [| "%d" ;(expr builder e) |] "printf" builder
