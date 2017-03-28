@@ -108,7 +108,11 @@ let translate filename program = (* translate an A.program to LLVM *)
     let ftype = L.function_type i32_t [| |] in
     L.define_function "main" ftype sake in
   let tick_build = L.builder_at_end context (L.entry_block tick) in
-  let tick_builder = stmt tick_build (A.Block ((fst program.A.fsms).fsm_body)) in 
+    let body x = 
+      let first lst =
+        fst lst in
+      (first x).fsm_body in
+  let tick_builder = stmt tick_build (A.Block body program.A.fsms) in(*((fst program.A.fsms).fsm_body)) in *)
   let tick_terminal = add_terminal tick_build L.build_ret_void in (* return void in tick *)
   let main_build = L.builder_at_end context (L.entry_block main) in
   let main_tick_call = L.build_call tick [| |] "tick" main_build in
