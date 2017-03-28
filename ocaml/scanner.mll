@@ -54,6 +54,7 @@ rule token = parse
   | "string"   { STRING }
   | "true"   { TRUE }
   | "false"  { FALSE }
+  | "print" { PRINT }
   | "fsm" { FSM }
   | "tick"   { TICK }
   | "reset"   { RESET }
