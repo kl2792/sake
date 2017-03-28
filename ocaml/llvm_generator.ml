@@ -14,7 +14,7 @@ let translate filename program = (* translate an A.program to LLVM *)
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
-  let print_t =
+  let printbig_t =
     L.function_type i32_t [| i32_t |] in
   let print_func =
     L.declare_function "printbig" printbig_t sake in
