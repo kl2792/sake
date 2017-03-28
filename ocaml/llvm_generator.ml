@@ -101,7 +101,7 @@ let translate program = (* translate an A.program to LLVM *)
       | A.Goto state -> () (* TODO: terminate state execution *)
       (* TODO: builds function for calling all the fsm-updating functions,
                uses alloca to allocate save-space for next state *)
-  let tick = (* TODO: build tick function *)() in
+  let tick = L.define_function  (* TODO: build tick function *)() in
     sake
 
   (* L.function_type to create function (tick) *)
