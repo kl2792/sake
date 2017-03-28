@@ -1,27 +1,33 @@
 OBJS = parser.cmo scanner.cmo sake.cmo
 
 sake : $(OBJS)
-		ocamlc -o sake $(OBJS)
+	ocamlc -o sake $(OBJS)
+	#ocamlfind ocamlopt -linkpkg llvm -package llvm.analysis $(OBJS) -o sake 
 
 scanner.ml : scanner.mll
-		ocamllex scanner.mll
+	ocamllex scanner.mll
 
 parser.ml parser.mli : parser.mly
-		ocamlyacc -v parser.mly
+	ocamlyacc -v parser.mly
 
 %.cmo : %.ml
-		ocamlc -c $<
+	ocamlc -c $<
 
 %.cmi : %.mli
-		ocamlc -c $<
+	ocamlc -c $<
 
 hello : #TODO this needs to somehow be linked to ll file 
 	llvm-as hello.ll
 	llc *.bc
 	gcc -c -o hello_wrapper.o hello_wrapper.c hello.h
-	gcc -o hello *.s hello_wrapper.o 
+	gcc -o hello *.s hello_wrapper.o
 
-# NEED TO COMPILE THE LL FILE TO A O FILE
+# hello:
+# 	gcc -c -o hello_wrapper.o hello_wrapper.c hello.h 
+# 	DO WE LINK THESES???? 
+# 	ocaml-build -use-ocamlfind -pkgs llvm,llvm-analysis -cflags -w,+1=4 hello 
+#
+#NEED TO COMPILE THE LL FILE TO A O FILE
 
 
 .PHONY : clean
