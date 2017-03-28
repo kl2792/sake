@@ -28,6 +28,7 @@ parser.ml parser.mli : parser.mly
 
 .PHONY : hello
 hello:
+	./sake hello.sk
 	lli hello.ll 
 
 .PHONY : clean
