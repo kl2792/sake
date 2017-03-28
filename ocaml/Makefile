@@ -33,11 +33,12 @@ printbig : printbig.c
 #llc hello.ll -> hello.s
 
 printbig : printbig.c
+	cc -o printbig -DBUILD_TEST printbig.c
 
 .PHONY : hello
 hello:
-	./sake hello.sk
-	lli hello.ll
+	./sake hello.sk 
+	#lli hello.ll
 
 .PHONY : clean
 clean :
