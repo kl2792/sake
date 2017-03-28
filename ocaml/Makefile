@@ -1,4 +1,4 @@
-OBJS = parser.cmx scanner.cmx sake.cmx header_generator.cmx llvm_generator.cmx
+OBJS = parser.cmx scanner.cmx header_generator.cmx llvm_generator.cmx sake.cmx
 
 sake : $(OBJS)
 	#ocamlc -o sake $(OBJS)
