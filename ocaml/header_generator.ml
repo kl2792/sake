@@ -1,20 +1,18 @@
 module A = Ast
 
-(* generate enum declaration with newlines for all types *)
+(* generate macro declarations with newlines for all types *)
 
-let enums_of_types name types = 
-        let rec counter i 
-	let enum_of_type name dtype = 
-		let values = List.map (fun s -> "#define " ^ name ^ "_" ^ dtype.A.type_name ^ "_" ^ s ^ " " ^ string_of_int i) dtype.A.type_values in
-                let values = String.concat "\n" values in
-		Printf.sprintf "%s\n" values
-	in 
-        let enums = Lis in
-        let enums = List.map (enum_of_type name) enums in 
-        String.concat "" enums 
+let macros_of_types name types =
+  let rec macros_of_type result i = function
+    | [] -> result
+    | dtype :: types ->
+        let macro = Printf.sprintf "#define %s_%s_%s %d\n"
+            name dtype.A.type_name i in
+          macro_of_types (macro ^ result) (i + 1) types in
+  let types = List.map macros_of_type types in String.concat "\n" types
 
-(* generate string of enum declaration for all fsms' state variables *)
-let enums_of_fsms name fsms =
+(* generate string of macro declarations for all fsms' state variables *)
+let macros_of_fsms name fsms =
 	let enum_of_fsm name fsm = 
 		let string_of_state s = "#define " ^ name ^ "_" ^ fsm.A.fsm_name  ^ "_" ^ s.A.state_name in
 		let states = List.map string_of_state fsm.A.fsm_body in
@@ -24,8 +22,8 @@ let enums_of_fsms name fsms =
 	let enums = List.map (enum_of_fsm name) fsms in 
         String.concat "" enums
 
-(* generate enum declarations from named SAST *)
-let enums_of_sast name sast =
+(* generate macro definitions from named SAST *)
+let macros_of_sast name sast =
 	let types = enums_of_types name sast.A.types in
 	let states = enums_of_fsms name sast.A.fsms in
 		types ^ "\n" ^ states
