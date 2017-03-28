@@ -103,7 +103,7 @@ cstmt:
   }}
 
 state_decl:
-  START ID LBRACE stmt_list2 RBRACE
+  START ID LBRACE stmt_list2 RBRACE 
   {{
     state_name = $2;
     state_start = true;
@@ -200,7 +200,7 @@ lvalue_list2: /* alternative way to list lvalues, line by line */
 
 state_list:
 /* nothing */ { [] }
-| state_list state_decl { $2 :: $1}
+| state_list NLINE state_decl { $2 :: $1}
 
 type_list:
 /* nothing */ { [] }

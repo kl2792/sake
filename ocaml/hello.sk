@@ -9,9 +9,7 @@ fsm f1{
 		}
 		else
 			goto s1
-
 	}
-
 	s1{
 		o = 1
 		if (i==0){
@@ -19,9 +17,7 @@ fsm f1{
 		}
 		else
 			goto s2
-
 	}
-
 	s2{
 		o = 2
 		if (i==0){
@@ -30,7 +26,6 @@ fsm f1{
 		else
 			goto s3
 	}
-
 	s3{
 		o = 3
 		if (i==0){
@@ -39,7 +34,6 @@ fsm f1{
 		else
 			goto s4
 	}
-
 	s4{
 		o = 4
 		if (i==0){
@@ -48,7 +42,6 @@ fsm f1{
 		else
 			goto s5
 	}
-
 	s5{
 		o = 5
 		if (i==0){
@@ -57,7 +50,6 @@ fsm f1{
 		else
 			goto s6
 	}
-
 	s6{
 		o = 6
 		if (i==0){
@@ -66,7 +58,6 @@ fsm f1{
 		else
 			goto s7
 	}
-
 	s7{
 		o = 7
 		if (i==0){
