@@ -30,8 +30,8 @@ let string_of_type = function
   | A.Int -> "int"
   | A.Char -> "char"
   | A.Bool -> "int"
-  | A.Array(array_name, length) -> "DON'T USE THIS" (* TODO: implement array *)
-  | A.Enum(type_name) -> "int"
+  | A.Array(_, _) -> "DON'T USE THIS" (* TODO: implement array *)
+  | A.Enum(_) -> "int"
 
 (* generate input struct declarations *)
 let input_struct_of_ast name fsms =  
@@ -48,10 +48,10 @@ let output_struct_of_ast name fsms =
 
 (* generate state struct declarations *)
 let state_struct_of_ast name fsms = 	
-  let state_of_fsm name fsm = 
+  let state_of_fsm fsm = 
       Printf.sprintf "int %s;\n" fsm.A.fsm_name 
   in 
-  let state_internals = List.map (state_of_fsm name) fsms.A.fsms in
+  let state_internals = List.map state_of_fsm fsms.A.fsms in
   let state_internals = String.concat "" state_internals in
   let fsm_local_vars = List.map (fun s -> (*s.locals.types ^*) " " ^  (snd s)) fsms.A.locals in 
   let fsm_local_vars = String.concat ";\n" fsm_local_vars in
