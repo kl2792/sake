@@ -24,6 +24,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
+  |  A.Print e -> L.build_call print_func [| "%d" ;(expr builder e) |] "printf" builder
 (*  | A.CharLit c -> L.const_int i8_t c
 
       | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
@@ -61,7 +62,6 @@ let translate filename program = (* translate an A.program to LLVM *)
              let _ = L.build_store e' (lookup s) builder in e' *) in
   let rec stmt builder = function
     A.Block body -> List.fold_left stmt builder body
-  |  A.Print e -> L.build_call print_func [| (*"%d" ;*)(expr builder e) |] "printf" builder
         | A.Expr e -> let _ = expr builder e in builder
       | A.If (predicate, then_stmt, else_stmt) ->
           let bool_val = expr builder predicate in
