@@ -14,41 +14,23 @@ let translate filename program = (* translate an A.program to LLVM *)
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
-  let init = function (* initialize primitive *)
-    A.Int -> L.const_int i32_t 0
-  | A.Enum(type_name) -> L.const_int i32_t 0
-  | A.Char -> L.const_int i8_t 0
-  | A.Bool -> L.const_int i1_t 0
-  | _ -> raise (Error "init is for primitives, dude") in (* let array_init length = () *)
-  let map init lvalues = (* function for generating StringMaps from lists *)
-    let iter map (dtype, name) =
-      StringMap.add name (L.define_global name (init dtype) sake) map in
-    List.fold_left iter StringMap.empty lvalues in
-  let inputs = map init program.A.inputs in (* global inputs for concurrent FSM collection *)
-  let outputs = map init program.A.outputs in (* global outputs for concurrent FSM collection *)
-  let locals = map init program.A.locals in (* fsm write-local state variables *)
-  let types = map init program.A.types in (* user-defined types *)
-  let states =
-    let iter map fsm =
-      let name = fsm.A.fsm_name and value = L.const_int i32_t 0 in
-      StringMap.add name (L.define_global name value sake) map in
-    List.fold_left iter StringMap.empty program.A.fsms in
-  let enum_values enum name = (* TODO: map each element to its index in the list of possible values *) (*
-    let iter map fsm =
-      let name = fsm.A.fsm_name and value = () in 
-    StringMap.find name name_map in
-    () *) in
-  let lookup name map = StringMap.find name map in
+  let print_t =
+    L.var_arg_function_type i32_t [| i32_t |] in
+  let print_func =
+    L.declare_function "print" print_t sake in
+  let add_terminal builder f = 
+    match L.block_terminator (L.insertion_block builder) with
+    Some _ -> () | None -> ignore (f builder) in
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
   | A.CharLit c -> L.const_int i8_t c
-
+(*
       | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
       | A.ArrayLit -> ()
       | A.StringLit -> ()
       | A.Fsm_call -> ()
-
+*)
       | A.Empty -> L.const_int i32_t 0
       | A.Variable s -> L.build_load (lookup s) s builder
       | A.Uop (uop, e) ->
@@ -79,6 +61,7 @@ let translate filename program = (* translate an A.program to LLVM *)
             let _ = L.build_store e' (lookup s) builder in e' in
   let rec stmt builder = function
     A.Block body -> List.fold_left stmt builder body
+  |  A.Print e -> L.build_call print_func [| (expr builder e) |] "print" builder
         | A.Expr e -> let _ = expr builder e in builder
       | A.If (predicate, then_stmt, else_stmt) ->
           let bool_val = expr builder predicate in
@@ -119,12 +102,22 @@ let translate filename program = (* translate an A.program to LLVM *)
       | A.For (name, iter, body) -> ()
       | A.Goto state -> (* TODO: terminate state execution *)() in 
   let tick =
-    let ftype = L.function_type void_t [| i8_t, i8_t, i8_t |] (* TODO: get correct types *) in
-    L.define_function (filename ^ "_tick") void_t sake in
-  let allocation = ()
+    let ftype = L.function_type void_t [| |] in
+    L.define_function "tick" ftype sake in
+  let main =
+    let ftype = L.function_type i32_t [| |] in
+    L.define_function "main" ftype sake in
+  let tick_build = L.builder_at_end sake (L.entry_block tick) in
+  let tick_builder = stmt tick_build (A.Block (fst programs.A.fsms)) in 
+  let tick_terminal = add_terminal builder L.build_ret_void in (* return void in tick *)
+  let main_build = L.builder_at_end sake (L.entry_block main) in
+  let main_tick_call = L.build_call tick [| |] "tick" builder in
+  let main_terminal = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
+
+  (* let allocation = ()
     (* TODO: allocation block *) in
   let build_fsm = (* TODO: fsm_execution block *)() in
-  let writing = (* TODO: block for writing to pointer *)() in
+  let writing = (* TODO: block for writing to pointer *)() in *)
   sake
 
   (* L.function_type to create function (tick) *)
