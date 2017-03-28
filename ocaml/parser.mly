@@ -74,6 +74,7 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
+| PRINT LPAREN expr RPAREN NLINE { Print($3) } //last minute
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
@@ -90,7 +91,6 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
 | GOTO ID NLINE { Goto ($2) }
-| PRINT LPAREN expr RPAREN NLINE { Print($3) } //last minute
 // NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
 
 cstmt:

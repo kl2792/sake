@@ -20,6 +20,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
 (*  | Call of string * expr list (* no functions *) *)
   | Fsm_call of string * fsm_call * expr list
   | Cond of expr * expr * expr
+  | Print of expr
   | Empty
 type case =
   | CaseValue of expr (* Q: should expr be expr list? *)
@@ -32,7 +33,6 @@ type stmt =
   | Expr of expr
   | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
   | Goto of string (* for FSM transitions *)
-  | Print of expr
 (*  | Return of expr (* for functions, but we're not doing functions *) *)
 type type_decl = {
   type_name  : string;
