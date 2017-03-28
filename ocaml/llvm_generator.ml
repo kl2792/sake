@@ -21,6 +21,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let add_terminal builder f = 
     match L.block_terminator (L.insertion_block builder) with
     Some _ -> () | None -> ignore (f builder) in
+  let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
