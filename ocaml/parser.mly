@@ -49,17 +49,14 @@ BOOL { Bool }
 lvalue:
  dtype ID { $1, $2 }
 
-literal:
+expr:
 INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 // DON'T NEED FOR HELLO WORLD | INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
-//| literal_opt { ArrayLit($1) } /*see list definitions below */
+//| { ArrayLit($1) } /*see list definitions below */
 | QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
-
-expr:
-literal { Literal($1) }
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
@@ -76,7 +73,6 @@ literal { Literal($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
@@ -94,7 +90,7 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
 | GOTO ID NLINE { Goto ($2) }
-| RETURN expr NLINE { Return($2) }
+// NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
 
 cstmt:
   case COLON stmt {$1, $3}
@@ -102,22 +98,22 @@ cstmt:
  type_decl:
   TYPE ID ASSIGN string_opt NLINE
   {{
-    name = $2;
-    types = $4;
+      type_name = $2;
+      type_values = $4;
   }}
 
 state_decl:
   START ID LBRACE stmt_list2 RBRACE
   {{
-    name = $2;
-    start = true;
-    body = List.rev $4;
+    state_name = $2;
+    state_start = true;
+    state_body = List.rev $4;
   }}
 | ID LBRACE stmt_list2 RBRACE
   {{
-    name = $1;
-    start = false;
-    body = List.rev $3;
+    state_name = $1;
+    state_start = false;
+    state_body = List.rev $3;
   }}
 
 /* fsm_decl:
@@ -157,8 +153,8 @@ state_decl:
 fsm_decl:
   FSM ID LBRACE NLINE state_list RBRACE
 {{
-  name = $2;
-  body = List.rev $5;
+  fsm_name = $2;
+  fsm_body = List.rev $5;
 }}
 
 
@@ -203,14 +199,6 @@ actuals_opt:
 actuals_list:
   expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1}
-
-literal_opt:
-  /* nothing */ { [] }
-| literal_list { List.rev $1 }
-
-literal_list:
-  literal { [$1] }
-| literal_list COMMA literal { $3 :: $1 }
 
 stmt_list:
   /* nothing */ { [] }
