@@ -74,7 +74,7 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| PRINT LPAREN expr RPAREN NLINE { Print($3) } //last minute
+| PRINT LPAREN expr RPAREN { Print($3) } //last minute
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
@@ -126,7 +126,7 @@ state_decl:
 
 // how the mighty have fallen
 fsm_decl:
-  FSM ID LBRACE stmt_list2 RBRACE
+  FSM ID LBRACE NLINE stmt_list2 RBRACE
 {{
   fsm_name = $2;
   fsm_body = List.rev $4;
