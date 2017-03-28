@@ -15,10 +15,11 @@ parser.ml parser.mli : parser.mly
 %.cmi : %.mli
 		ocamlc -c $<
 
-hello : hello_wrapper.o #TODO this needs to somehow be linked to ll file 
-	cc -o hello hello_wrapper.o 
-
-hello_wrapper.o : hello_wrapper.c hello.h
+hello : #TODO this needs to somehow be linked to ll file 
+	llvm-as hello.ll
+	llc *.bc
+	gcc -c -o hello_wrapper.o hello_wrapper.c hello.h
+	gcc -o hello *.s hello_wrapper.o 
 
 # NEED TO COMPILE THE LL FILE TO A O FILE
 
