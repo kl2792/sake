@@ -24,10 +24,10 @@ let translate program = (* translate an A.program to LLVM *)
     let iter map (dtype, name) =
       StringMap.add name (L.define_global name (init dtype) sake) map in
     List.fold_left iter StringMap.empty lvalues in
-  let inputs = map (init dtype) program.A.inputs in (* global inputs for concurrent FSM collection *)
-  let outputs = map (init dtype) program.A.outputs in (* global outputs for concurrent FSM collection *)
-  let locals = map (init dtype) program.A.locals in (* fsm write-local state variables *)
-  let types = map (init dtype) program.A.types in (* user-defined types *)
+  let inputs = map init program.A.inputs in (* global inputs for concurrent FSM collection *)
+  let outputs = map init program.A.outputs in (* global outputs for concurrent FSM collection *)
+  let locals = map init program.A.locals in (* fsm write-local state variables *)
+  let types = map init program.A.types in (* user-defined types *)
   let states =
     let iter map fsm =(* TODO: state gen code *)
       let init_fsm fsm = (**)
