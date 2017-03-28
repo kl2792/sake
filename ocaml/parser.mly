@@ -82,11 +82,11 @@ CASE expr { CaseValue($2) }
 
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
-| IF expr LBRACE stmt RBRACE %prec NOELSE { If($2, $4, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF expr LBRACE stmt RBRACE ELSE stmt { If($2, $4, $7) }  /*with else */
+| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
+| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
 // Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
-| FOR ID IN LPAREN expr RPAREN LBRACE stmt RBRACE { For($2, $5, $8) }
-| WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) }
+| FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
+| WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
 | GOTO ID NLINE { Goto ($2) }
@@ -103,7 +103,6 @@ cstmt:
   }}
 
 state_decl:
-/*Bug: */
   START ID LBRACE stmt_list2 RBRACE
   {{
     state_name = $2;
