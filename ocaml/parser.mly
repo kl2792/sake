@@ -139,7 +139,7 @@ fsm_decl:
     locals = List.rev $7;
     body = List.rev $8;
   }}
-| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list2 RBRACE NLINE
+| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list2 RBRACE NLINE  // BUG: If stmt_list2 not empty then don't need NLINE
 {{
   return = $1;
   name = $2;
