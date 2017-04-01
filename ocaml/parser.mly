@@ -10,7 +10,7 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
-%token TICK RESET
+%token TICK RESET PRINT
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -74,6 +74,7 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
+| PRINT LPAREN expr RPAREN { Print($3) } //last minute
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 case:
@@ -122,6 +123,12 @@ fsm_decl:
   fsm_name = $2;
   fsm_body = List.rev $4;
 }}
+| FSM ID LBRACE stmt_list2 RBRACE  //if there are no states
+{{
+  fsm_name = $2;
+  fsm_body = List.rev $4;
+}}
+
 
  /* func_decl:
   dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE NLINE
@@ -150,6 +157,15 @@ program:
     locals = List.rev $10;
     types = List.rev $11;
     fsms = List.rev $13;
+  }}
+/* MAXIMUM JANKNESS */
+| fsm_list NLINE EOF
+  {{
+    input = [];
+    output = [];
+    locals = [];
+    types = [];
+    fsms = List.rev $1;
   }}
 
 
@@ -199,7 +215,7 @@ lvalue_list2: /* alternative way to list lvalues, line by line */
 | lvalue_list NLINE lvalue { $3 :: $1 }
 
 state_list:
-/* nothing */ { [] }
+NLINE { [] }
 | state_list NLINE state_decl { $3 :: $1}
 
 type_list:
