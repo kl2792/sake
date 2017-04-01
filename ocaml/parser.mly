@@ -28,7 +28,7 @@
 
 /*literals */
 %token <int> INTLIT
-%token <int> RANGELEM
+%token <int> RTOK
 %token <char> CHARLIT
 /* %token <string> STRINGLIT */
 %token <string> ID /*why string? */
@@ -54,8 +54,8 @@ INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
-// DON'T NEED FOR HELLO WORLD | INTLIT COLON INTLIT COLON INTLIT { Range($1, $3, $5) }
-//| { ArrayLit($1) } /*see list definitions below */
+| RTOK RTOK INTLIT { Range($1, $2, $3) }
+// WILL IMPLEMENT LATER | actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
