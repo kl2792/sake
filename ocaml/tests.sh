@@ -21,6 +21,7 @@ globallog=tests.log
 rm -f $globallog
 error=0
 globalerror=0
+keep=0
 
 # TESTING CONFIGURATIONS
 
