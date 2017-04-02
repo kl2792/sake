@@ -1,6 +1,6 @@
 LLI="lli"
 LLC="llc"
-SAKE="./sake"
+SAKE="./sake.native"
 CC="cc"
 
 $SAKE hello.sk > hello.ll

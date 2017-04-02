@@ -11,7 +11,7 @@ LLC="llc"
 CC="cc"
 
 # Path to sake compiler - usually just ./sake.native 
-SAKE="./sake.native"
+SAKE="./sake"
 #SAKE="_build/sake.native"
 
 # Set time limit for all operations
@@ -31,7 +31,7 @@ Usage() {
 }
 
 # SignalError()
-signalError() {    
+SignalError() {    
     if [ $error -eq 0 ] ; then            
         echo "FAILED"                    
         error=1                     
@@ -90,7 +90,7 @@ Check() {
     if [ ! -f "../testing/$wrapper" ]; then
         #echo "No wrapper exists for this test"
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
+        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
@@ -100,9 +100,9 @@ Check() {
         # by just running first command, should not have to redirect the output 
         #echo "Wrapper exists for this test"
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
+        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-o" "${basename}.o" "${basename}${wrapper}.c" "${basename}.h" 
+        Run "$CC" "-o" "${basename}.o" "../testing/${wrapper}" "${basename}.h" 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
@@ -138,7 +138,7 @@ CheckFail() {
     generatedfiles="" 
 
     generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
-    RunFail "$SAKE" "<" $1 "2>" "${basename}.err" ">>" $globallog &&     
+    RunFail "$SAKE" " " $1 "2>" "${basename}.err" ">>" $globallog &&     
     Compare ${basename}.err ${reffile}.err ${basename}.diff
      
     # Report the status and clean up the generated files
