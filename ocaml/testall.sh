@@ -17,7 +17,7 @@ SAKE="_build/sake.native"
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=tests.log
+globallog=alltests.log
 rm -f $globallog
 error=0
 globalerror=0
@@ -102,7 +102,7 @@ Check() {
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
         Run "$SAKE" " " $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-o" "${basename}.o" "../testing/${wrapper}" "${basename}.h" 
+        Run "$CC" "-c" "-o" "${basename}.o" "../testing/${wrapper}" "${basename}.h" 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
