@@ -1,10 +1,10 @@
-#all : sake.native printbig.o
+all : sake.native printbig.o
 
-#sake.native :
-	#ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
+sake.native :
+	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
 	    sake.native
 
-all : sake printbig.o 
+#all : sake printbig.o 
 
 OBJS = ast.cmx llvm_generator.cmx parser.cmx scanner.cmx sake.cmx
 

@@ -11,8 +11,8 @@ LLC="llc"
 CC="cc"
 
 # Path to sake compiler - usually just ./sake.native 
-SAKE="./sake"
-#SAKE="_build/sake.native"
+#SAKE="./sake"
+SAKE="_build/sake.native"
 
 # Set time limit for all operations
 ulimit -t 30
