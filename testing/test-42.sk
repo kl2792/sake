@@ -1,0 +1,3 @@
+fsm hello {
+        print (42)
+}
