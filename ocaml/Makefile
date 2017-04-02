@@ -27,16 +27,6 @@ parser.ml parser.mli : parser.mly
 
 printbig : printbig.c
 
-#./sake hello.sk -> hello.ll
-#llc hello.ll -> hello.s
-
-printbig : printbig.c
-
-.PHONY : hello
-hello:
-	./sake hello.sk 
-	#lli hello.ll
-
 .PHONY : clean
 clean :
 	ocamlbuild -clean
