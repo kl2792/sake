@@ -55,18 +55,25 @@ Compare() {
 # TODO Run functions -> how we want run it and then report errors 
 Run() {
     echo $* 1>&2
-    echo $* || {
+    eval $* || {
         SignalError "$1 failed on $*"
         return 1
     }
+}
+
+RunFail() {
+    echo $* 1>&2
+    eval $* && {
+        SignalError "Failed: $* did not report an error"
+        return 1
+    }
+    return 0    
 }
 
 # TODO Check functions -> should be calling run() funcs and compare() funcs 
 Check() {
 
     error=0   
-    #echo $1
-
     basename=`echo $1 | sed 's/.*\\///
                              s/.sk//'`
     reffile=`echo $1 | sed 's/.sk$//'`    
@@ -99,7 +106,44 @@ Check() {
     fi
 }
 
+CheckFail() {
+
+    error=0   
+    basename=`echo $1 | sed 's/.*\\///
+                             s/.sk//'`
+    reffile=`echo $1 | sed 's/.sk$//'`    
+    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
+
+    echo -n "$basename..."
+
+    echo 1>&2     
+    echo "###### Testing $basename" 1>&2
+  
+    generatedfiles="" 
+
+    generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
+    RunFail "$SAKE" "<" $1 "2>" "${basename}.err" ">>" $globallog &&     
+    Compare ${basename}.err ${reffile}.err ${basename}.diff
+     
+    # Report the status and clean up the generated files
+    if [ $error -eq 0 ] ; then
+        if [ $keep -eq 0 ] ; then
+            rm -f $generatedfiles
+        fi
+        echo "OK"
+        echo "###### SUCCESS" 1>&2
+    else
+        echo "###### FAILED" 1>&2
+        globalerror=$error
+    fi
+}
+
+
+
+# START TESTING BELOW 
+
 LLIFail() {  
+
     echo "Could not find the LLVM interpreter \"$LLI\"." 
     echo "Check your LLVM installation and/or modify the LLI variable in testall.sh"
     exit 1
@@ -121,17 +165,19 @@ then
     files=$@
 else
     #Check this path 
-    files="../testing/test-*.sk" #testing/fail-*.sake
+    files="../testing/test-*.sk ../testing/fail-*.sk"
 fi
 
 # TODO CODE TO CALL FUNCTIONS ON FILES 
 
 for file in $files 
 do
-    #echo $file
     case $file in 
         *test-*)
             Check $file 2>> $globallog 
+            ;;
+        *fail-*)
+            CheckFail $file 2>> $globallog
             ;;
         *)
             echo "unkown file type $file"
