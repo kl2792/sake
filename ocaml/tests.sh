@@ -23,13 +23,10 @@ error=0
 globalerror=0
 keep=0
 
-# TESTING CONFIGURATIONS
-
-# TODO FUNCTIONS 
-
 # usage
 Usage() {
     echo "Usage: tests.sh [.sk file]"
+    echo "-k    Keep the intermediate files"
     exit 1
 }
 
@@ -78,20 +75,39 @@ Check() {
                              s/.sk//'`
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
+    wrapper_extension="-wrapper.c"
+    wrapper="$basename$wrapper_extension"
 
-    echo -n "$basename..."
+    #echo $wrapper 
+    #echo "../testing/$wrapper"
 
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
-  
+
     generatedfiles="" 
 
-    generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-    Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
-    Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
-    Run "./${basename}.exe" > "${basename}.out" &&
-    Compare ${basename}.out ${reffile}.out ${basename}.diff
+    if [ ! -f "../testing/$wrapper" ]; then
+        echo "No wrapper exists for this test"
+        echo "$basename..."
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
+        Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
+        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
+        Run "./${basename}.exe" > "${basename}.out" &&
+        Compare ${basename}.out ${reffile}.out ${basename}.diff
+    else
+        #TODO Change the run commands to work with the files generated, ll should be generated 
+        # by just running first command, should not have to redirect the output 
+        echo "Wrapper exists for this test"
+        echo "$basename..."
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
+        Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
+        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$CC" "-o" "${basename}.o" "${basename}${wrapper}.c" "${basename}.h" 
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
+        Run "./${basename}.exe" > "${basename}.out" &&
+        Compare ${basename}.out ${reffile}.out ${basename}.diff
+    fi
      
     # Report the status and clean up the generated files
     if [ $error -eq 0 ] ; then
@@ -141,6 +157,16 @@ CheckFail() {
 
 
 # START TESTING BELOW 
+
+while getopts kdpsh c; do
+    case $c in
+        k) # Keep intermediate files
+            keep=1
+            ;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
 
 LLIFail() {  
 
