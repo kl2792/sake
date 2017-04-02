@@ -49,7 +49,7 @@ Compare() {
     }                                
 }
 
-# TODO Run functions -> how we want run it and then report errors 
+# Run functions -> how we want run it and then report errors 
 Run() {
     echo $* 1>&2
     eval $* || {
@@ -67,7 +67,7 @@ RunFail() {
     return 0    
 }
 
-# TODO Check functions -> should be calling run() funcs and compare() funcs 
+# Check functions -> should be calling run() funcs and compare() funcs 
 Check() {
 
     error=0   
@@ -81,14 +81,14 @@ Check() {
     #echo $wrapper 
     #echo "../testing/$wrapper"
 
+    echo -n "$basename..."
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
 
     generatedfiles="" 
 
     if [ ! -f "../testing/$wrapper" ]; then
-        echo "No wrapper exists for this test"
-        echo "$basename..."
+        #echo "No wrapper exists for this test"
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
         Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
@@ -98,8 +98,7 @@ Check() {
     else
         #TODO Change the run commands to work with the files generated, ll should be generated 
         # by just running first command, should not have to redirect the output 
-        echo "Wrapper exists for this test"
-        echo "$basename..."
+        #echo "Wrapper exists for this test"
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
         Run "$SAKE" "<" $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
@@ -108,7 +107,8 @@ Check() {
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     fi
-     
+    
+
     # Report the status and clean up the generated files
     if [ $error -eq 0 ] ; then
         if [ $keep -eq 0 ] ; then
@@ -154,10 +154,7 @@ CheckFail() {
     fi
 }
 
-
-
-# START TESTING BELOW 
-
+# CHECK FOR FLAGS 
 while getopts kdpsh c; do
     case $c in
         k) # Keep intermediate files
@@ -194,7 +191,7 @@ else
     files="../testing/test-*.sk ../testing/fail-*.sk"
 fi
 
-# TODO CODE TO CALL FUNCTIONS ON FILES 
+# RUN CHECKS 
 
 for file in $files 
 do
