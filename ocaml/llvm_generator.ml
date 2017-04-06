@@ -31,10 +31,9 @@ let translate filename program = (* translate an A.program to LLVM *)
     let types = Array.of_list inputs in 
     L.struct_type context types in
   let state_t = 
-    let names
-    let types = List.map (fun t n -> ltype A.Enum) program.A.inputs in
+    let types = List.map (fun t n -> ltype (A.Enum "")) program.A.inputs in
     let types = Array.of_list inputs in 
-    L.struct_type context types in
+    L.named_struct_type context types in
   let global_vars =
     let map vars = 
       let merge index map (dtype, name) =
@@ -44,7 +43,7 @@ let translate filename program = (* translate an A.program to LLVM *)
     let inputs = map program.A.inputs in (* FSM collection inputs *)
     let outputs = map program.A.outputs in (* FSM collection outputs *)
     let locals = map program.A.locals in (* FSM write-local state variables *)
-    let states = List.map (fun fsm -> A.Enum, fsm.A.fsm_name) program.A.fsms in
+    let states = List.map (fun fsm -> (A.Enum ""), fsm.A.fsm_name) program.A.fsms in
     let states = map states in (* FSM state variables *)
     let names = ["input"; "output"; "local"; "state"] in
     let submaps = [inputs; outputs; locals; states] in
@@ -126,6 +125,20 @@ let translate filename program = (* translate an A.program to LLVM *)
       ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
       L.builder_at_end context merge_bb
   | A.For (name, iter, body) -> (* TODO: implement local variables for for loop *)()
+  | A.Switch (predicate, cases) ->
+      let case = expr builder predicate in
+      let merge_bb = L.append_block content "merge" fn in
+      let switch_in = L.build_switch case merge_bb (List.length cases) builder in
+      let rec iter i = function
+        | [] -> ()
+        | (c, s)::tail ->
+            let case_bb = L.append_block context (Printf.sprintf "case_%d" i) fn in
+            add_terminal (stmt (L.builder_at_end context case_bb) s)
+              (L.build_br merge_bb);
+            L.add_case switch_in c case_bb;
+            iter (i + 1) tail in
+      iter 0;
+      L.builder_at_end context merge_bb
   | A.Goto state -> L.build_ret_void builder in 
   let allocation = ()
     (* TODO: allocation block *) in
