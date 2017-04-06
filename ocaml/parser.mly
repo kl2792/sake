@@ -194,7 +194,7 @@ stmt_list2:
 
 cstmt_list: //BUG: NLINE NLINE after switch statement
 NLINE { [] }
-| cstmt_list cstmt {  $2 :: $1 }
+| cstmt_list NLINE cstmt {  $3 :: $1 }
 
 string_opt:
   /* nothing */ { [] }
