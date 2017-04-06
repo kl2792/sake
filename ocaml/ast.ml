@@ -27,7 +27,7 @@ type stmt =
   | For of string * expr * stmt
   | While of expr * stmt
   | Expr of expr
-  | Switch of expr * (case * stmt) list (* Q: Instead of expr should it be expr list? *)
+  | Switch of expr * (expr * stmt) list (* Q: Instead of expr should it be expr list? *)
   | Goto of string (* for FSM transitions *)
 (*  | Return of expr (* for functions, but we're not doing functions *) *)
 type cstmt = expr * stmt
