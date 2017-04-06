@@ -77,10 +77,6 @@ INTLIT { IntLit($1) }
 | PRINT LPAREN expr RPAREN { Print($3) } //last minute
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
-case:
-CASE expr { CaseValue($2) }
-| /* nothing */ { CaseAny }
-
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
@@ -89,12 +85,12 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
 | WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
 | expr NLINE{ Expr($1) }
-| SWITCH LPAREN expr RPAREN LBRACE NLINE cstmt_list RBRACE { Switch($3, List.rev $7) }
+| SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
 // NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
 
 cstmt:
-  case COLON stmt {$1, $3}
+  CASE expr COLON stmt {$2, $4}
 
  type_decl:
   TYPE ID ASSIGN string_opt NLINE
@@ -190,8 +186,8 @@ stmt_list2:
   NLINE { [] }
 | stmt_list2 stmt { $2 :: $1 }
 
-cstmt_list:
-/* nothing */ { [] }
+cstmt_list: //BUG: NLINE NLINE after switch statement
+  NLINE { [] }
 | cstmt_list NLINE cstmt {  $3 :: $1 }
 
 string_opt:
