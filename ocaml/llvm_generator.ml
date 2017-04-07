@@ -23,16 +23,16 @@ let translate filename program = (* translate an A.program to LLVM *)
   | _ -> raise (Error "haven't figured this out yet") in
   let init v t = L.const_int (ltype t) v in
   let input_t = (* input struct type *)
-    let types = List.map (fun t n -> ltype t) program.A.inputs in
-    let types = Array.of_list inputs in 
+    let types = List.map (fun (t, n) -> ltype t) program.A.input in
+    let types = Array.of_list types in 
     L.struct_type context types in
   let output_t = 
-    let types = List.map (fun t n -> ltype t) program.A.outputs in
-    let types = Array.of_list inputs in 
+    let types = List.map (fun (t, n) -> ltype t) program.A.output in
+    let types = Array.of_list types in 
     L.struct_type context types in
   let state_t = 
-    let types = List.map (fun t n -> ltype (A.Enum "")) program.A.inputs in
-    let types = Array.of_list inputs in 
+    let types = List.map (fun (t, n) -> ltype (A.Enum "")) program.A.input in
+    let types = Array.of_list types in 
     L.struct_type context types in
   let global_vars =
     let map vars = 
@@ -40,8 +40,8 @@ let translate filename program = (* translate an A.program to LLVM *)
         let global = L.define_global name (init 0 dtype) sake in
         StringMap.add name (index, global) map in
       List.fold_left (merge 0) StringMap.empty vars in
-    let inputs = map program.A.inputs in (* FSM collection inputs *)
-    let outputs = map program.A.outputs in (* FSM collection outputs *)
+    let inputs = map program.A.input in (* FSM collection inputs *)
+    let outputs = map program.A.output in (* FSM collection outputs *)
     let static = map program.A.locals in (* FSM write-local state variables *)
     let states = List.map (fun fsm -> (A.Enum ""), fsm.A.fsm_name) program.A.fsms in
     let states = map states in (* FSM state variables *)
@@ -49,17 +49,17 @@ let translate filename program = (* translate an A.program to LLVM *)
     let submaps = [inputs; outputs; static; states] in
     let merge map name submap = StringMap.add name submap map in
     List.fold_left2 merge StringMap.empty names submaps in
-  let value_of_enum enum name = try StringMap.find namein
-  let lookup name maps = (* searches for the given name in the specified maps *)
+  (* let value_of_enum enum name = try StringMap.find name in
+  let lookup name maps =  (* searches for the given name in the specified maps *)
     let rec search = function
       [] -> raise (Error "what the hell?")
     | map :: maps ->
         let map = StringMap.find map global_vars in
  (* TODO: return associated variable *)() in
-      search maps in
+      search maps in *)
   let tick =
     let types = [state_t, input_t, output_t] in
-    let pointers = Array.of_list (List.map L.pointer_type types)
+    let pointers = Array.of_list (List.map L.pointer_type types) in
     let ftype = L.function_type void_t pointers in
     L.define_function (filename ^ "_tick") void_t sake in
   let rec expr builder = function
