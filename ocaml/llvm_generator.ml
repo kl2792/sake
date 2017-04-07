@@ -58,7 +58,7 @@ let translate filename program = (* translate an A.program to LLVM *)
  (* TODO: return associated variable *)() in
       search maps in *)
   let tick =
-    let types = [state_t, input_t, output_t] in
+    let types = [state_t; input_t; output_t] in
     let pointers = Array.of_list (List.map L.pointer_type types) in
     let ftype = L.function_type void_t pointers in
     L.define_function (filename ^ "_tick") void_t sake in
@@ -66,10 +66,10 @@ let translate filename program = (* translate an A.program to LLVM *)
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
   | A.CharLit c -> L.const_int i8_t c
-  | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
+(*  | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
   | A.ArrayLit -> ()
   | A.StringLit -> ()
-  | A.Fsm_call -> ()
+  | A.Fsm_call -> () *)
   | A.Empty -> L.const_int i32_t 0
   | A.Variable s -> L.build_load (lookup s) s builder
   | A.Uop (uop, e) ->
