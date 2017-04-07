@@ -21,7 +21,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   | A.Bool -> i1_t
   | A.Enum _ -> i32_t
   | _ -> raise (Error "haven't figured this out yet") in
-  let init v t = L.const_int (ltype t) v
+  let init v t = L.const_int (ltype t) v in
   let input_t = (* input struct type *)
     let types = List.map (fun t n -> ltype t) program.A.inputs in
     let types = Array.of_list inputs in 
@@ -33,7 +33,7 @@ let translate filename program = (* translate an A.program to LLVM *)
   let state_t = 
     let types = List.map (fun t n -> ltype (A.Enum "")) program.A.inputs in
     let types = Array.of_list inputs in 
-    L.named_struct_type context types in
+    L.struct_type context types in
   let global_vars =
     let map vars = 
       let merge index map (dtype, name) =
@@ -42,11 +42,11 @@ let translate filename program = (* translate an A.program to LLVM *)
       List.fold_left (merge 0) StringMap.empty vars in
     let inputs = map program.A.inputs in (* FSM collection inputs *)
     let outputs = map program.A.outputs in (* FSM collection outputs *)
-    let locals = map program.A.locals in (* FSM write-local state variables *)
+    let static = map program.A.locals in (* FSM write-local state variables *)
     let states = List.map (fun fsm -> (A.Enum ""), fsm.A.fsm_name) program.A.fsms in
     let states = map states in (* FSM state variables *)
-    let names = ["input"; "output"; "local"; "state"] in
-    let submaps = [inputs; outputs; locals; states] in
+    let names = ["input"; "output"; "static"; "state"] in
+    let submaps = [inputs; outputs; static; states] in
     let merge map name submap = StringMap.add name submap map in
     List.fold_left2 merge StringMap.empty names submaps in
   let value_of_enum enum name = try StringMap.find namein
@@ -141,8 +141,20 @@ let translate filename program = (* translate an A.program to LLVM *)
       L.builder_at_end context merge_bb
   | A.Goto state -> L.build_ret_void builder in 
   let allocation = ()
-    (* TODO: allocation block *) in
-  let build_fsm = (* TODO: fsm_execution block *)() in
+  (* TODO: allocation block *) in
+  let fsms =
+    let rec build_fsms = function
+      | [] -> [] 
+      | fsm::fsms ->
+          let fn = 
+            let types = [state_t, state_t, input_t, output_t] in
+            let pointers = Array.of_list (List.map L.pointer_type types) in
+            let ftype = L.function_type void_t pointers in
+            L.define_function fsm.A.fsm_name void_t sake in
+          let builder = L.builder_at_end context (L.entry_block fn) in
+          let fsm = fsm, stmt fn builder fsm.A.fsm_body in
+          fsm::(build_fsms fsms) in
+    build_fsms program.A.fsms in
   let writing = (* TODO: block for memcpying to pointer *)() in
   sake
 
