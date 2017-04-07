@@ -137,7 +137,7 @@ let translate filename program = (* translate an A.program to LLVM *)
               (L.build_br merge_bb);
             L.add_case switch_in c case_bb;
             iter (i + 1) tail in
-      iter 0;
+      iter 0 cases;
       L.builder_at_end context merge_bb
   | A.Goto state -> L.build_ret_void builder in 
   let allocation = ()
