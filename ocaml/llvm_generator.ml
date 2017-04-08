@@ -24,18 +24,18 @@ let translate filename program = (* translate an A.program to LLVM *)
   let init v t = L.const_int (ltype t) v in
   let input_t = (* input struct type *)
     let types = List.map (fun (t, n) -> ltype t) program.A.input in
-    let types = Array.of_list types in 
+    let types = Array.of_list types in
     L.struct_type context types in
-  let output_t = 
+  let output_t =
     let types = List.map (fun (t, n) -> ltype t) program.A.output in
-    let types = Array.of_list types in 
+    let types = Array.of_list types in
     L.struct_type context types in
-  let state_t = 
+  let state_t =
     let types = List.map (fun (t, n) -> ltype (A.Enum "")) program.A.input in
-    let types = Array.of_list types in 
+    let types = Array.of_list types in
     L.struct_type context types in
   let global_vars =
-    let map vars = 
+    let map vars =
       let merge index map (dtype, name) =
         let global = L.define_global name (init 0 dtype) sake in
         StringMap.add name (index, global) map in
@@ -97,7 +97,11 @@ let translate filename program = (* translate an A.program to LLVM *)
 (*  | A.Assign (s, e) ->
       let e = expr builder e in (* TODO: fix assign *)
       let _ = L.build_store e (lookup s) builder in
-        e *) in 
+        e *) in
+  let add_terminal builder f =
+      match L.block_terminator (L.insertion_block builder) with
+      Some _ -> ()
+      | None -> ignore (f builder) in
   let rec stmt fn builder = function
     A.Block body -> List.fold_left (stmt fn) builder body
   | A.Expr e -> let _ = expr builder e in builder
@@ -139,14 +143,14 @@ let translate filename program = (* translate an A.program to LLVM *)
             iter (i + 1) tail in
       iter 0 cases;
       L.builder_at_end context merge_bb
-  | A.Goto state -> L.build_ret_void builder in 
+  | A.Goto state -> L.build_ret_void builder in
   let allocation = ()
   (* TODO: allocation block *) in
   let fsms =
     let rec build_fsms = function
-      | [] -> [] 
+      | [] -> []
       | fsm::fsms ->
-          let fn = 
+          let fn =
             let types = [state_t, state_t, input_t, output_t] in
             let pointers = Array.of_list (List.map L.pointer_type types) in
             let ftype = L.function_type void_t pointers in
