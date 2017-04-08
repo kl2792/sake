@@ -65,13 +65,13 @@ let translate filename program = (* translate an A.program to LLVM *)
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-  | A.CharLit c -> L.const_int i8_t c
+(*testing  | A.CharLit c -> L.const_int i8_t c *)
 (*  | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
   | A.ArrayLit -> ()
   | A.StringLit -> ()
   | A.Fsm_call -> () *)
   | A.Empty -> L.const_int i32_t 0
-  | A.Variable s -> L.build_load (lookup s) s builder
+ (* | A.Variable s -> L.build_load (lookup s) s builder *)
   | A.Uop (uop, e) ->
       let build = (match uop with
         A.Neg -> L.build_neg
@@ -94,10 +94,10 @@ let translate filename program = (* translate an A.program to LLVM *)
       | A.Or  -> L.build_or) in
       let e1 = expr builder e1 and e2 = expr builder e2 in
         build e1 e2 "tmp" builder
-  | A.Assign (s, e) ->
+(*  | A.Assign (s, e) ->
       let e = expr builder e in (* TODO: fix assign *)
       let _ = L.build_store e (lookup s) builder in
-        e in
+        e *) in 
   let rec stmt fn builder = function
     A.Block body -> List.fold_left (stmt fn) builder body
   | A.Expr e -> let _ = expr builder e in builder
