@@ -111,7 +111,7 @@ let translate filename program = (* translate an A.program to LLVM *)
       let _ =
         add_terminal (stmt fn (L.builder_at_end context then_bb) then_stmt)
         (L.build_br merge_bb) in
-      let else_bb = L.append_block context "else" the_function in
+      let else_bb = L.append_block context "else" fn in
       add_terminal (stmt fn (L.builder_at_end context else_bb) else_stmt)
       (L.build_br merge_bb);
       let bool_val = expr builder predicate in
@@ -128,38 +128,40 @@ let translate filename program = (* translate an A.program to LLVM *)
       let merge_bb = L.append_block context "merge" fn in
       ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
       L.builder_at_end context merge_bb
-  | A.For (name, iter, body) -> (* TODO: implement local variables for for loop *)()
+(*  | A.For (name, iter, body) -> (* TODO: implement local variables for for loop *)() *)
   | A.Switch (predicate, cases) ->
       let case = expr builder predicate in
-      let merge_bb = L.append_block content "merge" fn in
+      let merge_bb = L.append_block context "merge" fn in
       let switch_in = L.build_switch case merge_bb (List.length cases) builder in
       let rec iter i = function
         | [] -> ()
         | (c, s)::tail ->
+	    let onval = expr builder c in
             let case_bb = L.append_block context (Printf.sprintf "case_%d" i) fn in
             add_terminal (stmt (L.builder_at_end context case_bb) s)
               (L.build_br merge_bb);
-            L.add_case switch_in c case_bb;
+            L.add_case switch_in onval case_bb in
             iter (i + 1) tail in
       iter 0 cases;
-      L.builder_at_end context merge_bb
-  | A.Goto state -> L.build_ret_void builder in
-  let allocation = ()
-  (* TODO: allocation block *) in
+      L.builder_at_end context merge_bb 
+  (*| A.Goto state -> L.build_ret_void builder in
+  	let allocation = () 
+  	(* TODO: allocation block*) *)
+  in
   let fsms =
     let rec build_fsms = function
       | [] -> []
       | fsm::fsms ->
           let fn =
-            let types = [state_t, state_t, input_t, output_t] in
+            let types = [state_t; state_t; input_t; output_t] in
             let pointers = Array.of_list (List.map L.pointer_type types) in
             let ftype = L.function_type void_t pointers in
             L.define_function fsm.A.fsm_name void_t sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
           let fsm = fsm, stmt fn builder fsm.A.fsm_body in
           fsm::(build_fsms fsms) in
-    build_fsms program.A.fsms in
-  let writing = (* TODO: block for memcpying to pointer *)() in
+    build_fsms program.A.fsms in  
+  let writing = (* TODO: block for memcpying to pointer *)() in 
   sake
 
   (* L.function_type to create function (tick) *)
