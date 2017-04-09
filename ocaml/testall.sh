@@ -86,7 +86,7 @@ Check() {
     generatedfiles="" 
 
     if [ ! -f "../testing/${basename}.c" ]; then
-        error=1
+        error=2
         echo "FAILED NO WRAPPER"  
     else
         #TODO Change the run commands to work with the files generated, ll should be generated 
@@ -109,8 +109,11 @@ Check() {
         fi
         echo "OK"
         echo "###### SUCCESS" 1>&2
-    else
+    elif [ $error -eq 1 ] ; then 
         echo "###### FAILED" 1>&2
+        globalerror=$error
+    else 
+        echo "###### FAILED NO WRAPPER" 1>&2
         globalerror=$error
     fi
 }
