@@ -31,6 +31,7 @@
 %token <int> RTOK
 %token <char> CHARLIT
 %token <string> STRINGLIT
+%token <string> ESCAPE
 %token <string> ID
 %token <string> TYPENAME
 
@@ -55,6 +56,7 @@ INTLIT { IntLit($1) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 | STRINGLIT { StringLit ($1) }
+| ESCAPE { Escape ($1) }
 | RTOK RTOK INTLIT { Range($1, $2, $3) }
 // WILL IMPLEMENT LATER | actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
