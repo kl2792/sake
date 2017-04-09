@@ -83,6 +83,19 @@ Check() {
     #generatedfiles="" 
 
     if [ ! -f "../testing/${basename}.c" ]; then
+        
+        echo "#include <stdio.h>" > ${basename}.c
+        echo "#include ${basename}.h\n" >> ${basename}.c
+        echo "int main() {\n\t ${basename}_tick(NULL, NULL, NULL);\n}" >> ${basename}.c
+
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
+        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
+        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$CC" "-c" "${basename}.c" "${basename}.h" 
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
+        Run "./${basename}.exe" > "${basename}.out" &&
+        Compare ${basename}.out ${reffile}.out ${basename}.diff
+
         error=2      
         echo "FAILED NO WRAPPER"  
 
