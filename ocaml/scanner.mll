@@ -72,6 +72,9 @@ rule token = parse
   | low aln* as lxm { ID (lxm) }
   | dgt+ as num { INTLIT (int_of_string num) }
   | ':'dgt+ as num { RTOK (int_of_string num) }
+  | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
+  | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
+  | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
@@ -79,7 +82,6 @@ rule token = parse
   *)
   | eof { EOF }
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
-  | '"'([^'"']* as st_litr)'"'						{ STRINGLIT(st_litr)}
 
 and comment = parse
     "~)" { token lexbuf }

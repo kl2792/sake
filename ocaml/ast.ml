@@ -11,6 +11,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | CharLit of char
   | IntLit of int
   | StringLit of string
+  | Escape of string
   | RangeLit of int * int * int (* only valid for bool, char, int *)
   | ArrayLit of expr list
   | Variable of string
