@@ -30,8 +30,8 @@
 %token <int> INTLIT
 %token <int> RTOK
 %token <char> CHARLIT
-/* %token <string> STRINGLIT */
-%token <string> ID /*why string? */
+%token <string> STRINGLIT
+%token <string> ID
 %token <string> TYPENAME
 
 %start program
@@ -54,6 +54,7 @@ INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
+| STRINGLIT { StringLit ($1) }
 | RTOK RTOK INTLIT { Range($1, $2, $3) }
 // WILL IMPLEMENT LATER | actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
@@ -74,20 +75,23 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| PRINT LPAREN expr RPAREN { Print($3) } //last minute
+| PRINT LPAREN STRINGLIT COMMA actuals_opt RPAREN { Print($3, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
-// Kind of Jank | IF expr LBRACE stmt RBRACE ELIF stmt { If($2, $4, $7) }  /*with elif */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
 | WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
+| dtype stexpr_list {Ldecl($1, List.rev $2)}  //fix
 // NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
+
+stexpr:
+  ID expr {$1, $2}
 
 cstmt:
   CASE expr COLON stmt {$2, $4}
@@ -97,7 +101,7 @@ cstmt:
   {{
     type_name = $2;
     type_values = $4;
-  }}
+
 
 state_decl:
   START ID LBRACE stmt_list2 RBRACE
@@ -125,32 +129,13 @@ fsm_decl:
   fsm_body = List.rev $4;
 }}
 
-
- /* func_decl:
-  dtype ID LPAREN lvalue_opt RPAREN LBRACE lvalue_list2 stmt_list2 RBRACE NLINE
-  {{
-    return = $1;
-    name = $2;
-    formals = $4;
-    locals = List.rev $7;
-    body = List.rev $8;
-  }}
-| dtype ID LPAREN lvalue_opt RPAREN LBRACE stmt_list2 RBRACE NLINE  // BUG: If stmt_list2 not empty then don't need NLINE
-{{
-  return = $1;
-  name = $2;
-  formals = $4;
-  locals = [];
-  body = List.rev $7;
-}} */
-
 program:
 /* Bug: if no type_list need NLINE NLINE */
   INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE lvalue_list2 type_list NLINE fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    locals = List.rev $10;
+    public = List.rev $10;
     types = List.rev $11;
     fsms = List.rev $13;
   }}
@@ -159,16 +144,13 @@ program:
   {{
     input = [];
     output = [];
-    locals = [];
+    public = [];
     types = [];
     fsms = List.rev $1;
   }}
 
 
 /*list definitions */
-char_opt:
-  /* nothing */ { [] }
-| char_opt CHARLIT { $2 :: $1 }
 
 actuals_opt:
   /* nothing */ { [] }
@@ -177,6 +159,10 @@ actuals_opt:
 actuals_list:
   expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1}
+
+stexpr_list:
+  stexpr { [$1] }
+| stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
   /* nothing */ { [] }
@@ -206,9 +192,14 @@ lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
-lvalue_list2: /* alternative way to list lvalues, line by line */
-   NLINE { [] }
-| lvalue_list NLINE lvalue { $3 :: $1 }
+public_opt:
+ /* nothing */ { [] }
+| public_list {List.rev $1}
+
+public_list:
+ dytype ID expr { [$1, $2, $3] }
+| public_list COMMA dytype ID expr {}
+
 
 state_list:
 NLINE { [] }
@@ -221,7 +212,3 @@ type_list:
 fsm_list:
 /* nothing */ { [] }
 | fsm_list fsm_decl { $2 :: $1}
-
-//func_list:
-///* nothing */ { [] }
-//| func_list func_decl { $2 :: $1}
