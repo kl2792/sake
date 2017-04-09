@@ -8,7 +8,8 @@ exception Not_found
 
 (* Note: () means "We have to write code here" *)
 
-let translate filename program = (* translate an A.program to LLVM *)
+(* Translate an A.program to LLVM *)
+let translate filename program =
   let context = L.global_context () in
   let sake = L.create_module context filename
     and i32_t  = L.i32_type  context
@@ -22,7 +23,9 @@ let translate filename program = (* translate an A.program to LLVM *)
   | A.Enum _ -> i32_t
   | _ -> raise (Error "haven't figured this out yet") in
   let init v t = L.const_int (ltype t) v in
-  let input_t = (* input struct type *)
+
+  (* New types *) 
+  let input_t =
     let types = List.map (fun (t, n) -> ltype t) program.A.input in
     let types = Array.of_list types in
     L.struct_type context types in
@@ -34,6 +37,17 @@ let translate filename program = (* translate an A.program to LLVM *)
     let types = List.map (fun (t, n) -> ltype (A.Enum "")) program.A.input in
     let types = Array.of_list types in
     L.struct_type context types in
+  
+  (* External functions *)
+  let printf = 
+    let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+    L.declare_function "printf" ftype sake in
+  let memcpy =
+    let formals = [| L.pointer_type void_t; L.pointer_type void_t; i32_t |] in
+    let ftype = L.function_type (L.pointer_type void_t) formals in
+    L.declare_function "memcpy" ftype sake in
+
+  (* Global variables *)
   let global_vars =
     let map vars =
       let merge index map (dtype, name) =
@@ -42,26 +56,26 @@ let translate filename program = (* translate an A.program to LLVM *)
       List.fold_left (merge 0) StringMap.empty vars in
     let inputs = map program.A.input in (* FSM collection inputs *)
     let outputs = map program.A.output in (* FSM collection outputs *)
-    let static = map program.A.locals in (* FSM write-local state variables *)
+    let public = List.map (fun (t, n, _) -> t, n) program.A.public in
+    let public = map public in (* FSM static write-local state variables *)
     let states = List.map (fun fsm -> (A.Enum ""), fsm.A.fsm_name) program.A.fsms in
     let states = map states in (* FSM state variables *)
-    let names = ["input"; "output"; "static"; "state"] in
-    let submaps = [inputs; outputs; static; states] in
+    let names = ["input"; "output"; "public"; "state"]
+    and submaps = [inputs; outputs; public; states] in
     let merge map name submap = StringMap.add name submap map in
     List.fold_left2 merge StringMap.empty names submaps in
-  (* let value_of_enum enum name = try StringMap.find name in
+  
+  (* Variable and enum lookup *)
+  let value_of_enum enum name = StringMap.find name in
   let lookup name maps =  (* searches for the given name in the specified maps *)
     let rec search = function
       [] -> raise (Error "what the hell?")
     | map :: maps ->
-        let map = StringMap.find map global_vars in
- (* TODO: return associated variable *)() in
-      search maps in *)
-  let tick =
-    let types = [state_t; input_t; output_t] in
-    let pointers = Array.of_list (List.map L.pointer_type types) in
-    let ftype = L.function_type void_t pointers in
-    L.define_function (filename ^ "_tick") void_t sake in
+      let map = StringMap.find map global_vars in
+      (* TODO: return associated variable *)() in
+    search maps in
+
+  (* Expression builder *)
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
   | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
@@ -97,11 +111,14 @@ let translate filename program = (* translate an A.program to LLVM *)
 (*  | A.Assign (s, e) ->
       let e = expr builder e in (* TODO: fix assign *)
       let _ = L.build_store e (lookup s) builder in
-        e *) in
+        e *)
+  | _ -> raise (Error "expr type not implemented") in
   let add_terminal builder f =
       match L.block_terminator (L.insertion_block builder) with
       Some _ -> ()
       | None -> ignore (f builder) in
+
+  (* Statement builder *)
   let rec stmt fn builder = function
     A.Block body -> List.fold_left (stmt fn) builder body
   | A.Expr e -> let _ = expr builder e in builder
@@ -128,30 +145,32 @@ let translate filename program = (* translate an A.program to LLVM *)
       let merge_bb = L.append_block context "merge" fn in
       ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
       L.builder_at_end context merge_bb
-(*  | A.For (name, iter, body) -> (* TODO: implement local variables for for loop *)() *)
+  | A.For (name, iter, body) ->
+      (* TODO: implement local variables for for loop *)
+      raise (Error "stop it")
   | A.Switch (predicate, cases) ->
       let case = expr builder predicate in
       let merge_bb = L.append_block context "merge" fn in
       let switch_in = L.build_switch case merge_bb (List.length cases) builder in
       let rec iter i = function
         | [] -> ()
-        | (c, s)::tail ->
-	    let onval = expr builder c in
+        | (c, s) :: tail ->
+            let onval = expr builder c in
             let case_bb = L.append_block context (Printf.sprintf "case_%d" i) fn in
-            add_terminal (stmt (L.builder_at_end context case_bb) s)
-              (L.build_br merge_bb);
-            L.add_case switch_in onval case_bb in
+            add_terminal (stmt fn (L.builder_at_end context case_bb) s)
+            (L.build_br merge_bb);
+            L.add_case switch_in onval case_bb;
             iter (i + 1) tail in
       iter 0 cases;
-      L.builder_at_end context merge_bb 
-  (*| A.Goto state -> L.build_ret_void builder in
-  	let allocation = () 
-  	(* TODO: allocation block*) *)
-  in
+      L.builder_at_end context merge_bb
+  | A.Ldecl (dtype, decls) -> raise (Error "stop it, i said")
+  | A.Goto state -> ()(* return here *) in
+
+  (* FSM functions *)
   let fsms =
     let rec build_fsms = function
       | [] -> []
-      | fsm::fsms ->
+      | fsm :: fsms ->
           let fn =
             let types = [state_t; state_t; input_t; output_t] in
             let pointers = Array.of_list (List.map L.pointer_type types) in
@@ -159,9 +178,18 @@ let translate filename program = (* translate an A.program to LLVM *)
             L.define_function fsm.A.fsm_name void_t sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
           let fsm = fsm, stmt fn builder fsm.A.fsm_body in
-          fsm::(build_fsms fsms) in
-    build_fsms program.A.fsms in  
-  let writing = (* TODO: block for memcpying to pointer *)() in 
+          fsm :: (build_fsms fsms) in
+
+  (* Tick function definition *)
+  let tick =
+    let types = [state_t; input_t; output_t] in
+    let pointers = Array.of_list (List.map L.pointer_type types) in
+    let ftype = L.function_type i32_t pointers in
+    L.define_function (filename ^ "_tick") void_t sake in
+  let builder = L.builder_at_end context (L.entry_block tick) in
+  let alloc = L.build_alloca state_t "state" builder in
+    build_fsms program.A.fsms in
+  let writing = () in 
   sake
 
   (* L.function_type to create function (tick) *)
