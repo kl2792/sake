@@ -79,6 +79,7 @@ rule token = parse
   *)
   | eof { EOF }
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
+  | '"'([^'"']* as st_litr)'"'						{ STRINGLIT(st_litr)}
 
 and comment = parse
     "~)" { token lexbuf }
