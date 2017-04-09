@@ -88,8 +88,7 @@ LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
-| dtype stexpr_list {Ldecl($1, List.rev $2)}  //fix
-// NOT DOING FUNCTION DECLS | RETURN expr NLINE { Return($2) }
+| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
 
 stexpr:
   ID expr {$1, $2}
@@ -203,7 +202,6 @@ public_opt:
 public_list:
  dstexpr { [$1] }
 | public_list COMMA dstexpr {$3 :: $1}
-
 
 state_list:
 NLINE { [] }
