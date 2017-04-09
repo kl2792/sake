@@ -46,7 +46,7 @@ type fsm_decl = {
 type program = {
   input : lvalue list;
   output: lvalue list;
-  public: dtype * (string * expr) list;
+  public: (dtype * string * expr) list;
   types : type_decl list;
   fsms  : fsm_decl list;
 }
