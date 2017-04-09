@@ -87,7 +87,7 @@ Check() {
 
     if [ ! -f "../testing/${basename}.c" ]; then
         error=1
-        echo "FAILED NO WRAPPER" 1>&2   
+        echo "FAILED NO WRAPPER"  
     else
         #TODO Change the run commands to work with the files generated, ll should be generated 
         # by just running first command, should not have to redirect the output 
