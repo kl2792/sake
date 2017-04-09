@@ -1,7 +1,7 @@
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
-  | Bool | Int | Char
+  | Bool | Int | Char | String
   | Array of dtype * int
   | Enum of string (* just the name of the enum *)
 type lvalue = dtype * string
@@ -10,9 +10,9 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | BoolLit of bool
   | CharLit of char
   | IntLit of int
+  | StringLit of string
   | RangeLit of int * int * int (* only valid for bool, char, int *)
   | ArrayLit of expr list
-  | StringLit of char list
   | Variable of string
   | Uop of uop * expr
   | Binop of expr * op * expr
