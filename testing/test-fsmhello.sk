@@ -1,7 +1,7 @@
 input [int i]
 output [int o]
 
-fsm f1{
+fsm fsmhello {
 	start s0{
 		o = 0
 		if (i==0){
