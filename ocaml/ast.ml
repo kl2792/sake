@@ -18,7 +18,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Binop of expr * op * expr
   | Assign of string * expr
 (*  | Call of string * expr list (* no functions *) *)
-  | Fsm_call of string * fsm_call * expr list
+(*  | Fsm_call of string * fsm_call * expr list *)
   | Cond of expr * expr * expr
   | Empty
 type stmt =
@@ -32,7 +32,7 @@ type stmt =
 (*  | Return of expr (* for functions, but we're not doing functions *) *)
 type cstmt = expr * stmt
 type type_decl = {
-  type_name  : string;
+  type_name   : string;
   type_values : string list;
 }
 type state_decl = {
