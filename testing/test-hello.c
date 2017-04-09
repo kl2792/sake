@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include "../ocaml/test-wrapper.h"
+#include "../ocaml/test-hello.h"
 
 int main() {
-    struct test-wrapper_input i;
-    struct test-wrapper_output p;
-    struct test-wrapper_state q;
+    struct test-hello_input i;
+    struct test-hello_output p;
+    struct test-hello_state q;
     
-    test-wrapper_tick(&q, &i, &p);
+    test-hello_tick(&q, &i, &p);
 
     return 0;
 }

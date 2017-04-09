@@ -5,29 +5,14 @@
 
 int main(){
     
-    struct test-fsmhello_state hello_fsm; /* = malloc(sizeof(struct name_state));
-    if (hello_fsm == NULL) {
-        perror("malloc returned null");
-        exit(1);
-    }*/
+    struct test-fsmhello_state hello_fsm; 
 
-    struct test-fsmhello_input current_input; /*= malloc(sizeof(struct name_input));
-    if (current_input == NULL) {
-        perror("malloc returned null");
-        free(hello_fsm);
-        exit(1);
-    }*/
+    struct test-fsmhello_input current_input; 
 
-    struct test-fsmhello_output current_output; /* = malloc(sizeof(struct name_output));
-    if (current_output == NULL) {
-        perror("malloc returned null");
-        free(hello_fsm);
-        free(current_input);
-        exit(1);
-    }*/
+    struct test-fsmhello_output current_output;
 
     // Set the initial state struct to initial values 
-    test-fsmhello_tick(hello_fsm, NULL, current_output);
+    //test-fsmhello_tick(hello_fsm, NULL, current_output);
 
     // Take one input at a time from the user
     char input[500];
@@ -61,7 +46,7 @@ int main(){
         }
 
         //reset the machine
-        test-fsmhello_tick(hello_fsm, NULL, current_output);
+        //test-fsmhello_tick(hello_fsm, NULL, current_output);
 
         printf("\nPlease enter an input stream of 0s and 1s. (max. 50): ");
     }
