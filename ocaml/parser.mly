@@ -59,7 +59,6 @@ INTLIT { IntLit($1) }
 | ESCAPE { Escape ($1) }
 | RTOK RTOK INTLIT { Range($1, $2, $3) }
 // WILL IMPLEMENT LATER | actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
-| QUOTES char_opt QUOTES { StringLit(List.rev $2)} // array of characters (string)
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
@@ -98,12 +97,12 @@ stexpr:
 cstmt:
   CASE expr COLON stmt {$2, $4}
 
- type_decl:
+type_decl:
   TYPE ID ASSIGN string_opt NLINE
   {{
     type_name = $2;
     type_values = $4;
-
+  }}
 
 state_decl:
   START ID LBRACE stmt_list2 RBRACE
@@ -133,11 +132,11 @@ fsm_decl:
 
 program:
 /* Bug: if no type_list need NLINE NLINE */
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE lvalue_list2 type_list NLINE fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE public_opt type_list NLINE fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = List.rev $10;
+    public = $10;
     types = List.rev $11;
     fsms = List.rev $13;
   }}
@@ -194,13 +193,16 @@ lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
+dstexpr:
+  dtype ID expr { $1, $2, $3}
+
 public_opt:
- /* nothing */ { [] }
+ NLINE { [] }
 | public_list {List.rev $1}
 
 public_list:
- dytype ID expr { [$1, $2, $3] }
-| public_list COMMA dytype ID expr {}
+ dstexpr { [$1] }
+| public_list COMMA dstexpr {$3 :: $1}
 
 
 state_list:
