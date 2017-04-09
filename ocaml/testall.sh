@@ -75,8 +75,6 @@ Check() {
                              s/.sk//'`
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
-    wrapper_ext="-wrapper"
-    wrapper="$basename$wrapper_ext"
 
     #echo $wrapper 
     #echo "../testing/$wrapper"
@@ -87,14 +85,9 @@ Check() {
 
     generatedfiles="" 
 
-    if [ ! -f "../testing/${wrapper}.c" ]; then
-        #echo "No wrapper exists for this test"
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
-        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
-        Run "./${basename}.exe" > "${basename}.out" &&
-        Compare ${basename}.out ${reffile}.out ${basename}.diff
+    if [ ! -f "../testing/${basename}.c" ]; then
+        error=1
+        echo "FAILED NO WRAPPER" 1>&2   
     else
         #TODO Change the run commands to work with the files generated, ll should be generated 
         # by just running first command, should not have to redirect the output 
@@ -102,8 +95,8 @@ Check() {
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
         Run "$SAKE" " " $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-c" "../testing/${wrapper}.c" "${basename}.h" 
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${wrapper}.o" "printbig.o" &&                    
+        Run "$CC" "-c" "../testing/${basename}.c" "${basename}.h" 
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     fi
