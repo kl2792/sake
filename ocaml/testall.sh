@@ -80,16 +80,19 @@ Check() {
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
 
-    generatedfiles="" 
+    #generatedfiles="" 
 
     if [ ! -f "../testing/${basename}.c" ]; then
+        error=1        
+        echo "FAILED NO WRAPPER"  
+
         #echo "No wrapper exists for this test"
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
-        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
-        Run "./${basename}.exe" > "${basename}.out" &&
-        Compare ${basename}.out ${reffile}.out ${basename}.diff
+     #   generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
+      #  Run "$SAKE" " " $1 ">" "${basename}.ll" &&
+       # Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+       # Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
+       # Run "./${basename}.exe" > "${basename}.out" &&
+       # Compare ${basename}.out ${reffile}.out ${basename}.diff
     else
         #TODO Change the run commands to work with the files generated, ll should be generated 
         # by just running first command, should not have to redirect the output 
