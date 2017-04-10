@@ -93,9 +93,11 @@ let translate filename program =
      let args = fmt :: (List.map (expr builder) args) in
      L.build_call printf (Array.of_list args) "printf" builder
 *)
-(* ONE ARGUMENT VERSION *)
+(* ONE ARGUMENT/JANK VERSION *)
  | A.Print (fmt, arg) ->
-     L.build_call printf [| fmt; (expr builder arg) |] "printf" builder
+     let arg1 = List.hd arg in
+     let format_str = L.build_global_stringptr fmt "fmt" builder in
+     L.build_call printf [| format_str; (expr builder arg1) |] "printf" builder
 (*********************)
   | A.Uop (uop, e) ->
       let build = (match uop with
