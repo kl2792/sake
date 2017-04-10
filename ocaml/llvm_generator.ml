@@ -76,9 +76,9 @@ let translate filename program =
     search maps in
 
   (* External functions *)
-  let printf =
+  let print =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-    L.declare_function "printf" ftype sake in
+    L.declare_function "print" ftype sake in
   let memcpy =
     let formals = [| L.pointer_type i8_t; L.pointer_type i8_t; i32_t |] in
     let ftype = L.function_type (L.pointer_type i8_t) formals in
@@ -111,9 +111,12 @@ let translate filename program =
     | A.Empty -> L.const_int i32_t 0
     | A.Variable s -> raise (Error "NIMP: Variable")(*L.build_load (lookup s) s builder*)
     | A.Print (fmt, args) ->
-        let fmt = L.build_global_stringptr fmt "fmt" builder in
-        let args = fmt :: (List.map (expr builder) args) in
-        L.build_call printf (Array.of_list args) "printf" builder
+        let fmt' = L.build_global_stringptr fmt "fmt" builder in
+        let args = [fmt'; expr builder (List.hd args)] in
+        (* let args = fmt :: (List.map (expr builder) args) in *)
+        let args = Array.of_list args in
+        Printf.printf "\n\n\n\n\n%s %s\n\n\n\n\n" fmt (L.string_of_llvalue args.(1));
+        L.build_call print args "printf" builder
     | A.Uop (uop, e) ->
         let build = lluop uop in
         let e = expr builder e in

@@ -2,4 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int printf(const char * restrict format, ...);
+int (*print)(const char * restrict, ...) = printf;
+
+/*int print(const char * restrict format, int arg) {
+	printf(format, arg);
+}*/
