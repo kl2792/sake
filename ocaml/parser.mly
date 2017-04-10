@@ -81,6 +81,7 @@ INTLIT { IntLit($1) }
 
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
+| STATE ID LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $4) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
@@ -103,37 +104,13 @@ type_decl:
     type_values = $4;
   }}
 
-state_decl:
-  START ID LBRACE stmt_list2 RBRACE
-  {{
-    state_name = $2;
-    state_start = true;
-    state_body = List.rev $4;
-  }}
-| ID LBRACE stmt_list2 RBRACE
-  {{
-    state_name = $1;
-    state_start = false;
-    state_body = List.rev $3;
-  }}
-| stmt_list2  //for testing, //if there are no states
-{{
-    state_name = "Hello"; 
-    state_start = false;
-    state_body = List.rev $1;
-}}
-
 fsm_decl:
-  FSM ID LBRACE state_list NLINE RBRACE
+  FSM ID LBRACE stmt_list2 NLINE RBRACE
 {{
   fsm_name = $2;
+  fsm_states = [];
   fsm_body = List.rev $4;
 }}
-/* | FSM ID LBRACE stmt_list2 RBRACE  //if there are no states
-{{
-  fsm_name = $2;
-  fsm_body = List.rev $4;
-}} */
 
 program:
 /* Bug: if no type_list need NLINE NLINE */
@@ -208,10 +185,6 @@ public_opt:
 public_list:
  dstexpr { [$1] }
 | public_list COMMA dstexpr {$3 :: $1}
-
-state_list:
-NLINE { [] }
-| state_list NLINE state_decl { $3 :: $1}
 
 type_list:
 /* nothing */ { [] }
