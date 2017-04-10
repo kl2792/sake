@@ -107,7 +107,7 @@ Check() {
         # by just running first command, should not have to redirect the output 
         #echo "Wrapper exists for this test"
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
+        Run "$SAKE" " " $1 &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c" "${basename}.h" 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    

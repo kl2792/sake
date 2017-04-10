@@ -105,7 +105,7 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE stmt_list2 NLINE RBRACE
+  FSM ID LBRACE stmt_list2 RBRACE
 {{
   fsm_name = $2;
   fsm_states = ["start"];
