@@ -8,7 +8,7 @@ LLI="lli"
 LLC="llc"
 
 # Path to the C compiler
-CC="cc"
+CC="gcc"
 
 # Path to sake compiler - usually just ./sake.native 
 #SAKE="./sake"
@@ -52,6 +52,7 @@ Compare() {
 # Run functions -> how we want run it and then report errors 
 Run() {
     echo $* 1>&2
+    #echo $*
     eval $* || {
         SignalError "$1 failed on $*"
         return 1
@@ -93,23 +94,20 @@ Check() {
         echo "#include \"${basename}.h\"\n" >> ../testing/${basename}.c
         echo "int main() {\n\t ${basename}_tick(NULL, NULL, NULL);\n}" >> ../testing/${basename}.c
         
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-
-        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
-        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-c" "${basename}.c" "${basename}.h" 
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" && 
+        Run "$SAKE" " " $1 ${basename} &&
+        Run "mv ${basename}.h ../testing/" &&
+        #Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
-
     else
-        #TODO Change the run commands to work with the files generated, ll should be generated 
-        # by just running first command, should not have to redirect the output 
-        #echo "Wrapper exists for this test"
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" " " $1 &&
-        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-c" "../testing/${basename}.c" "${basename}.h" 
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&     
+        Run "$SAKE" " " $1 ${basename} &&
+        Run "mv ${basename}.h ../testing/" &&
+        #Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
@@ -123,11 +121,8 @@ Check() {
         fi
         echo "OK"
         echo "###### SUCCESS" 1>&2
-    elif [ $error -eq 1 ] ; then 
-        echo "###### FAILED" 1>&2
-        globalerror=$error
     else 
-        echo "###### FAILED NO WRAPPER" 1>&2
+        echo "###### FAILED" 1>&2
         globalerror=$error
     fi
 }
@@ -148,7 +143,7 @@ CheckFail() {
     generatedfiles="" 
 
     generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
-    RunFail "$SAKE" " " $1 "2>" "${basename}.err" ">>" $globallog &&     
+    RunFail "$SAKE" " " $1 ${basename} "2>" "${basename}.err" ">>" $globallog &&     
     Compare ${basename}.err ${reffile}.err ${basename}.diff
      
     # Report the status and clean up the generated files
@@ -197,7 +192,7 @@ then
     files=$@
 else
     #Check this path 
-    files="../testing/test-*.sk ../testing/fail-*.sk"
+    files="../testing/test_*.sk ../testing/fail_*.sk"
 fi
 
 # RUN CHECKS 
@@ -205,10 +200,10 @@ fi
 for file in $files 
 do
     case $file in 
-        *test-*)
+        *test_*)
             Check $file 2>> $globallog 
             ;;
-        *fail-*)
+        *fail_*)
             CheckFail $file 2>> $globallog
             ;;
         *)
