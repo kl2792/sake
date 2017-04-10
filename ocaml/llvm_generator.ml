@@ -172,7 +172,6 @@ let translate filename program =
   | A.State name -> raise (Error "not this one!")
   | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
 
-  (*
   (* FSM functions *)
   let fsms =
     let rec build_fsms = function
@@ -182,7 +181,7 @@ let translate filename program =
             let types = [state_t; state_t; input_t; output_t] in
             let pointers = Array.of_list (List.map L.pointer_type types) in
             let ftype = L.function_type i32_t pointers in
-            L.define_function fsm.A.fsm_name void_t sake in
+            L.define_function fsm.A.fsm_name ftype sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
           let body = stmt fn builder (A.Block fsm.A.fsm_body) in
           let fsm = fsm, add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
@@ -194,12 +193,12 @@ let translate filename program =
     let types = [state_t; input_t; output_t] in
     let args = Array.of_list (List.map L.pointer_type types) in
     let ftype = L.function_type i32_t args in
-    L.define_function (filename ^ "_tick") i32_t sake in
+    L.define_function (filename ^ "_tick") ftype sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
   let calls = () in
   let writing = () in
-  let terminal = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in *)
+  let terminal = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
   sake
 
   (* L.function_type to create function (tick) *)
