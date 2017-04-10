@@ -81,7 +81,7 @@ INTLIT { IntLit($1) }
 
 stmt:
 LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
-| STATE ID LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $4) }
+| STATE ID NLINE { State($2) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
