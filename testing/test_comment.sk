@@ -1,4 +1,4 @@
 fsm variables {
-        int i = 4 
+        ~ int i = 4 
         ~ public int k = 4
 }
