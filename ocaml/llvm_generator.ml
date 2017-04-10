@@ -143,21 +143,21 @@ let translate filename program =
   let rec stmt fn builder = function
     | A.Block body -> List.fold_left (stmt fn) builder body
     | A.Expr e -> let _ = expr builder e in builder
-  | A.If (predicate, then_stmt, else_stmt) ->
-      let merge_bb = L.append_block context "merge" fn in
-      let then_bb = L.append_block context "then" fn in
-      let _ =
-        add_terminal (stmt fn (L.builder_at_end context then_bb) then_stmt)
-        (L.build_br merge_bb) in
-      let else_bb = L.append_block context "else" fn in
-      add_terminal (stmt fn (L.builder_at_end context else_bb) else_stmt)
-      (L.build_br merge_bb);
+    | A.If (predicate, then_stmt, else_stmt) ->
+        let merge_bb = L.append_block context "merge" fn in
+        let then_bb = L.append_block context "then" fn in
+        let _ =
+          add_terminal (stmt fn (L.builder_at_end context then_bb) then_stmt)
+          (L.build_br merge_bb) in
+        let else_bb = L.append_block context "else" fn in
+        add_terminal (stmt fn (L.builder_at_end context else_bb) else_stmt)
+        (L.build_br merge_bb);
       let bool_val = expr builder predicate in
       ignore (L.build_cond_br bool_val then_bb else_bb builder);
       L.builder_at_end context merge_bb
-  | A.While (predicate, body) ->
-      let pred_bb = L.append_block context "while" fn in
-      ignore (L.build_br pred_bb builder);
+    | A.While (predicate, body) ->
+        let pred_bb = L.append_block context "while" fn in
+        ignore (L.build_br pred_bb builder);
       let body_bb = L.append_block context "while_body" fn in
       add_terminal (stmt fn (L.builder_at_end context body_bb) body)
       (L.build_br pred_bb);
@@ -166,27 +166,27 @@ let translate filename program =
       let merge_bb = L.append_block context "merge" fn in
       ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
       L.builder_at_end context merge_bb
-  | A.Switch (predicate, cases) ->
-      let case = expr builder predicate in
-      let merge_bb = L.append_block context "merge" fn in
-      let switch_in = L.build_switch case merge_bb (List.length cases) builder in
-      let rec iter i = function
-        | [] -> ()
-        | (c, s) :: tail ->
-            let onval = expr builder c in
-            let case_bb = L.append_block context (Printf.sprintf "case_%d" i) fn in
-            add_terminal (stmt fn (L.builder_at_end context case_bb) s)
-            (L.build_br merge_bb);
-            L.add_case switch_in onval case_bb;
+    | A.Switch (predicate, cases) ->
+        let case = expr builder predicate in
+        let merge_bb = L.append_block context "merge" fn in
+        let switch_in = L.build_switch case merge_bb (List.length cases) builder in
+        let rec iter i = function
+          | [] -> ()
+          | (c, s) :: tail ->
+              let onval = expr builder c in
+              let case_bb = L.append_block context (Printf.sprintf "case_%d" i) fn in
+              add_terminal (stmt fn (L.builder_at_end context case_bb) s)
+              (L.build_br merge_bb);
+              L.add_case switch_in onval case_bb;
             iter (i + 1) tail in
-      iter 0 cases;
-      L.builder_at_end context merge_bb
-  | A.For (name, iter, body) ->
-      (* TODO: implement local variables for for loop *)
-      raise (Error "stop it")
-  | A.Ldecl (dtype, decls) -> raise (Error "stop it, i said")
-  | A.State name -> raise (Error "not this one!")
-  | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
+        iter 0 cases;
+        L.builder_at_end context merge_bb
+    | A.For (name, iter, body) ->
+        (* TODO: implement local variables for for loop *)
+        raise (Error "stop it")
+    | A.Ldecl (dtype, decls) -> raise (Error "stop it, i said")
+    | A.State name -> raise (Error "not this one!")
+    | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
 
   (* FSM functions *)
   let fsms =
