@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../ocaml/test-wrapper.h"
+#include "test-wrapper.h"
 
 int main() {
     struct test-wrapper_input i;

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../ocaml/test-switch.h"
+#include "test-switch.h"
 
 int main() {
     struct test-switch_input i;

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../ocaml/test-hello.h"
+#include "test-hello.h"
 
 int main() {
     struct test-hello_input i;
