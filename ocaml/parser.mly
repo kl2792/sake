@@ -9,7 +9,7 @@
 %token EOF
 
 /*tokens specific to our language */
-%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
+%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
 %token TICK RESET PRINT
 
 /* ASSOCIATIVITY */
@@ -115,12 +115,12 @@ fsm_decl:
 
 program:
 /* Bug: if no type_list need NLINE NLINE */
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE public_opt type_list NLINE fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE public_opt type_list fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = $10;
-    types = List.rev $11;
+    public = $11;
+    types = List.rev $12;
     fsms = List.rev $13;
   }}
 /* MAXIMUM JANKNESS */
@@ -180,8 +180,8 @@ dstexpr:
   dtype ID expr { $1, $2, $3}
 
 public_opt:
- NLINE { [] }
-| public_list {List.rev $1}
+ /*nothing*/ { [] }
+| PUBLIC public_list NLINE {List.rev $2}
 
 public_list:
  dstexpr { [$1] }
