@@ -16,30 +16,30 @@ let translate filename program =
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
-  let ltype = function
+  let lltype = function
     A.Int -> i32_t
   | A.Char -> i8_t
   | A.Bool -> i1_t
   | A.Enum _ -> i32_t
   | _ -> raise (Error "haven't figured this out yet") in
-  let init v t = L.const_int (ltype t) v in
+  let init v t = L.const_int (lltype t) v in
 
   (* New types *)
   let input_t =
-    let types = List.map (fun (t, n) -> ltype t) program.A.input in
+    let types = List.map (fun (t, _) -> lltype t) program.A.input in
     let types = Array.of_list types in
     L.struct_type context types in
   let output_t =
-    let types = List.map (fun (t, n) -> ltype t) program.A.output in
+    let types = List.map (fun (t, _) -> lltype t) program.A.output in
     let types = Array.of_list types in
     L.struct_type context types in
   let state_t =
-    let types = List.map (fun (t, n) -> ltype (A.Enum "")) program.A.input in
+    let types = List.map (fun (_, _) -> lltype (A.Enum "")) program.A.input in
     (* TODO: let types = types @ *)
     let types = Array.of_list types in
     L.struct_type context types in
 
-  (* Global variables *)
+  (* Variables *)
   let global_vars =
     let map vars =
       let merge index map (dtype, name) =
@@ -55,17 +55,24 @@ let translate filename program =
     let names = ["input"; "output"; "public"; "state"]
     and submaps = [inputs; outputs; public; states] in
     let merge map name submap = StringMap.add name submap map in
-    List.fold_left2 merge StringMap.empty names submaps in
+    List.fold_left2 merge StringMap.empty names submaps in  
+  let locals = StringMap.empty in
 
-  (* Variable and enum lookup *)
-  let value_of_enum enum name = StringMap.find name in
-  let lookup name maps = (* searches for given name in the specified maps *)
+  (* Lookup functions *)
+  let value name =
+    let rec find_name i = function
+      | [] -> raise (Error "... y tho")
+      | enum :: tail ->
+          if enum == name then i else find_name (i + 1) tail in
+    find_name 0 program.A.types in
+  let lookup name maps = (* search for given name in specified maps *)
     let rec search = function
-      [] -> raise (Error "what the hell?")
-    | map :: maps ->
-      let map = StringMap.find map global_vars in
-      try StringMap.find name map
-      with Not_found -> search maps in
+      | [] -> raise (Error "what the hell?")
+      | map :: maps ->
+          let map = StringMap.find map global_vars in
+          try
+            StringMap.find name map
+          with Not_found -> search maps in
     search maps in
 
   (* External functions *)
@@ -77,60 +84,63 @@ let translate filename program =
     let ftype = L.function_type (L.pointer_type i8_t) formals in
     L.declare_function "memcpy" ftype sake in
 
-  (* Local variables *)
-  let locals = StringMap.empty in
+  (* Operation mappers *)
+  let llop = function 
+    | A.Add -> L.build_add
+    | A.Sub -> L.build_sub
+    | A.Mul -> L.build_mul
+    | A.Div -> L.build_sdiv
+    | A.Eq  -> L.build_icmp L.Icmp.Eq
+    | A.Neq -> L.build_icmp L.Icmp.Ne
+    | A.Lt  -> L.build_icmp L.Icmp.Slt
+    | A.Le  -> L.build_icmp L.Icmp.Sle
+    | A.Gt  -> L.build_icmp L.Icmp.Sgt
+    | A.Ge  -> L.build_icmp L.Icmp.Sge
+    | A.And -> L.build_and
+    | A.Or  -> L.build_or in
+  let lluop = function
+    | A.Neg -> L.build_neg
+    | A.Not -> L.build_not in
 
   (* Expression builder *)
   let rec expr builder = function
-    A.IntLit i -> L.const_int i32_t i
-  | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
-(*testing  | A.CharLit c -> L.const_int i8_t c *)
-(*  | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
-  | A.ArrayLit -> ()
-  | A.Fsm_call -> () *)
-  | A.StringLit s -> L.const_stringz context s
-  | A.Empty -> L.const_int i32_t 0
- (* | A.Variable s -> L.build_load (lookup s) s builder *)
- | A.Print (fmt, args) ->
-     let fmt = L.build_global_stringptr fmt "fmt" builder in
-     let args = fmt :: (List.map (expr builder) args) in
-     L.build_call printf (Array.of_list args) "printf" builder
-  | A.Uop (uop, e) ->
-      let build = (match uop with
-        A.Neg -> L.build_neg
-      | A.Not -> L.build_not) in
-      let e = expr builder e in
+    | A.IntLit i -> L.const_int i32_t i
+    | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
+    | A.CharLit c -> L.const_int i8_t (int_of_char c)
+    | A.StringLit s -> L.const_stringz context s
+    | A.Empty -> L.const_int i32_t 0
+    | A.Variable s -> raise (Error "NIMP: Variable")(*L.build_load (lookup s) s builder*)
+    | A.Print (fmt, args) ->
+        let fmt = L.build_global_stringptr fmt "fmt" builder in
+        let args = fmt :: (List.map (expr builder) args) in
+        L.build_call printf (Array.of_list args) "printf" builder
+    | A.Uop (uop, e) ->
+        let build = lluop uop in
+        let e = expr builder e in
         build e "tmp" builder
-  | A.Binop (e1, op, e2) ->
-      let build = (match op with
-        A.Add -> L.build_add
-      | A.Sub -> L.build_sub
-      | A.Mul -> L.build_mul
-      | A.Div -> L.build_sdiv
-      | A.Eq  -> L.build_icmp L.Icmp.Eq
-      | A.Neq -> L.build_icmp L.Icmp.Ne
-      | A.Lt  -> L.build_icmp L.Icmp.Slt
-      | A.Le  -> L.build_icmp L.Icmp.Sle
-      | A.Gt  -> L.build_icmp L.Icmp.Sgt
-      | A.Ge  -> L.build_icmp L.Icmp.Sge
-      | A.And -> L.build_and
-      | A.Or  -> L.build_or) in
-      let e1 = expr builder e1 and e2 = expr builder e2 in
+    | A.Binop (e1, op, e2) ->
+        let build = llop op in
+        let e1 = expr builder e1 and e2 = expr builder e2 in
         build e1 e2 "tmp" builder
-  (* | A.Assign (s, e) ->
-      let e = expr builder e in (* TODO: fix assign *)
-      let _ = L.build_store e (lookup s) builder in
+    | A.Assign (s, e) -> raise (Error "NIMP: Assign")
+        (* let e = expr builder e in (* TODO: fix assign *)
+        let _ = L.build_store e (lookup s) builder in
         e *)
-  | _ -> raise (Error "expr type not implemented") in
+    | A.Escape s -> raise (Error "NIMP: Escape")
+    | A.Range (s, e, i) -> raise (Error "NIMP: Range")
+    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit")
+    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond")
+    in
+
   let add_terminal builder f =
-      match L.block_terminator (L.insertion_block builder) with
+    match L.block_terminator (L.insertion_block builder) with
       Some _ -> ()
-      | None -> ignore (f builder) in
+    | None -> ignore (f builder) in
 
   (* Statement builder *)
   let rec stmt fn builder = function
-    A.Block body -> List.fold_left (stmt fn) builder body
-  | A.Expr e -> let _ = expr builder e in builder
+    | A.Block body -> List.fold_left (stmt fn) builder body
+    | A.Expr e -> let _ = expr builder e in builder
   | A.If (predicate, then_stmt, else_stmt) ->
       let merge_bb = L.append_block context "merge" fn in
       let then_bb = L.append_block context "then" fn in
