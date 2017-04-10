@@ -37,7 +37,6 @@ type type_decl = {
 }
 type fsm_decl = {
   fsm_name  : string;
-  fsm_start : string;
   fsm_states: string list;
   fsm_body  : stmt list;
 }
