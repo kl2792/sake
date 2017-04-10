@@ -116,6 +116,12 @@ state_decl:
     state_start = false;
     state_body = List.rev $3;
   }}
+| stmt_list2  //for testing, if there are no states
+{{
+    state_name = [];
+    state_start = [];
+    state_body = List.rev $1;
+}}
 
 fsm_decl:
   FSM ID LBRACE state_list NLINE RBRACE
@@ -123,11 +129,11 @@ fsm_decl:
   fsm_name = $2;
   fsm_body = List.rev $4;
 }}
-| FSM ID LBRACE stmt_list2 RBRACE  //if there are no states
+/* | FSM ID LBRACE stmt_list2 RBRACE  //if there are no states
 {{
   fsm_name = $2;
   fsm_body = List.rev $4;
-}}
+}} */
 
 program:
 /* Bug: if no type_list need NLINE NLINE */
