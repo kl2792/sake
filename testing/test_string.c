@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "test_4.h"
+#include "test_string.h"
 
 int main() {
-	 test_4_tick(NULL, NULL, NULL);
+	 test_string_tick(NULL, NULL, NULL);
 }

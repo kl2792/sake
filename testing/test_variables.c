@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "test_2.h"
+#include "test_variables.h"
 
 int main() {
-	 test_2_tick(NULL, NULL, NULL);
+	 test_variables_tick(NULL, NULL, NULL);
 }

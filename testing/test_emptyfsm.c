@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "test_1.h"
+#include "test_emptyfsm.h"
 
 int main() {
-	 test_1_tick(NULL, NULL, NULL);
+	 test_emptyfsm_tick(NULL, NULL, NULL);
 }
