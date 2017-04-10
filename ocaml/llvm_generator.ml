@@ -63,7 +63,8 @@ let translate filename program =
       [] -> raise (Error "what the hell?")
     | map :: maps ->
       let map = StringMap.find map global_vars in
-      (* TODO: return associated variable *)() in
+      try StringMap.find name map
+      with Not_found -> search maps in
     search maps in
 
   (* External functions *)
@@ -86,19 +87,10 @@ let translate filename program =
   | A.StringLit s -> L.const_stringz context s
   | A.Empty -> L.const_int i32_t 0
  (* | A.Variable s -> L.build_load (lookup s) s builder *)
-
-(*ORIGINAL PRINT F *)
-(*
  | A.Print (fmt, args) ->
+     let fmt = L.build_global_stringptr fmt "fmt" builder in
      let args = fmt :: (List.map (expr builder) args) in
      L.build_call printf (Array.of_list args) "printf" builder
-*)
-(* ONE ARGUMENT/JANK VERSION *)
- | A.Print (fmt, arg) ->
-     let arg1 = List.hd arg in
-     let format_str = L.build_global_stringptr fmt "fmt" builder in
-     L.build_call printf [| format_str; (expr builder arg1) |] "printf" builder
-(*********************)
   | A.Uop (uop, e) ->
       let build = (match uop with
         A.Neg -> L.build_neg
@@ -191,7 +183,7 @@ let translate filename program =
             let ftype = L.function_type void_t pointers in
             L.define_function fsm.A.fsm_name void_t sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
-          let fsm = fsm, stmt fn builder fsm.A.fsm_body in
+          let fsm = fsm, stmt fn builder (A.Block fsm.A.fsm_body) in
           fsm :: (build_fsms fsms) in
     build_fsms program.A.fsms in
 
