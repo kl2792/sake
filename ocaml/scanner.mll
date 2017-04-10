@@ -55,6 +55,7 @@ rule token = parse
   | "string"   { STRING }
   | "true"   { TRUE }
   | "false"  { FALSE }
+  | "print"  { PRINT }
   | "fsm" { FSM }
   | "tick"   { TICK }
   | "reset"   { RESET }
@@ -72,6 +73,9 @@ rule token = parse
   | low aln* as lxm { ID (lxm) }
   | dgt+ as num { INTLIT (int_of_string num) }
   | ':'dgt+ as num { RTOK (int_of_string num) }
+  | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
+  | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
+  | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }

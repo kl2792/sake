@@ -75,8 +75,6 @@ Check() {
                              s/.sk//'`
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
-    wrapper_ext="-wrapper"
-    wrapper="$basename$wrapper_ext"
 
     #echo $wrapper 
     #echo "../testing/$wrapper"
@@ -87,23 +85,32 @@ Check() {
 
     generatedfiles="" 
 
-    if [ ! -f "../testing/${wrapper}.c" ]; then
-        #echo "No wrapper exists for this test"
+    if [ ! -f "../testing/${basename}.c" ]; then
+        #error=2
+        #echo "FAILED NO WRAPPER"  
+
+        echo "#include <stdio.h>" > ../testing/${basename}.c
+        echo "#include \"${basename}.h\"\n" >> ../testing/${basename}.c
+        echo "int main() {\n\t ${basename}_tick(NULL, NULL, NULL);\n}" >> ../testing/${basename}.c
+        
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
+
         Run "$SAKE" " " $1 ">" "${basename}.ll" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&                    
+        Run "$CC" "-c" "${basename}.c" "${basename}.h" 
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
+
     else
         #TODO Change the run commands to work with the files generated, ll should be generated 
         # by just running first command, should not have to redirect the output 
         #echo "Wrapper exists for this test"
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&    
-        Run "$SAKE" " " $1 ">" "${basename}.ll" &&
+        Run "$SAKE" " " $1 &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-c" "../testing/${wrapper}.c" "${basename}.h" 
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${wrapper}.o" "printbig.o" &&                    
+        Run "$CC" "-c" "../testing/${basename}.c" "${basename}.h" 
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     fi
@@ -116,8 +123,11 @@ Check() {
         fi
         echo "OK"
         echo "###### SUCCESS" 1>&2
-    else
+    elif [ $error -eq 1 ] ; then 
         echo "###### FAILED" 1>&2
+        globalerror=$error
+    else 
+        echo "###### FAILED NO WRAPPER" 1>&2
         globalerror=$error
     fi
 }
