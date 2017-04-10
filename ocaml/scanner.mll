@@ -40,6 +40,7 @@ rule token = parse
   | "&&"     { AND }
   | "||"     { OR }
   | "!"      { NOT }
+  | "print"  { PRINT }
   | "if"     { IF }
   | "else"   { ELSE }
   | "for"    { FOR }
