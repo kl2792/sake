@@ -72,8 +72,8 @@ let translate filename program =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let formals = [| L.pointer_type void_t; L.pointer_type void_t; i32_t |] in
-    let ftype = L.function_type (L.pointer_type void_t) formals in
+    let formals = [| L.pointer_type i8_t; L.pointer_type i8_t; i32_t |] in
+    let ftype = L.function_type (L.pointer_type i8_t) formals in
     L.declare_function "memcpy" ftype sake in
 
   (* Expression builder *)
@@ -183,20 +183,22 @@ let translate filename program =
             let ftype = L.function_type void_t pointers in
             L.define_function fsm.A.fsm_name void_t sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
-          let fsm = fsm, stmt fn builder (A.Block fsm.A.fsm_body) in
+          let body = stmt fn builder (A.Block fsm.A.fsm_body) in
+          let fsm = fsm, add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
           fsm :: (build_fsms fsms) in
     build_fsms program.A.fsms in
 
   (* Tick function definition *)
   let tick =
     let types = [state_t; input_t; output_t] in
-    let pointers = Array.of_list (List.map L.pointer_type types) in
-    let ftype = L.function_type i32_t pointers in
-    L.define_function (filename ^ "_tick") void_t sake in
+    let args = Array.of_list (List.map L.pointer_type types) in
+    let ftype = L.function_type i32_t args in
+    L.define_function (filename ^ "_tick") i32_t sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
-(*  let calls =
-  let writing = () in *)
+  let terminal = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in 
+  let calls = () in
+  let writing = () in
   sake
 
   (* L.function_type to create function (tick) *)
