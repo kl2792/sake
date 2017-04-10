@@ -118,8 +118,8 @@ state_decl:
   }}
 | stmt_list2  //for testing, if there are no states
 {{
-    state_name = [];
-    state_start = [];
+    state_name = "Hello"; //can delete later
+    state_start = false;
     state_body = List.rev $1;
 }}
 
