@@ -1,4 +1,4 @@
-all : sake.native printbig.o
+all : sake.native print.o
 
 sake.native :
 	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
@@ -23,7 +23,7 @@ parser.ml parser.mli : parser.mly
 %.cmx : %.ml
 	ocamlfind ocamlopt -c -package llvm $<
 
-printbig : printbig.c
+print : print.c
 
 .PHONY : clean
 clean :
