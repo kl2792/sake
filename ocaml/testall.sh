@@ -99,7 +99,7 @@ Check() {
         Run "mv ${basename}.h ../testing/" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     else
@@ -108,7 +108,7 @@ Check() {
         Run "mv ${basename}.h ../testing/" &&
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
+        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     fi
@@ -178,10 +178,10 @@ LLIFail() {
 
 which "$LLI" >> $globallog || LLIFail
 
-if [ ! -f printbig.o ]
+if [ ! -f print.o ]
 then        
-    echo "Could not find printbig.o"   
-    echo "Try \"make printbig.o\""
+    echo "Could not find print.o"   
+    echo "Try \"make print.o\""
     exit 1
 fi
 
