@@ -97,7 +97,7 @@ Check() {
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" && 
         Run "$SAKE" " " $1 ${basename} &&
         Run "mv ${basename}.h ../testing/" &&
-        #Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
@@ -106,7 +106,7 @@ Check() {
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" &&     
         Run "$SAKE" " " $1 ${basename} &&
         Run "mv ${basename}.h ../testing/" &&
-        #Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
+        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "printbig.o" &&                    
         Run "./${basename}.exe" > "${basename}.out" &&
