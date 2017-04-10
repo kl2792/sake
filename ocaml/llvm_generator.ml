@@ -127,7 +127,7 @@ let translate filename program =
         build e1 e2 "tmp" builder
     | A.Assign (s, e) -> raise (Error "NIMP: Assign")
         (* let e = expr builder e in (* TODO: fix assign *)
-        let _ = L.build_store e (lookup s) builder in
+       let _ = L.build_store e (lookup s) builder in
         e *)
     | A.Escape s -> raise (Error "NIMP: Escape")
     | A.Range (s, e, i) -> raise (Error "NIMP: Range")
@@ -179,8 +179,8 @@ let translate filename program =
               (L.build_br merge_bb);
               L.add_case switch_in onval case_bb;
             iter (i + 1) tail in
-        iter 0 cases;
-        L.builder_at_end context merge_bb
+        iter 0 cases; 
+        L.builder_at_end context merge_bb 
     | A.For (name, iter, body) ->
         (* TODO: implement local variables for for loop *)
         raise (Error "stop it")
