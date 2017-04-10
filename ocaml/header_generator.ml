@@ -78,7 +78,7 @@ let header_guard name macros structs tick =
     upper upper macros structs tick
 
 			(* convert named AST to header file *)
-let string_of_ast name ast =
+let translate name ast =
   let macros = macros_of_ast name ast
   and structs = structs_of_ast name ast 	
   and tick = tick_prototype name in
