@@ -114,14 +114,13 @@ fsm_decl:
 }}
 
 program:
-/* Bug: if no type_list need NLINE NLINE */
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE public_opt type_list fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE public_opt type_list fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = $11;
-    types = List.rev $12;
-    fsms = List.rev $13;
+    public = $12;
+    types = List.rev $13;
+    fsms = List.rev $14;
   }}
 /* MAXIMUM JANKNESS */
 | fsm_list NLINE EOF
