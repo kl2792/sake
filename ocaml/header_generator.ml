@@ -6,7 +6,7 @@ let macros_of_types name types =
     | [] -> result ^ "\n"
     | dtype :: types ->
         let macro = Printf.sprintf "#define %s_%s_%s %d\n"
-            name dtype.A.type_name (List.nth dtype.A.type_values i) i in
+          name dtype.A.type_name (List.nth dtype.A.type_values i) i in
         macros_of_type (macro ^ result) (i + 1) types in
     macros_of_type "" 0 types
 
@@ -16,7 +16,7 @@ let macros_of_fsms name fsms =
     | [] -> result
     | fsm :: fsms ->
        let macro = Printf.sprintf "#define %s_%s_%s %d\n"
-            name fsm.A.fsm_name (List.nth fsm.A.fsm_body i).A.state_name i in
+        name fsm.A.fsm_name (List.nth fsm.A.fsm_states i) i in
        macros_of_fsm (macro ^ result) (i + 1) fsms in
     macros_of_fsm "" 0 fsms
 
