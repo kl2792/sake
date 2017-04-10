@@ -116,9 +116,9 @@ state_decl:
     state_start = false;
     state_body = List.rev $3;
   }}
-| stmt_list2  //for testing, if there are no states
+| stmt_list2  //for testing, //if there are no states
 {{
-    state_name = "Hello"; //can delete later
+    state_name = "Hello"; 
     state_start = false;
     state_body = List.rev $1;
 }}
