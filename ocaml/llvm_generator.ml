@@ -87,7 +87,7 @@ let translate filename program =
   | A.Empty -> L.const_int i32_t 0
  (* | A.Variable s -> L.build_load (lookup s) s builder *)
  | A.Print (fmt, args) ->
-     let args = (expr builder fmt) :: (List.map (expr builder) args) in
+     let args = fmt :: (List.map (expr builder) args) in
      L.build_call printf (Array.of_list args) "printf" builder
   | A.Uop (uop, e) ->
       let build = (match uop with
