@@ -9,4 +9,4 @@ let name = (*String.lowercase_ascii *) Sys.argv.(2) in
      and llvm = Llvm_generator.translate name ast (* sast *) in
       Printf.fprintf (open_out header_name) "%s" header;
       Llvm_analysis.assert_valid_module llvm;
-      Printf.fprintf (open_out llvm_name) "%s" (Llvm.string_of_llmodule llvm); 
+      Printf.fprintf (open_out llvm_name) "%s" (Llvm.string_of_llmodule llvm);
