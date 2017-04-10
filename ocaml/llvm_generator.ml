@@ -37,15 +37,6 @@ let translate filename program =
     let types = List.map (fun (t, n) -> ltype (A.Enum "")) program.A.input in
     let types = Array.of_list types in
     L.struct_type context types in
-  
-  (* External functions *)
-  let printf = 
-    let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-    L.declare_function "printf" ftype sake in
-  let memcpy =
-    let formals = [| L.pointer_type void_t; L.pointer_type void_t; i32_t |] in
-    let ftype = L.function_type (L.pointer_type void_t) formals in
-    L.declare_function "memcpy" ftype sake in
 
   (* Global variables *)
   let global_vars =
@@ -75,6 +66,15 @@ let translate filename program =
       (* TODO: return associated variable *)() in
     search maps in
 
+  (* External functions *)
+  let printf = 
+    let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+    L.declare_function "printf" ftype sake in
+  let memcpy =
+    let formals = [| L.pointer_type void_t; L.pointer_type void_t; i32_t |] in
+    let ftype = L.function_type (L.pointer_type void_t) formals in
+    L.declare_function "memcpy" ftype sake in
+
   (* Expression builder *)
   let rec expr builder = function
     A.IntLit i -> L.const_int i32_t i
@@ -82,8 +82,8 @@ let translate filename program =
 (*testing  | A.CharLit c -> L.const_int i8_t c *)
 (*  | A.Range -> () (* DON'T NEED FOR HELLO WORLD *)
   | A.ArrayLit -> ()
-  | A.StringLit -> ()
   | A.Fsm_call -> () *)
+  | A.StringLit s -> L.const_stringz context s
   | A.Empty -> L.const_int i32_t 0
  (* | A.Variable s -> L.build_load (lookup s) s builder *)
   | A.Uop (uop, e) ->
@@ -145,9 +145,6 @@ let translate filename program =
       let merge_bb = L.append_block context "merge" fn in
       ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
       L.builder_at_end context merge_bb
-  | A.For (name, iter, body) ->
-      (* TODO: implement local variables for for loop *)
-      raise (Error "stop it")
   | A.Switch (predicate, cases) ->
       let case = expr builder predicate in
       let merge_bb = L.append_block context "merge" fn in
@@ -163,8 +160,15 @@ let translate filename program =
             iter (i + 1) tail in
       iter 0 cases;
       L.builder_at_end context merge_bb
+  | A.Print (fmt, args) ->
+      let args = (expr builder fmt) :: (List.map (expr builder) args) in
+      L.build_call printf (Array.of_list args) "printf" builder
+  | A.For (name, iter, body) ->
+      (* TODO: implement local variables for for loop *)
+      raise (Error "stop it")
   | A.Ldecl (dtype, decls) -> raise (Error "stop it, i said")
-  | A.Goto state -> ()(* return here *) in
+  | A.State name -> raise (Error "not this one!")
+  | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
 
   (* FSM functions *)
   let fsms =
@@ -179,6 +183,7 @@ let translate filename program =
           let builder = L.builder_at_end context (L.entry_block fn) in
           let fsm = fsm, stmt fn builder fsm.A.fsm_body in
           fsm :: (build_fsms fsms) in
+    build_fsms program.A.fsms in
 
   (* Tick function definition *)
   let tick =
@@ -187,8 +192,8 @@ let translate filename program =
     let ftype = L.function_type i32_t pointers in
     L.define_function (filename ^ "_tick") void_t sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
-  let alloc = L.build_alloca state_t "state" builder in
-    build_fsms program.A.fsms in
+  let state = L.build_alloca state_t "state" builder in
+  let calls = 
   let writing = () in 
   sake
 
