@@ -8,5 +8,6 @@ let name = (*String.lowercase_ascii *) Sys.argv.(2) in
   let header = Header_generator.translate name ast (* sast *)
      and llvm = Llvm_generator.translate name ast (* sast *) in
       Printf.fprintf (open_out header_name) "%s" header;
+      (*print_string (Llvm.string_of_llmodule llvm);*)
       Llvm_analysis.assert_valid_module llvm;
       Printf.fprintf (open_out llvm_name) "%s" (Llvm.string_of_llmodule llvm);
