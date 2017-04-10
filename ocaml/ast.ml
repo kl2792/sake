@@ -35,14 +35,11 @@ type type_decl = {
   type_name   : string;
   type_values : string list;
 }
-type state_decl = {
-  state_name  : string;
-  state_start : bool;
-  state_body  : stmt list;
-}
 type fsm_decl = {
-  fsm_name : string;
-  fsm_body : state_decl list;
+  fsm_name  : string;
+  fsm_start : string;
+  fsm_states: string list;
+  fsm_body  : stmt list;
 }
 type program = {
   input : lvalue list;
