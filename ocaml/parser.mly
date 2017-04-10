@@ -108,7 +108,7 @@ fsm_decl:
   FSM ID LBRACE stmt_list2 NLINE RBRACE
 {{
   fsm_name = $2;
-  fsm_states = [START];
+  fsm_states = ["start"];
   fsm_body = List.rev $4;
 }}
 
