@@ -1,4 +1,4 @@
-fsm hithere {
+fsm switchCase {
         switch(1) {
 
                 case 1: 0
