@@ -2,7 +2,5 @@ fsm switch {
      switch (1) {
 
         case 0: 0
-
-        case 1: 1
      }
 }
