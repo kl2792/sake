@@ -36,10 +36,10 @@ ast.cmo :
 ast.cmx :
 header_generator.cmo : ast.cmo
 header_generator.cmx : ast.cmx
-llvm_generator.cmo : ast.cmo
-llvm_generator.cmx : ast.cmx	
-sake.cmo: scanner.cmo parser.cmi header_generator.cmo llvm_generator.cmo ast.cmo
-sake.cmx: scanner.cmx parser.cmx header_generator.cmx llvm_generator.cmx ast.cmx
+# llvm_generator.cmo : ast.cmo
+# llvm_generator.cmx : ast.cmx	
+sake.cmo: scanner.cmo parser.cmi header_generator.cmo ast.cmo
+sake.cmx: scanner.cmx parser.cmx header_generator.cmx ast.cmx
 parser.cmo: ast.cmo parser.cmi
 parser.cmx: ast.cmx parser.cmi
 scanner.cmo: parser.cmi
