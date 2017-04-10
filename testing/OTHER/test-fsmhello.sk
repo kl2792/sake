@@ -1,6 +1,0 @@
-input [int i]
-output [int o]
-
-fsm fsmhello {
-
-}
