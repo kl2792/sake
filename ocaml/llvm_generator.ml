@@ -35,6 +35,7 @@ let translate filename program =
     L.struct_type context types in
   let state_t =
     let types = List.map (fun (t, n) -> ltype (A.Enum "")) program.A.input in
+    (* TODO: let types = types @ *)
     let types = Array.of_list types in
     L.struct_type context types in
 
@@ -45,12 +46,12 @@ let translate filename program =
         let global = L.define_global name (init 0 dtype) sake in
         StringMap.add name (index, global) map in
       List.fold_left (merge 0) StringMap.empty vars in
-    let inputs = map program.A.input in (* FSM collection inputs *)
-    let outputs = map program.A.output in (* FSM collection outputs *)
+    let inputs = map program.A.input in (* FSM inputs *)
+    let outputs = map program.A.output in (* FSM outputs *)
     let public = List.map (fun (t, n, _) -> t, n) program.A.public in
-    let public = map public in (* FSM static write-local state variables *)
+    let public = map public in (* FSM public write-local state variables *)
     let states = List.map (fun fsm -> (A.Enum ""), fsm.A.fsm_name) program.A.fsms in
-    let states = map states in (* FSM state variables *)
+    let states = map states in (* FSM state indicators *)
     let names = ["input"; "output"; "public"; "state"]
     and submaps = [inputs; outputs; public; states] in
     let merge map name submap = StringMap.add name submap map in
@@ -58,7 +59,7 @@ let translate filename program =
 
   (* Variable and enum lookup *)
   let value_of_enum enum name = StringMap.find name in
-  let lookup name maps =  (* searches for the given name in the specified maps *)
+  let lookup name maps = (* searches for given name in the specified maps *)
     let rec search = function
       [] -> raise (Error "what the hell?")
     | map :: maps ->
@@ -75,6 +76,9 @@ let translate filename program =
     let formals = [| L.pointer_type i8_t; L.pointer_type i8_t; i32_t |] in
     let ftype = L.function_type (L.pointer_type i8_t) formals in
     L.declare_function "memcpy" ftype sake in
+
+  (* Local variables *)
+  let locals = StringMap.empty in
 
   (* Expression builder *)
   let rec expr builder = function
@@ -113,7 +117,7 @@ let translate filename program =
       | A.Or  -> L.build_or) in
       let e1 = expr builder e1 and e2 = expr builder e2 in
         build e1 e2 "tmp" builder
-(*  | A.Assign (s, e) ->
+  (* | A.Assign (s, e) ->
       let e = expr builder e in (* TODO: fix assign *)
       let _ = L.build_store e (lookup s) builder in
         e *)
@@ -192,13 +196,13 @@ let translate filename program =
   let tick =
     let types = [state_t; input_t; output_t] in
     let args = Array.of_list (List.map L.pointer_type types) in
-    let ftype = L.function_type i32_t args in
+    let ftype = L.function_type void_t args in
     L.define_function (filename ^ "_tick") ftype sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
   let calls = () in
   let writing = () in
-  let terminal = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
+  let terminal = add_terminal builder L.build_ret_void in
   sake
 
   (* L.function_type to create function (tick) *)
