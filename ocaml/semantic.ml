@@ -53,6 +53,9 @@ let check (input, output, public, types, fsms) =
        locals = []; body = [] }))
    in *)
      
+  let fsm_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
+                         built_in_decls fsms
+  in
 
 (************** THIS IS FAKE NEWS ***************)
 
