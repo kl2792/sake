@@ -30,8 +30,9 @@ let string_of_type = function
   | A.Int -> "int"
   | A.Char -> "char"
   | A.Bool -> "int"
+  | A.String -> "char *" 
   | A.Array(_, _) -> "DON'T USE THIS" (* TODO: implement array *)
-  | A.Enum(_) -> "int"
+  | A.Enum(_) -> "int" 
 
 (* generate input struct declarations *)
 let input_struct_of_ast name fsms =  
