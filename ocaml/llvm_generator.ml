@@ -129,8 +129,7 @@ let translate filename program =
     | A.Escape s -> raise (Error "NIMP: Escape")
     | A.Range (s, e, i) -> raise (Error "NIMP: Range")
     | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit")
-    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond")
-    in
+    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") in
 
   let add_terminal builder f =
     match L.block_terminator (L.insertion_block builder) with
@@ -197,9 +196,9 @@ let translate filename program =
             let ftype = L.function_type i32_t pointers in
             L.define_function fsm.A.fsm_name ftype sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
-          let body = stmt fn builder (A.Block fsm.A.fsm_body) in
-          let fsm = fsm, add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
-          fsm :: (build_fsms fsms) in
+          let _ = stmt fn builder (A.Block fsm.A.fsm_body) in
+          let _ = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
+          (fsm.A.fsm_name, fn) :: (build_fsms fsms) in
     build_fsms program.A.fsms in
 
   (* Tick function definition *)
@@ -210,7 +209,9 @@ let translate filename program =
     L.define_function (filename ^ "_tick") ftype sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
-  let calls = () in
+  (*let calls =
+    let build (name, fn) = L.build_call fn () name builder  in
+    L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
   let writing = () in
   let terminal = add_terminal builder L.build_ret_void in
   sake
