@@ -94,7 +94,7 @@ Check() {
         echo "#include \"${basename}.h\"\n" >> ../testing/${basename}.c
         echo "int main() {\n\t ${basename}_tick(NULL, NULL, NULL);\n}" >> ../testing/${basename}.c
         
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" && 
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" && 
         Run "$SAKE" " " $1 ${basename} &&
         Run "mv ${basename}.h ../testing/" &&
         #Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
@@ -103,7 +103,7 @@ Check() {
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     else
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&     
+        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" &&     
         Run "$SAKE" " " $1 ${basename} &&
         Run "mv ${basename}.h ../testing/" &&
         #Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
