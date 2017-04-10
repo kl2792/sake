@@ -193,8 +193,8 @@ let translate filename program =
     L.define_function (filename ^ "_tick") void_t sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
-  let calls = 
-  let writing = () in 
+(*  let calls = 
+  let writing = () in *)
   sake
 
   (* L.function_type to create function (tick) *)
