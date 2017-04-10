@@ -24,7 +24,7 @@ let translate filename program =
   | _ -> raise (Error "haven't figured this out yet") in
   let init v t = L.const_int (ltype t) v in
 
-  (* New types *) 
+  (* New types *)
   let input_t =
     let types = List.map (fun (t, n) -> ltype t) program.A.input in
     let types = Array.of_list types in
@@ -55,7 +55,7 @@ let translate filename program =
     and submaps = [inputs; outputs; public; states] in
     let merge map name submap = StringMap.add name submap map in
     List.fold_left2 merge StringMap.empty names submaps in
-  
+
   (* Variable and enum lookup *)
   let value_of_enum enum name = StringMap.find name in
   let lookup name maps =  (* searches for the given name in the specified maps *)
@@ -67,7 +67,7 @@ let translate filename program =
     search maps in
 
   (* External functions *)
-  let printf = 
+  let printf =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
@@ -86,6 +86,9 @@ let translate filename program =
   | A.StringLit s -> L.const_stringz context s
   | A.Empty -> L.const_int i32_t 0
  (* | A.Variable s -> L.build_load (lookup s) s builder *)
+ | A.Print (fmt, args) ->
+     let args = (expr builder fmt) :: (List.map (expr builder) args) in
+     L.build_call printf (Array.of_list args) "printf" builder
   | A.Uop (uop, e) ->
       let build = (match uop with
         A.Neg -> L.build_neg
@@ -160,9 +163,6 @@ let translate filename program =
             iter (i + 1) tail in
       iter 0 cases;
       L.builder_at_end context merge_bb
-  | A.Print (fmt, args) ->
-      let args = (expr builder fmt) :: (List.map (expr builder) args) in
-      L.build_call printf (Array.of_list args) "printf" builder
   | A.For (name, iter, body) ->
       (* TODO: implement local variables for for loop *)
       raise (Error "stop it")
@@ -193,7 +193,7 @@ let translate filename program =
     L.define_function (filename ^ "_tick") void_t sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
-(*  let calls = 
+(*  let calls =
   let writing = () in *)
   sake
 
