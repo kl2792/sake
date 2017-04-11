@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "test-fsmhello.h"
+#include "test_fsmhello.h"
 
 int main(){
     
-    struct test-fsmhello_state hello_fsm; 
+    struct test_fsmhello_state hello_fsm; 
 
-    struct test-fsmhello_input current_input; 
+    struct test_fsmhello_input current_input; 
 
-    struct test-fsmhello_output current_output;
+    struct test_fsmhello_output current_output;
 
     // Set the initial state struct to initial values 
     //test-fsmhello_tick(hello_fsm, NULL, current_output);
@@ -39,7 +39,7 @@ int main(){
             current_input.i = curr_int;
 
             // call tick on input 
-            test-fsmhello_tick(&hello_fsm, &current_input, &current_output);
+            test_fsmhello_tick(&hello_fsm, &current_input, &current_output);
 
             // interpret the output and print it to the screen
             printf("%d", current_output.o);        

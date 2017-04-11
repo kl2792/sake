@@ -9,7 +9,7 @@
 %token EOF
 
 /*tokens specific to our language */
-%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN
+%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
 %token TICK RESET PRINT
 
 /* ASSOCIATIVITY */
@@ -81,7 +81,7 @@ INTLIT { IntLit($1) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
-LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
+LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
 | STATE ID NLINE { State($2) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
@@ -99,14 +99,14 @@ cstmt:
   CASE expr COLON stmt {$2, $4}
 
 type_decl:
-  TYPE ID ASSIGN string_opt NLINE
+  TYPE ID ASSIGN string_opt NLINE 
   {{
     type_name = $2;
     type_values = $4;
   }}
 
 fsm_decl:
-  FSM ID LBRACE stmt_list2 RBRACE
+  FSM ID LBRACE stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
   fsm_states = ["start"];
@@ -114,17 +114,16 @@ fsm_decl:
 }}
 
 program:
-/* Bug: if no type_list need NLINE NLINE */
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE public_opt type_list NLINE fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE public_opt type_list fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = $10;
-    types = List.rev $11;
-    fsms = List.rev $13;
+    public = $12;
+    types = List.rev $13;
+    fsms = List.rev $14;
   }}
 /* MAXIMUM JANKNESS */
-| fsm_list NLINE EOF
+| fsm_list EOF
   {{
     input = [];
     output = [];
@@ -149,16 +148,12 @@ stexpr_list:
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  /* nothing */ { [] }
-| stmt_list stmt { $2 :: $1 }
-
-stmt_list2:
   NLINE { [] }
-| stmt_list2 stmt { $2 :: $1 }
+| stmt_list stmt { $2 :: $1 }
 
 cstmt_list: //BUG: NLINE NLINE after switch statement
   NLINE { [] }
-| cstmt_list NLINE cstmt {  $3 :: $1 }
+| cstmt_list cstmt {  $2 :: $1 }
 
 string_opt:
   /* nothing */ { [] }
@@ -168,10 +163,6 @@ string_list:
   TYPENAME { [$1] }
 | string_list BAR TYPENAME { $3 :: $1 }
 
-lvalue_opt:
-  NLINE { [] }  /* So it's not empty */
-| lvalue_list { List.rev $1 }
-
 lvalue_list:
   lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
@@ -180,8 +171,8 @@ dstexpr:
   dtype ID expr { $1, $2, $3}
 
 public_opt:
- NLINE { [] }
-| public_list {List.rev $1}
+ /*nothing*/ { [] }
+| PUBLIC public_list NLINE {List.rev $2}
 
 public_list:
  dstexpr { [$1] }

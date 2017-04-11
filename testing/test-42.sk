@@ -1,3 +1,0 @@
-fsm fortytwo {
-        print("%d", 42)
-}

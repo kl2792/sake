@@ -54,7 +54,7 @@ let state_struct_of_ast name program =
   let var_of_public (t, n, _) = (string_of_type t) ^ " " ^ n in
   let fsm_local_vars = List.map var_of_public program.A.public in 
   let fsm_local_vars = String.concat ";\n" fsm_local_vars in
-    Printf.sprintf "struct %s_name {\n%s\n%s};\n" name state_internals fsm_local_vars
+    Printf.sprintf "struct %s_state {\n%s\n%s};\n" name state_internals fsm_local_vars
 
 (* generate the struct declarations from fsms in ast *) 
 let structs_of_ast name ast = 
@@ -68,7 +68,7 @@ let structs_of_ast name ast =
 
 (* generate prototype of tick function, given a name *)
 let tick_prototype name =
-  Printf.sprintf "int %s_tick(struct %s_state *, struct %s_input *, struct %s_output *);\n" 
+  Printf.sprintf "void %s_tick(struct %s_state *, struct %s_input *, struct %s_output *);\n" 
     name name name name
 
 (* the ifdef ... endif guard *)

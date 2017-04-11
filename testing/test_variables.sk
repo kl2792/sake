@@ -1,0 +1,4 @@
+public int j = 4, int x = 7
+fsm variables {
+       int i = 4 
+}
