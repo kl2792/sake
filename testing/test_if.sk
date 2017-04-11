@@ -1,0 +1,6 @@
+fsm ifTest {
+        int i = 4
+
+        if (i == 7) {
+        } 
+}
