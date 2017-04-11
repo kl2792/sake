@@ -1,5 +1,6 @@
-input [int i]
-output [int o]
+input[int i, char p]
+ouput[int k, int l]
 
-fsm fsmhello {
+fsm hello {
 }
+
