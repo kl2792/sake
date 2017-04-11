@@ -1,5 +1,5 @@
 input[int i, int o]
-ouput[int k, int l]
+output[int k, int l]
 
 fsm hello {
 }
