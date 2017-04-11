@@ -1,5 +1,4 @@
-input[int i, int o]
-ouput[int k, int l]
-
+~input[int i, int o]
+~ouput[int k, int l]
 fsm hello {
 }
