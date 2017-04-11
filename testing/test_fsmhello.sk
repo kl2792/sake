@@ -1,6 +1,5 @@
-input[int i, char p]
+input[int i, int o]
 ouput[int k, int l]
 
 fsm hello {
 }
-
