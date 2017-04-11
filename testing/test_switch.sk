@@ -1,6 +1,6 @@
 fsm switchCase {
         switch(1) {
-
-                case 1: print("%d", 1)
+                case 0: print("%d", 0)
+		case 1: print("%d", 1)
         }
 }
