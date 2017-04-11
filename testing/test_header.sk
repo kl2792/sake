@@ -2,5 +2,7 @@ input [int i, int o, char o]
 output [int p, int q]
 
 public int k = 4
+public int v = 5
+
 fsm headerTest {
 }
