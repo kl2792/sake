@@ -1,4 +1,4 @@
-input [int i, int o, char o]
+input [int i, int o, char l]
 output [int p, int q]
 
 public int k = 4
