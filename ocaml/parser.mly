@@ -81,7 +81,7 @@ INTLIT { IntLit($1) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
-LBRACE stmt_list2 RBRACE NLINE { Block(List.rev $2) }
+LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
 | STATE ID NLINE { State($2) }
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
@@ -99,14 +99,14 @@ cstmt:
   CASE expr COLON stmt {$2, $4}
 
 type_decl:
-  TYPE ID ASSIGN string_opt NLINE
+  TYPE ID ASSIGN string_opt NLINE 
   {{
     type_name = $2;
     type_values = $4;
   }}
 
 fsm_decl:
-  FSM ID LBRACE stmt_list2 RBRACE
+  FSM ID LBRACE stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
   fsm_states = ["start"];
@@ -123,7 +123,7 @@ program:
     fsms = List.rev $14;
   }}
 /* MAXIMUM JANKNESS */
-| fsm_list NLINE EOF
+| fsm_list EOF
   {{
     input = [];
     output = [];
@@ -148,16 +148,12 @@ stexpr_list:
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  /* nothing */ { [] }
-| stmt_list stmt { $2 :: $1 }
-
-stmt_list2:
   NLINE { [] }
-| stmt_list2 stmt { $2 :: $1 }
+| stmt_list stmt { $2 :: $1 }
 
 cstmt_list: //BUG: NLINE NLINE after switch statement
   NLINE { [] }
-| cstmt_list NLINE cstmt {  $3 :: $1 }
+| cstmt_list cstmt {  $2 :: $1 }
 
 string_opt:
   /* nothing */ { [] }
@@ -166,10 +162,6 @@ string_opt:
 string_list:
   TYPENAME { [$1] }
 | string_list BAR TYPENAME { $3 :: $1 }
-
-lvalue_opt:
-  NLINE { [] }  /* So it's not empty */
-| lvalue_list { List.rev $1 }
 
 lvalue_list:
   lvalue { [$1] }
