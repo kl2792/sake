@@ -168,15 +168,15 @@ lvalue_list:
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 dstexpr:
-  dtype ID expr { $1, $2, $3}
+ PUBLIC dtype ID ASSIGN expr { $2, $3, $5 }
 
 public_opt:
  /*nothing*/ { [] }
-| PUBLIC public_list NLINE {List.rev $2}
+| public_list NLINE NLINE{List.rev $1}
 
 public_list:
  dstexpr { [$1] }
-| public_list COMMA dstexpr {$3 :: $1}
+| public_list NLINE dstexpr {$3 :: $1}
 
 type_list:
 /* nothing */ { [] }
