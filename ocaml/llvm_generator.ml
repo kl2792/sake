@@ -11,7 +11,7 @@ exception Not_found
 (* Translate an A.program to LLVM *)
 let translate filename program =
   let context = L.global_context () in
-  let sake = L.create_module context filename
+  let sake = L.create_module context "sake"
     and i32_t  = L.i32_type  context
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
@@ -78,7 +78,7 @@ let translate filename program =
   (* External functions *)
   let print =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-    L.declare_function "print" ftype sake in
+    L.declare_function "printf" ftype sake in
   let memcpy =
     let formals = [| L.pointer_type i8_t; L.pointer_type i8_t; i32_t |] in
     let ftype = L.function_type (L.pointer_type i8_t) formals in
@@ -115,7 +115,6 @@ let translate filename program =
         let args = [fmt'; expr builder (List.hd args)] in
         (* let args = fmt :: (List.map (expr builder) args) in *)
         let args = Array.of_list args in
-        Printf.printf "\n\n\n\n\n%s %s\n\n\n\n\n" fmt (L.string_of_llvalue args.(1));
         L.build_call print args "printf" builder
     | A.Uop (uop, e) ->
         let build = lluop uop in
@@ -212,6 +211,18 @@ let translate filename program =
     L.define_function (filename ^ "_tick") ftype sake in
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
+  let calls = 
+    let rec call = function
+      | [] -> ()
+      | (name, fsm) :: tail ->
+          let args = L.params tick in
+          let args = Array.of_list (state :: (Array.to_list args)) in
+          L.build_call fsm args name builder;
+          call tail in
+    call fsms in
+  (*let args = List.map (fun s -> Printf.printf "%s " (L.string_of_llvalue s)) (Array.to_list (L.params fsm)); Printf.printf "\n" in*)
+  (*let args = List.map L.const_pointer_null [state_t; state_t; input_t; output_t] in*)
+  (*let _ = L.build_call fsm (Array.of_list args) name builder in*)
   (*let calls =
     let build (name, fn) = L.build_call fn () name builder  in
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
