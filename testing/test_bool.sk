@@ -1,0 +1,7 @@
+input [int i, int o, bool pumpkins, char l]
+output [int p, int q]
+
+fsm headerTest {
+        public int p = 23
+        public bool l = 22
+}

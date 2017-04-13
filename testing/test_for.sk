@@ -1,10 +1,11 @@
 input [int i, int o, char l]
 output [int p, int q]
 
-public int k = 4
-public int v = 5
-
 fsm headerTest {
-        for {
+        public int k = 4
+        public int v = 5
+        
+        for k in range (0,2) {
+                k = k + 1
         }
 }
