@@ -7,6 +7,6 @@ fsm hello {
         print ("%d", 6-0)
         print ("%d", 1+1+1+1+1+1+1)
         print ("%d", 1+2-3+4+4)
-        
+ 
         return 0
 }
