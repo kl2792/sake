@@ -81,10 +81,10 @@ INTLIT { IntLit($1) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
-LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
+LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE ID NLINE { State($2) }
-| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
+| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
+| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
 | WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
 | expr NLINE{ Expr($1) }
