@@ -123,13 +123,13 @@ program:
     fsms = List.rev $14;
   }}
 /* MAXIMUM JANKNESS */
-| fsm_list EOF
+| public_opt type_list fsm_list EOF
   {{
     input = [];
     output = [];
-    public = [];
-    types = [];
-    fsms = List.rev $1;
+    public = $1;
+    types = List.rev $2;
+    fsms = List.rev $3;
   }}
 
 
