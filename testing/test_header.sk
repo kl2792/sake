@@ -4,4 +4,5 @@ output [int p, int q]
 fsm headerTest {
         public int k = 4
         public int v = 5
+
 }
