@@ -106,11 +106,12 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
+  fsm_public = $5;
   fsm_states = ["start"];
-  fsm_body = List.rev $4;
+  fsm_body = List.rev $6;
 }}
 
 program:
@@ -148,7 +149,7 @@ stexpr_list:
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  NLINE { [] }
+  /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
 cstmt_list: //BUG: NLINE NLINE after switch statement
