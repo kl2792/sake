@@ -18,6 +18,7 @@ int main(){
     char input[500];
     printf("Please enter an input stream of 0s and 1s. (max. 50): ");
 
+    /*
     // RUN THE SIMULATION MULTIPLE TIMES 
     while (fgets(input, sizeof(input), stdin) != NULL) {
 
@@ -31,18 +32,22 @@ int main(){
         }
 
         int i;
-        for (i = 0; i < length-1; i++) { 
-            char curr_char = input[i];
-            int curr_int = atoi(&curr_char);
+        for (i = 0; i < length-1; i = i+2) { 
+            char curr_char1 = input[i];
+            char curr_char2 = input[i+1];
+            int curr_int1 = atoi(&curr_char1);
+            int curr_int2 = atoi(&curr_char2);
 
             // setting new input 
-            current_input.i = curr_int;
+            current_input.i = curr_int1;
+            current_input.o = curr_int2;
 
             // call tick on input 
             test_fsmhello_tick(&hello_fsm, &current_input, &current_output);
 
             // interpret the output and print it to the screen
-            printf("%d", current_output.o);        
+            printf("%d", current_output.k);        
+            printf("%d", current_output.l);        
         }
 
         //reset the machine
@@ -50,4 +55,6 @@ int main(){
 
         printf("\nPlease enter an input stream of 0s and 1s. (max. 50): ");
     }
+    */
+    return 0;
 }
