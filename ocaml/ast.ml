@@ -25,7 +25,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
 type stmt =
   | Block of stmt list
   | State of string
-  | If of expr * stmt * stmt
+  | If of expr * stmt * stmt 
   | For of string * expr * stmt
   | While of expr * stmt
   | Switch of expr * (expr * stmt) list

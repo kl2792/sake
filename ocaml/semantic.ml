@@ -52,10 +52,37 @@ let check (input, output, public, types, fsms) =
      { typ = Void; fname = "printbig"; formals = [(Int, "x")];
        locals = []; body = [] }))
    in *)
-     
-  let fsm_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
-                         built_in_decls fsms
+
+  let fsm_decls = List.fold_left (fun m fd -> StringMap.add fd.fsm_name fd m)
+                         StringMap.empty fsms
   in
+
+  let fsm_decl s = try StringMap.find s fsm_decls
+       with Not_found -> raise (Failure ("unrecognized fsm " ^ s))
+
+  let check_fsm fsm =
+(**** Check FSM INSTANCE VARS: public and states ****)
+    
+    report_duplicate (fun n -> "duplicate public " ^ n ^ " in " ^ fsm.fsm_name)
+      (List.map snd fsm.fsm_public);
+
+    report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
+      (List.map snd func.locals);
+
+      
+
+    List.iter (check_not_void (fun n -> "illegal void formal " ^ n ^
+      " in " ^ func.fname)) func.formals;
+
+    report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
+      (List.map snd func.formals);
+
+    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+      " in " ^ func.fname)) func.locals;
+
+    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
+      (List.map snd func.locals);
+
 
 (************** THIS IS FAKE NEWS ***************)
 

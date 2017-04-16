@@ -1,5 +1,5 @@
 module L = Llvm
-module A = Ast
+module A = Sast
 
 module StringMap = Map.Make(String)
 
@@ -62,8 +62,7 @@ let translate filename program =
   let value name =
     let rec find_name i = function
       | [] -> raise (Error "... y tho")
-      | enum :: tail ->
-          if enum == name then i else find_name (i + 1) tail in
+      | enum :: tail -> if enum == name then i else find_name (i + 1) tail in
     find_name 0 program.A.types in
   let lookup name maps = (* search for given name in specified maps *)
     let rec search = function
@@ -82,6 +81,7 @@ let translate filename program =
   let memcpy =
     let formals = [| L.pointer_type i8_t; L.pointer_type i8_t; i32_t |] in
     let ftype = L.function_type (L.pointer_type i8_t) formals in
+    Printf.printf "%s" (L.string_of_lltype ftype);
     L.declare_function "memcpy" ftype sake in
 
   (* Operation mappers *)
@@ -226,7 +226,9 @@ let translate filename program =
   (*let calls =
     let build (name, fn) = L.build_call fn () name builder  in
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
-  let writing = () in
+  let writing =
+    let args = Array.of_list [(L.params tick).(0); state; L.size_of state_t] in
+    L.build_call memcpy args "memcpy" builder in
   let terminal = add_terminal builder L.build_ret_void in
   sake
 

@@ -86,7 +86,7 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
-| WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
+| WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
@@ -106,11 +106,12 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
+  fsm_public = $5;
   fsm_states = ["start"];
-  fsm_body = List.rev $4;
+  fsm_body = List.rev $6;
 }}
 
 program:
@@ -148,7 +149,7 @@ stexpr_list:
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  NLINE { [] }
+  /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
 cstmt_list: //BUG: NLINE NLINE after switch statement
