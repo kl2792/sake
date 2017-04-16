@@ -81,12 +81,12 @@ INTLIT { IntLit($1) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
-LBRACE stmt_list RBRACE NLINE { Block(List.rev $2) }
+LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE ID NLINE { State($2) }
-| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE %prec NOELSE { If($3, $7, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF LPAREN expr RPAREN LBRACE NLINE stmt RBRACE NLINE ELSE NLINE stmt { If($3, $7, $12) }  /*with else */
+| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
+| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
 | FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
-| WHILE LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { While($3, $7) }
+| WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
@@ -106,11 +106,12 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
+  fsm_public = $5;
   fsm_states = ["start"];
-  fsm_body = List.rev $4;
+  fsm_body = List.rev $6;
 }}
 
 program:
@@ -123,13 +124,13 @@ program:
     fsms = List.rev $14;
   }}
 /* MAXIMUM JANKNESS */
-| fsm_list EOF
+| public_opt type_list fsm_list EOF
   {{
     input = [];
     output = [];
-    public = [];
-    types = [];
-    fsms = List.rev $1;
+    public = $1;
+    types = List.rev $2;
+    fsms = List.rev $3;
   }}
 
 
@@ -148,7 +149,7 @@ stexpr_list:
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  NLINE { [] }
+  /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
 cstmt_list: //BUG: NLINE NLINE after switch statement
@@ -168,15 +169,15 @@ lvalue_list:
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 dstexpr:
-  dtype ID expr { $1, $2, $3}
+ PUBLIC dtype ID ASSIGN expr { $2, $3, $5 }
 
 public_opt:
  /*nothing*/ { [] }
-| PUBLIC public_list NLINE {List.rev $2}
+| public_list NLINE NLINE{List.rev $1}
 
 public_list:
  dstexpr { [$1] }
-| public_list COMMA dstexpr {$3 :: $1}
+| public_list NLINE dstexpr {$3 :: $1}
 
 type_list:
 /* nothing */ { [] }
