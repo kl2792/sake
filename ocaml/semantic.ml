@@ -61,7 +61,16 @@ let check (input, output, public, types, fsms) =
        with Not_found -> raise (Failure ("unrecognized fsm " ^ s))
 
   let check_fsm fsm =
-(**** Check FSM INSTANCE VARS ****)
+(**** Check FSM INSTANCE VARS: public and states ****)
+    
+    report_duplicate (fun n -> "duplicate public " ^ n ^ " in " ^ fsm.fsm_name)
+      (List.map snd fsm.fsm_public);
+
+    report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
+      (List.map snd func.locals);
+
+      
+
     List.iter (check_not_void (fun n -> "illegal void formal " ^ n ^
       " in " ^ func.fname)) func.formals;
 
