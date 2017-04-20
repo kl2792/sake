@@ -25,7 +25,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
 type stmt =
   | Block of stmt list
   | State of string
-  | If of expr * stmt * stmt 
+  | If of expr * stmt * stmt
   | For of string * expr * stmt
   | While of expr * stmt
   | Switch of expr * (expr * stmt) list
@@ -38,12 +38,14 @@ type type_decl = {
 }
 type fsm_decl = {
   fsm_name  : string;
+  fsm_states: string list;
   fsm_public: (dtype * string * expr) list;
   fsm_body  : stmt list;
 }
 type program = {
   input : lvalue list;
   output: lvalue list;
+  public: (dtype * string * expr) list;
   types : type_decl list;
   fsms  : fsm_decl list;
 }
