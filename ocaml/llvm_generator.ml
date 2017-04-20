@@ -1,5 +1,5 @@
 module L = Llvm
-module A = Sast
+module A = Ast
 
 module StringMap = Map.Make(String)
 
@@ -55,16 +55,16 @@ let translate filename program =
     let names = ["input"; "output"; "public"; "state"]
     and submaps = [inputs; outputs; public; states] in
     let merge map name submap = StringMap.add name submap map in
-    List.fold_left2 merge StringMap.empty names submaps in  
-  let locals = StringMap.empty in
+    List.fold_left2 merge StringMap.empty names submaps in
 
   (* Lookup functions *)
+  let locals = ref [] in
   let value name =
     let rec find_name i = function
       | [] -> raise (Error "... y tho")
       | enum :: tail -> if enum == name then i else find_name (i + 1) tail in
     find_name 0 program.A.types in
-  let lookup name maps = (* search for given name in specified maps *)
+  let lookup name locals maps = (* search for given name in specified maps *)
     let rec search = function
       | [] -> raise (Error "what the hell?")
       | map :: maps ->
@@ -79,9 +79,8 @@ let translate filename program =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let formals = [| L.pointer_type i8_t; L.pointer_type i8_t; i32_t |] in
+    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i32_t |] in
     let ftype = L.function_type (L.pointer_type i8_t) formals in
-    Printf.printf "%s" (L.string_of_lltype ftype);
     L.declare_function "memcpy" ftype sake in
 
   (* Operation mappers *)
@@ -200,6 +199,7 @@ let translate filename program =
           let builder = L.builder_at_end context (L.entry_block fn) in
           let _ = stmt fn builder (A.Block fsm.A.fsm_body) in
           let _ = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
+          locals := [StringMap.empty];
           (fsm.A.fsm_name, fn) :: (build_fsms fsms) in
     build_fsms program.A.fsms in
 
@@ -227,8 +227,8 @@ let translate filename program =
     let build (name, fn) = L.build_call fn () name builder  in
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
   let writing =
-    let args = Array.of_list [(L.params tick).(0); state; L.size_of state_t] in
-    L.build_call memcpy args "memcpy" builder in
+    let args = [|(L.params tick).(0); state; L.size_of state_t|] in
+    (*L.build_call memcpy args "memcpy" builder*)() in
   let terminal = add_terminal builder L.build_ret_void in
   sake
 
