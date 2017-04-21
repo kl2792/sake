@@ -71,10 +71,33 @@ let check (input, output, public, types, fsms) =
       fsm.fsm_states;
 
       
+  type translation_environment = {
+    scope : symbol_table;   (* symbol table for vars *)
+    in_switch : bool;
+    case_labels : list ref; (* known case labels *)
+    exception_scope : exception_scope; (* sym tab for exceptions *)
+    state_labels : label list ref; (* labels on statements *)
+    forward_gotos : label list ref; (* forward goto destinations *)
+  }
 
-    (* Type of each variable (global, formal, or local *)
-    let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-  StringMap.empty (globals @ publics @ locals)
+
+  type symbol_table = {
+    parent : symbol_table option;
+    variables : variable_decl list
+  }
+
+  let rec find_variable (scope : symbol_table) name =
+    try
+      List.find (fun (s, _, _, _) -> s = name) scope.variables
+    with Not_found ->
+      match scope.parent with
+        Some(parent) -> find_variable parent name
+      | _ -> raise Not_found
+
+
+  (* Type of each variable (global, formal, or local *)
+  let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
+  StringMap.empty (globals @ publics @ locals) I love that
   func.formals @ func.locals )
     in
 
