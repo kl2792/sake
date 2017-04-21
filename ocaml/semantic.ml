@@ -1,4 +1,5 @@
 open ast
+open sast
 
 module StringMap = Map.Make(String);
 
@@ -29,7 +30,7 @@ let check (input, output, public, types, fsms) =
    
   (**** Checking Global Variables ****)
 
-  let globals = input@output in
+  let globals = input @ output in
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
    
@@ -67,21 +68,22 @@ let check (input, output, public, types, fsms) =
       (List.map snd fsm.fsm_public);
 
     report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
-      (List.map snd func.locals);
+      fsm.fsm_states;
 
       
 
-    List.iter (check_not_void (fun n -> "illegal void formal " ^ n ^
-      " in " ^ func.fname)) func.formals;
+    (* Type of each variable (global, formal, or local *)
+    let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
+  StringMap.empty (globals @ publics @ locals)
+  func.formals @ func.locals )
+    in
 
-    report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
-      (List.map snd func.formals);
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
 
-    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
-      " in " ^ func.fname)) func.locals;
 
-    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
-      (List.map snd func.locals);
 
 
 (************** THIS IS FAKE NEWS ***************)
