@@ -115,13 +115,13 @@ fsm_decl:
 }}
 
 program:
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE public_opt type_list fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_list fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = $12;
-    types = List.rev $13;
-    fsms = List.rev $14;
+    public = [];
+    types = List.rev $12;
+    fsms = List.rev $13;
   }}
 /* MAXIMUM JANKNESS */
 | public_opt type_list fsm_list EOF
@@ -136,13 +136,13 @@ program:
 
 /*list definitions */
 
-actuals_opt:
-  /* nothing */ { [] }
-| actuals_list { List.rev $1 }
+//actuals_opt:
+//  /* nothing */ { [] }
+/*| actuals_list { List.rev $1 }
 
 actuals_list:
   expr { [$1] }
-| actuals_list COMMA expr { $3 :: $1}
+| actuals_list COMMA expr { $3 :: $1} */
 
 stexpr_list:
   stexpr { [$1] }
@@ -173,14 +173,14 @@ dstexpr:
 
 public_opt:
  /*nothing*/ { [] }
-| public_list NLINE NLINE{List.rev $1}
+| public_list NLINE NLINE {List.rev $}
 
 public_list:
  PUBLIC dstexpr { [$2] }
 | public_list NLINE PUBLIC dstexpr {$4 :: $1}
 
 local_opt:
-/*nothing*/ { [] }
+NLINE { [] }
 | local_list NLINE NLINE {List.rev $1}
 
 local_list:
