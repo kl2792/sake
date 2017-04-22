@@ -13,7 +13,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | StringLit of string
   | Escape of string
   | Range of int * int * int (* only valid for bool, char, int *)
-  | ArrayLit of expr list
+ (* | ArrayLit of expr list *)
   | Variable of string
   | Uop of uop * expr
   | Binop of expr * op * expr
@@ -40,6 +40,7 @@ type fsm_decl = {
   fsm_name  : string;
   fsm_states: string list;
   fsm_public: (dtype * string * expr) list;
+  fsm_local: expr list;
   fsm_body  : stmt list;
 }
 type program = {

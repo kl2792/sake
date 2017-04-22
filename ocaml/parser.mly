@@ -77,7 +77,6 @@ INTLIT { IntLit($1) }
 | ID ASSIGN expr { Assign($1, $3) }
 | dtype ID ASSIGN expr { Assign($2, $4) }
 //| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| PRINT LPAREN STRINGLIT COMMA actuals_opt RPAREN { Print($3, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
@@ -106,12 +105,13 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE NLINE public_opt stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt actuals_list2 stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
   fsm_public = $5;
+  fsm_local = List.rev $6;
   fsm_states = ["start"];
-  fsm_body = List.rev $6;
+  fsm_body = List.rev $7;
 }}
 
 program:
@@ -144,6 +144,10 @@ actuals_list:
   expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1}
 
+actuals_list2:
+/*nothing*/ { [] }
+| actuals_list2 NLINE expr { $3 :: $1 }
+
 stexpr_list:
   stexpr { [$1] }
 | stexpr_list COMMA stexpr { $3 :: $1}
@@ -152,7 +156,7 @@ stmt_list:
   /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
-cstmt_list: //BUG: NLINE NLINE after switch statement
+cstmt_list: 
   NLINE { [] }
 | cstmt_list cstmt {  $2 :: $1 }
 
