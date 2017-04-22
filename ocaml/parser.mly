@@ -174,15 +174,16 @@ dstexpr:
 
 public_opt:
  /*nothing*/ { [] }
-| public_list NLINE NLINE {List.rev $}
+| public_list NLINE {List.rev $1}
 
 public_list:
  PUBLIC dstexpr { [$2] }
 | public_list NLINE PUBLIC dstexpr {$4 :: $1}
 
+//BUG: there is public, but no local then only one NLINE before stmt_list
 local_opt:
-NLINE { [] }
-| local_list NLINE NLINE {List.rev $1}
+/*nothing*/ { [] }
+| NLINE local_list NLINE NLINE {List.rev $2}
 
 local_list:
 dstexpr { [$1] }
