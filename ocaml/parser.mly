@@ -105,11 +105,11 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE NLINE public_opt actuals_list2 stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt local_opt stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
   fsm_public = $5;
-  fsm_local = List.rev $6;
+  fsm_local = $6;
   fsm_states = ["start"];
   fsm_body = List.rev $7;
 }}
@@ -144,10 +144,6 @@ actuals_list:
   expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1}
 
-actuals_list2:
-/*nothing*/ { [] }
-| actuals_list2 NLINE expr { $3 :: $1 }
-
 stexpr_list:
   stexpr { [$1] }
 | stexpr_list COMMA stexpr { $3 :: $1}
@@ -173,15 +169,23 @@ lvalue_list:
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 dstexpr:
- PUBLIC dtype ID ASSIGN expr { $2, $3, $5 }
+ dtype ID ASSIGN expr { $1, $2, $4 }
 
 public_opt:
  /*nothing*/ { [] }
 | public_list NLINE NLINE{List.rev $1}
 
 public_list:
- dstexpr { [$1] }
-| public_list NLINE dstexpr {$3 :: $1}
+ PUBLIC dstexpr { [$2] }
+| public_list NLINE PUBLIC dstexpr {$4 :: $1}
+
+local_opt:
+/*nothing*/ { [] }
+| local_list NLINE NLINE {List.rev $1}
+
+local_list:
+dstexpr { [$1] }
+| local_list NLINE dstexpr { $3 :: $1 }
 
 type_list:
 /* nothing */ { [] }
