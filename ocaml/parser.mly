@@ -86,7 +86,7 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE ID NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
-| FOR LPAREN ID IN expr RPAREN stmt { For($3, $5, $7) }
+| FOR ID IN LPAREN expr RPAREN stmt { For($2, $5, $7) }
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
