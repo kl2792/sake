@@ -5,7 +5,7 @@ fsm headerTest {
         public int k = 4
         public int v = 5
         
-        for k in range (0,2) {
+        for k in range (0:2:1) {
                 k = k + 1
         }
 }
