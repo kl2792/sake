@@ -1,35 +1,28 @@
+(* SAST *)
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
   | Bool | Int | Char | String
-  | Array of dtype * int
   | Enum of string (* just the name of the enum *)
-type lvalue = dtype * string
-type fsm_call = Tick | Reset
-type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
+type expr =
   | BoolLit of bool
   | CharLit of char
   | IntLit of int
   | StringLit of string
-  | Escape of string
-  | Range of int * int * int (* only valid for bool, char, int *)
-  | ArrayLit of expr list
   | Variable of string
+  | Access of string * string
   | Uop of uop * expr
   | Binop of expr * op * expr
   | Assign of string * expr
-(*  | Fsm_call of string * fsm_call * expr list *)
-  | Print of string * expr list
-  | Cond of expr * expr * expr
+  | Printf of string * expr list
   | Empty
 type stmt =
   | Block of stmt list
   | State of string
   | If of expr * stmt * stmt
-  | For of string * expr * stmt
+  | For of string * (int * int * int) * stmt
   | While of expr * stmt
   | Switch of expr * (expr * stmt) list
-  | Ldecl of dtype * (string * expr) list (* local decls *)
   | Expr of expr
   | Goto of string (* for FSM transitions *)
 type type_decl = {
@@ -39,11 +32,12 @@ type type_decl = {
 type fsm_decl = {
   fsm_name  : string;
   fsm_states: string list;
+  fsm_locals: (dtype * string * expr) list;
   fsm_body  : stmt list;
 }
 type program = {
-  input : lvalue list;
-  output: lvalue list;
+  input : (dtype * string) list;
+  output: (dtype * string) list;
   public: (dtype * string * expr) list;
   types : type_decl list;
   fsms  : fsm_decl list;
