@@ -9,7 +9,7 @@ let aln = (ltr | dgt)
 
 rule token = parse
     spc { token lexbuf }
-  | "(~" { comment lexbuf }
+  | "/~" { comment lexbuf }
   | "~" { line_comment lexbuf }
   | '.' { DOT }
   | '_' { UNDER }
@@ -86,7 +86,7 @@ rule token = parse
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-    "~)" { token lexbuf }
+    "~/" { token lexbuf }
   | _    { comment lexbuf }
 and line_comment = parse
     '\n' { token lexbuf }
