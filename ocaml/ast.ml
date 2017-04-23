@@ -21,7 +21,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
 (*  | Fsm_call of string * fsm_call * expr list *)
   | Print of string * expr list
   | Cond of expr * expr * expr
-  | Access string * string
+  | Access of string * string
   | Empty
 type stmt =
   | Block of stmt list
