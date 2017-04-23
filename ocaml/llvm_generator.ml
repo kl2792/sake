@@ -129,7 +129,7 @@ let translate filename program =
         e *)
     | A.Escape s -> raise (Error "NIMP: Escape")
     | A.Range (s, e, i) -> raise (Error "NIMP: Range")
-    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit")
+(*    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit") *)
     | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") in
 
   let add_terminal builder f =
@@ -239,4 +239,4 @@ let translate filename program =
   (* L.build_load and L.build_store for the expression builder *)
   (* L.build_(add|sub|mul|sdiv|or|...) for arithmetic/comparison *)
   (* L.build_ret_void for returning void *)
-  (* Note: evaluate assignments from right to left, not left to right *)
+(* Note: evaluate assignments from right to left, not left to right *)
