@@ -10,7 +10,7 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
-%token TICK RESET PRINT
+%token TICK RESET PRINT ESCAPE
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -76,6 +76,7 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | dtype ID ASSIGN expr { Assign($2, $4) }
+| PRINT LPAREN STRINGLIT COMMA actuals_list RPAREN { Print($3, List.rev $5) }
 | ID DOT ID { Access($1, $3) }
 //| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
@@ -139,11 +140,11 @@ program:
 
 //actuals_opt:
 //  /* nothing */ { [] }
-/*| actuals_list { List.rev $1 }
+//| actuals_list { List.rev $1 }
 
 actuals_list:
   expr { [$1] }
-| actuals_list COMMA expr { $3 :: $1} */
+| actuals_list COMMA expr { $3 :: $1} 
 
 stexpr_list:
   stexpr { [$1] }
