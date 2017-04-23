@@ -57,23 +57,37 @@ state thinking
 			goto eating
 		}
 	} else if (hunger > 1000) { ~ dead lock
-		goto dead
+		state dead
+		a = Dead
+		goto dead ~ lock philosopher in death
 	}
-	
-state dead
-	a = Dead
-	goto dead ~ lock philosopher in death
 
 state eating
 	a = Eating
 	if ((hunger = hunger - 100) <= 0) {
-		hunger = 0 
+		hunger = 0
+		goto eating
 	}
 	goto thinking
 }
 
 ---- HEADER FILE ----
 
+// Proposed new structure
+struct name {
+	struct {
+		int philosopher[5];
+		int philosopher_state[5];
+		int philosopher_condition[5];
+		int philosopher_hunger[5];
+	} state;
+	struct {} input;
+	struct {
+		int
+	}
+}
+
+// small proposal
 struct name_state {
 	int philosopher_state[5];
 }
