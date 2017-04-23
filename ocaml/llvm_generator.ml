@@ -130,7 +130,7 @@ let translate filename program =
         e *)
     | A.Escape s -> raise (Error "NIMP: Escape")
     | A.Range (s, e, i) -> raise (Error "NIMP: Range")
-    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit")
+(*    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit") *)
     | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") in
 
   let add_terminal builder f =
