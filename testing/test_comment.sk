@@ -1,4 +1,8 @@
-fsm variables {
+fsm comments {
         ~ int i = 4 
         ~ public int k = 4
+        /~ This should be a multi line comment ~/
+        /~
+         ~ This shoudl workd
+         ~/
 }
