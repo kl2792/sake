@@ -91,7 +91,7 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
-| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
+//| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
 
 stexpr:
   ID expr {$1, $2}
