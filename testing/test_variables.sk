@@ -2,5 +2,6 @@ fsm variables {
         public int j = 4
         public int x = 7
 
-       int l = 0
+        int l = 0
+
 }

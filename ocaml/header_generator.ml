@@ -39,7 +39,7 @@ let string_of_type = function
   | A.Char -> "char"
   | A.Bool -> "int"
   | A.String -> "char *"
-  | A.Array (_, _) -> "DON'T USE THIS" (* TODO: implement array *)
+(*  | A.Array (_, _) -> "DON'T USE THIS" (* TODO: implement array *) *)
   | A.Enum _ -> "int" 
 
 (* generate input struct declarations *)
@@ -60,11 +60,11 @@ let output_struct_of_ast name fsms =
 let state_struct_of_ast name program = 	
   let var_of_fsm fsm = Printf.sprintf "int %s;\n" fsm.A.fsm_name in 
   let state_internals = List.map var_of_fsm program.A.fsms in
-  let state_internals = String.concat "" state_internals in
+  let state_internals = String.concat "\t" state_internals in
   let var_of_public (t, n, _) = (string_of_type t) ^ " " ^ n in
   let fsm_local_vars = List.map var_of_public program.A.public in 
   let fsm_local_vars = String.concat ";\n\t" fsm_local_vars in
-  Printf.sprintf "struct %s_state {\n\t%s\t%s;\n};\n" name state_internals fsm_local_vars
+    Printf.sprintf "struct %s_state {\n\t%s\t%s;\n};\n" name state_internals fsm_local_vars
 
 (* generate the struct declarations from fsms in ast *) 
 let structs_of_ast name ast = 
