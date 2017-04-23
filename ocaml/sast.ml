@@ -1,17 +1,11 @@
-
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
-
 type uop = Neg | Not
-
 type dtype = (* built-in primitives + custom user type *)
   | Bool | Int | Char | String
   | Array of dtype * int
   | Enum of string (* just the name of the enum *)
-
 type lvalue = dtype * string
-
 type fsm_call = Tick | Reset
-
 type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | BoolLit of bool
   | CharLit of char
@@ -28,7 +22,6 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | Print of string * expr list
   | Cond of expr * expr * expr
   | Empty
-
 type stmt =
   | Block of stmt list
   | State of string
@@ -39,18 +32,15 @@ type stmt =
   | Ldecl of dtype * (string * expr) list (* local decls *)
   | Expr of expr
   | Goto of string (* for FSM transitions *)
-
 type type_decl = {
   type_name   : string;
   type_values : string list;
 }
-
 type fsm_decl = {
   fsm_name  : string;
   fsm_states: string list;
   fsm_body  : stmt list;
 }
-
 type program = {
   input : lvalue list;
   output: lvalue list;
