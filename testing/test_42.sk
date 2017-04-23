@@ -1,4 +1,3 @@
-
 fsm fortytwo {
         print("%d\n", 42)
 }
