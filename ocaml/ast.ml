@@ -13,7 +13,7 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
   | StringLit of string
   | Escape of string
   | Range of int * int * int (* only valid for bool, char, int *)
-  | ArrayLit of expr list
+ (* | ArrayLit of expr list *)
   | Variable of string
   | Uop of uop * expr
   | Binop of expr * op * expr
@@ -21,11 +21,12 @@ type expr = (* Note: Call ~ func_decl : Fsm_call ~ fsm_decl *)
 (*  | Fsm_call of string * fsm_call * expr list *)
   | Print of string * expr list
   | Cond of expr * expr * expr
+  | Access of string * string
   | Empty
 type stmt =
   | Block of stmt list
   | State of string
-  | If of expr * stmt * stmt 
+  | If of expr * stmt * stmt
   | For of string * expr * stmt
   | While of expr * stmt
   | Switch of expr * (expr * stmt) list
@@ -38,8 +39,9 @@ type type_decl = {
 }
 type fsm_decl = {
   fsm_name  : string;
-  fsm_public: (dtype * string * expr) list;
   fsm_states: string list;
+  fsm_public: (dtype * string * expr) list;
+  fsm_local: (dtype * string * expr) list;
   fsm_body  : stmt list;
 }
 type program = {

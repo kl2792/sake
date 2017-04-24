@@ -10,7 +10,7 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
-%token TICK RESET PRINT
+%token TICK RESET PRINT ESCAPE
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -58,7 +58,7 @@ INTLIT { IntLit($1) }
 | STRINGLIT { StringLit ($1) }
 | ESCAPE { Escape ($1) }
 | RTOK RTOK INTLIT { Range($1, $2, $3) }
-// WILL IMPLEMENT LATER | actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
+//| actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
@@ -76,8 +76,9 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | dtype ID ASSIGN expr { Assign($2, $4) }
+| PRINT LPAREN STRINGLIT COMMA actuals_list RPAREN { Print($3, List.rev $5) }
+| ID DOT ID { Access($1, $3) }
 //| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| PRINT LPAREN STRINGLIT COMMA actuals_opt RPAREN { Print($3, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
@@ -85,12 +86,12 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE ID NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
-| FOR ID IN LPAREN expr RPAREN LBRACE NLINE stmt RBRACE { For($2, $5, $9) }
+| FOR ID IN LPAREN expr RPAREN stmt { For($2, $5, $7) }
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
-| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
+//| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
 
 stexpr:
   ID expr {$1, $2}
@@ -106,22 +107,23 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE NLINE public_opt stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt local_opt stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
   fsm_public = $5;
+  fsm_local = $6;
   fsm_states = ["start"];
-  fsm_body = List.rev $6;
+  fsm_body = List.rev $7;
 }}
 
 program:
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE public_opt type_list fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_list fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = $12;
-    types = List.rev $13;
-    fsms = List.rev $14;
+    public = [];
+    types = List.rev $12;
+    fsms = List.rev $13;
   }}
 /* MAXIMUM JANKNESS */
 | public_opt type_list fsm_list EOF
@@ -136,13 +138,13 @@ program:
 
 /*list definitions */
 
-actuals_opt:
-  /* nothing */ { [] }
-| actuals_list { List.rev $1 }
+//actuals_opt:
+//  /* nothing */ { [] }
+//| actuals_list { List.rev $1 }
 
 actuals_list:
   expr { [$1] }
-| actuals_list COMMA expr { $3 :: $1}
+| actuals_list COMMA expr { $3 :: $1} 
 
 stexpr_list:
   stexpr { [$1] }
@@ -152,7 +154,7 @@ stmt_list:
   /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
-cstmt_list: //BUG: NLINE NLINE after switch statement
+cstmt_list: 
   NLINE { [] }
 | cstmt_list cstmt {  $2 :: $1 }
 
@@ -169,15 +171,24 @@ lvalue_list:
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 dstexpr:
- PUBLIC dtype ID ASSIGN expr { $2, $3, $5 }
+ dtype ID ASSIGN expr { $1, $2, $4 }
 
 public_opt:
  /*nothing*/ { [] }
-| public_list NLINE NLINE{List.rev $1}
+| public_list NLINE {List.rev $1}
 
 public_list:
- dstexpr { [$1] }
-| public_list NLINE dstexpr {$3 :: $1}
+ PUBLIC dstexpr { [$2] }
+| public_list NLINE PUBLIC dstexpr {$4 :: $1}
+
+//BUG: there is public, but no local then only one NLINE before stmt_list
+local_opt:
+/*nothing*/ { [] }
+| NLINE local_list NLINE NLINE {List.rev $2}
+
+local_list:
+dstexpr { [$1] }
+| local_list NLINE dstexpr { $3 :: $1 }
 
 type_list:
 /* nothing */ { [] }

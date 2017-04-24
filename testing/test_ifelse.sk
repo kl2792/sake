@@ -1,9 +1,6 @@
 input [int i, int o, char l]
 output [int p, int q]
 
-public int k = 4
-public int v = 5
-
 fsm headerTest {
         if (v == 5) {
                 v = 6

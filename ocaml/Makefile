@@ -1,4 +1,4 @@
-all : sake.native print.o
+all : clean sake.native print.o
 
 sake.native :
 	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
