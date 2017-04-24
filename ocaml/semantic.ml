@@ -12,11 +12,12 @@ let check program =
     sast_pub_list []  program.A.fsms in
   let slvalue (t, n) = t, n in
   let stype t = {S.type_name=t.A.type_name; S.type_values=t.A.type_values} in
-  let svar (d, s, e) = d, s, e in
+  (* let svar (d, s, e) = d, s, e in *)
   let sfsm f = {
     S.fsm_name=f.A.fsm_name;
     S.fsm_states=["start"];
-    S.fsm_locals=svar f.A.fsm_locals;
+    (* S.fsm_locals=svar f.A.fsm_locals; *)
+    S.fsm_locals=f.A.fsm_locals;
     S.fsm_body=f.A.fsm_body;
   } in
   {
