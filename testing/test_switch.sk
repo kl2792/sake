@@ -1,5 +1,6 @@
 fsm switchCase {
-        switch(1) {
+        int i = 1
+        switch(i) {
                 case 0: print("%d", 0)
 		case 1: print("%d", 1)
         }

@@ -198,7 +198,7 @@ let translate filename program =
             let ftype = L.function_type i32_t pointers in
             L.define_function fsm.A.fsm_name ftype sake in
           let builder = L.builder_at_end context (L.entry_block fn) in
-          let _ = stmt fn builder (A.Block fsm.A.fsm_body) in
+          let builder = stmt fn builder (A.Block fsm.A.fsm_body) in
           let _ = add_terminal builder (L.build_ret (L.const_int i32_t 0)) in
           locals := [StringMap.empty];
           (fsm.A.fsm_name, fn) :: (build_fsms fsms) in

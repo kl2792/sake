@@ -1,0 +1,26 @@
+input[int in]
+output[char out] 
+
+fsm trafficLight {
+        state Red
+                if (in == 1) {
+                        out = 'g' 
+                        goto Green
+                }
+                else {
+                        out = 'r'
+                        goto Red
+                }
+        state Yellow
+                out = 'r' 
+                goto Red 
+        state Green
+                if (in == 0) {
+                        out = 'y'
+                        goto Yellow
+                }
+                else {
+                        out = 'g'
+                        goto Green
+                }    
+}

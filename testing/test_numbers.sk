@@ -3,4 +3,6 @@ fsm numbers {
         2
         3
         4
+        true
+        false
 }

@@ -1,0 +1,6 @@
+input[char decision]
+output[char result]
+
+fsm go {
+
+}
