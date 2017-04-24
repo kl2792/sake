@@ -1,24 +1,30 @@
-
 module A = Ast
 module S = Sast
 
-module StringMap = Map.Make(String);
-
-
+module StringMap = Map.Make(String)
 
 let check program =
   let public = 
-    let get_names fsm_name = function [] -> ()
-      | x :: y -> (fsm_name ^ "_" ^ x) :: (get_names fsm_name y) in
-    let rec sast_pub_list = function [] -> ()
-      | x :: y -> (get_names x) :: (sast_pub_list y) in
-    sast_pub_list program.A.fsms in
+    let rec get_names a n = function [] -> a
+      | (_, pn, _) :: t -> get_names ((n ^ "_" ^ pn) :: a) n t in
+    let rec sast_pub_list a = function [] -> a
+      | h :: t -> sast_pub_list (get_names a h.A.fsm_name h.A.fsm_public) t in
+    sast_pub_list []  program.A.fsms in
+  let slvalue (t, n) = t, n in
+  let stype t = {S.type_name=t.A.type_name; S.type_values=t.A.type_values} in
+  let svar (d, s, e) = d, s, e in
+  let sfsm f = {
+    S.fsm_name=f.A.fsm_name;
+    S.fsm_states=["start"];
+    S.fsm_locals=svar f.A.fsm_locals;
+    S.fsm_body=f.A.fsm_body;
+  } in
   {
-    S.input = program.A.input;
-    S.output = program.A.output;
+    S.input = List.map slvalue program.A.input;
+    S.output = List.map slvalue program.A.output;
     S.public = public;
-    S.types = program.A.types;
-    S.fsms = program.A.fsms
+    S.types = List.map stype program.A.types;
+    S.fsms = List.map sfsm program.A.fsms;
   }
 
 (*
