@@ -1,11 +1,28 @@
-open ast
-open sast
+
+module A = Ast
+module S = Sast
 
 module StringMap = Map.Make(String);
 
 
 
-let check (input, output, public, types, fsms) =
+let check program =
+  let public = 
+    let get_names fsm_name = function [] -> ()
+      | x :: y -> (fsm_name ^ "_" ^ x) :: (get_names fsm_name y) in
+    let rec sast_pub_list = function [] -> ()
+      | x :: y -> (get_names x) :: (sast_pub_list y) in
+    sast_pub_list program.A.fsms in
+  {
+    S.input = program.A.input;
+    S.output = program.A.output;
+    S.public = public;
+    S.types = program.A.types;
+    S.fsms = program.A.fsms
+  }
+
+(*
+let autre program = 
 
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
@@ -30,7 +47,7 @@ let check (input, output, public, types, fsms) =
    
   (**** Checking Global Variables ****)
 
-  let globals = input @ output in
+  let globals = program.A.input @ program.A.output in
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
    
@@ -63,12 +80,22 @@ let check (input, output, public, types, fsms) =
 
   let check_fsm fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
+
+    List.iter (check_not_void (fun n -> "illegal void public " ^ n ^
+      " in " ^ fsm.fsm_name)) fsm.fsm_public;
     
     report_duplicate (fun n -> "duplicate public " ^ n ^ " in " ^ fsm.fsm_name)
       (List.map snd fsm.fsm_public);
 
     report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
       fsm.fsm_states;
+
+    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+      " in " ^ fsm.fsm_name)) fsm.fsm_locals;
+
+    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.fsm_name)
+      (List.map snd fsm.fsm_locals);
+
 
       
   type translation_environment = {
@@ -213,3 +240,4 @@ let check (input, output, public, types, fsms) =
    
   in
   List.iter check_function functions
+*)
