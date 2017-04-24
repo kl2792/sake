@@ -111,8 +111,9 @@ fsm_decl:
 {{
   fsm_name = $2;
   fsm_public = $5;
-  fsm_local = $6;
+  fsm_locals = $6;
   fsm_body = List.rev $7;
+  fsm_states = ["start"];
 }}
 
 program:
@@ -122,6 +123,7 @@ program:
     output = List.rev $8;
     types = List.rev $12;
     fsms = List.rev $13;
+    public = [];
   }}
 /* No input output */
 | type_list fsm_list EOF
@@ -130,6 +132,7 @@ program:
     output = [];
     types = List.rev $1;
     fsms = List.rev $2;
+    public = [];
   }}
 
 
