@@ -1,32 +1,26 @@
-input[int i]
-output[char k] 
+input[int in]
+output[char out] 
 
 fsm trafficLight {
         state Red
-                if (i == 1) {
-                        k = 'y' 
-                        goto Yellow
+                if (in == 1) {
+                        out = 'g' 
+                        goto Green
                 }
                 else {
-                        k = 'r'
+                        out = 'r'
                         goto Red
                 }
         state Yellow
-                if (i == 1) {
-                        k = 'g'
-                        goto Green 
-                } 
-                else {
-                        k = 'y'
+                out = 'r' 
+                goto Red 
+        state Green
+                if (in == 0) {
+                        out = 'y'
                         goto Yellow
                 }
-        state Green
-                if (i == 1) {
-                        k = 'r'
-                        goto Red 
-                }
                 else {
-                        k = 'g'
+                        out = 'g'
                         goto Green
                 }    
 }
