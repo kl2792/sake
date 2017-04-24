@@ -1,0 +1,12 @@
+input [int i, int o, char l]
+output [int p, int q]
+
+fsm headerTest {
+        public int k = 4
+        public int v = 5        
+        for k in (0:2:1) {
+                for v in (0:5:1) {
+                        k = k + 1
+                }
+        }
+}

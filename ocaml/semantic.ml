@@ -1,16 +1,33 @@
-open ast
-open sast
+
+module A = Ast
+module S = Sast
 
 module StringMap = Map.Make(String);
 
 
 
-let check (input, output, public, types, fsms) =
+let check program =
+  let public = 
+    let get_names fsm_name = function [] -> ()
+      | x :: y -> (fsm_name ^ "_" ^ x) :: (get_names fsm_name y) in
+    let rec sast_pub_list = function [] -> ()
+      | x :: y -> (get_names x) :: (sast_pub_list y) in
+    sast_pub_list program.A.fsms in
+  {
+    S.input = program.A.input;
+    S.output = program.A.output;
+    S.public = public;
+    S.types = program.A.types;
+    S.fsms = program.A.fsms
+  }
+
+(*
+let autre program = 
 
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
     let rec helper = function
-	n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
+  n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
       | _ :: t -> helper t
       | [] -> ()
     in helper (List.sort compare list)
@@ -30,7 +47,7 @@ let check (input, output, public, types, fsms) =
    
   (**** Checking Global Variables ****)
 
-  let globals = input @ output in
+  let globals = program.A.input @ program.A.output in
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
    
@@ -63,6 +80,9 @@ let check (input, output, public, types, fsms) =
 
   let check_fsm fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
+
+    List.iter (check_not_void (fun n -> "illegal void public " ^ n ^
+      " in " ^ fsm.fsm_name)) fsm.fsm_public;
     
     report_duplicate (fun n -> "duplicate public " ^ n ^ " in " ^ fsm.fsm_name)
       (List.map snd fsm.fsm_public);
@@ -70,11 +90,41 @@ let check (input, output, public, types, fsms) =
     report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
       fsm.fsm_states;
 
-      
+    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+      " in " ^ fsm.fsm_name)) fsm.fsm_locals;
 
-    (* Type of each variable (global, formal, or local *)
-    let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-  StringMap.empty (globals @ publics @ locals)
+    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.fsm_name)
+      (List.map snd fsm.fsm_locals);
+
+
+      
+  type translation_environment = {
+    scope : symbol_table;   (* symbol table for vars *)
+    in_switch : bool;
+    case_labels : list ref; (* known case labels *)
+    exception_scope : exception_scope; (* sym tab for exceptions *)
+    state_labels : label list ref; (* labels on statements *)
+    forward_gotos : label list ref; (* forward goto destinations *)
+  }
+
+
+  type symbol_table = {
+    parent : symbol_table option;
+    variables : variable_decl list
+  }
+
+  let rec find_variable (scope : symbol_table) name =
+    try
+      List.find (fun (s, _, _, _) -> s = name) scope.variables
+    with Not_found ->
+      match scope.parent with
+        Some(parent) -> find_variable parent name
+      | _ -> raise Not_found
+
+
+  (* Type of each variable (global, formal, or local *)
+  let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
+  StringMap.empty (globals @ publics @ locals) I love that
   func.formals @ func.locals )
     in
 
@@ -114,7 +164,7 @@ let check (input, output, public, types, fsms) =
 
     (* Type of each variable (global, formal, or local *)
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-	StringMap.empty (globals @ func.formals @ func.locals )
+  StringMap.empty (globals @ func.formals @ func.locals )
     in
 
     let type_of_identifier s =
@@ -124,31 +174,31 @@ let check (input, output, public, types, fsms) =
 
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
-	Literal _ -> Int
+  Literal _ -> Int
       | BoolLit _ -> Bool
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-	(match op with
+  (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-	| Equal | Neq when t1 = t2 -> Bool
-	| Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-	| And | Or when t1 = Bool && t2 = Bool -> Bool
+  | Equal | Neq when t1 = t2 -> Bool
+  | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+  | And | Or when t1 = Bool && t2 = Bool -> Bool
         | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
               string_of_typ t2 ^ " in " ^ string_of_expr e))
         )
       | Unop(op, e) as ex -> let t = expr e in
-	 (match op with
-	   Neg when t = Int -> Int
-	 | Not when t = Bool -> Bool
+   (match op with
+     Neg when t = Int -> Int
+   | Not when t = Bool -> Bool
          | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
-	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
+           string_of_typ t ^ " in " ^ string_of_expr ex)))
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
                                 and rt = expr e in
         check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
-				     " = " ^ string_of_typ rt ^ " in " ^ 
-				     string_of_expr ex))
+             " = " ^ string_of_typ rt ^ " in " ^ 
+             string_of_expr ex))
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
            raise (Failure ("expecting " ^ string_of_int
@@ -168,7 +218,7 @@ let check (input, output, public, types, fsms) =
 
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	Block sl -> let rec check_block = function
+  Block sl -> let rec check_block = function
            [Return _ as s] -> stmt s
          | Return _ :: _ -> raise (Failure "nothing may follow a return")
          | Block sl :: ss -> check_block (sl @ ss)
@@ -190,3 +240,4 @@ let check (input, output, public, types, fsms) =
    
   in
   List.iter check_function functions
+*)

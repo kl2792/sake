@@ -9,12 +9,11 @@ let aln = (ltr | dgt)
 
 rule token = parse
     spc { token lexbuf }
-  | "(~" { comment lexbuf }
+  | "/~" { comment lexbuf }
   | "~" { line_comment lexbuf }
   | '.' { DOT }
   | '_' { UNDER }
   | '|' { BAR }
-  | '?' { QUESMARK }
   | '\n'     { NLINE }
   | '('      { LPAREN }
   | ')'      { RPAREN }
@@ -45,7 +44,6 @@ rule token = parse
   | "for"    { FOR }
   | "in"     { IN }
   | "while"  { WHILE }
-  | "return" { RETURN }
   | "continue"   { CONTINUE }
   | "break"   { BREAK }
   | "int"    { INT }
@@ -75,7 +73,6 @@ rule token = parse
   | dgt+ as num { INTLIT (int_of_string num) }
   | ':'dgt+ as num { RTOK (int_of_string num) }
   | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
-  | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
   | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
@@ -86,7 +83,7 @@ rule token = parse
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-    "~)" { token lexbuf }
+    "~/" { token lexbuf }
   | _    { comment lexbuf }
 and line_comment = parse
     '\n' { token lexbuf }

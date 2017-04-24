@@ -6,7 +6,7 @@ int main() {
     struct test_42_output p;
     struct test_42_state q;
     
-    test_42_tick(&q, &i, &p);
+    test_42_tick(NULL, NULL, NULL);
 
     return 0;
 }

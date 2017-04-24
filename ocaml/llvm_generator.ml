@@ -16,27 +16,46 @@ let translate filename program =
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
     and void_t = L.void_type context in
-  let lltype = function
-    A.Int -> i32_t
-  | A.Char -> i8_t
-  | A.Bool -> i1_t
-  | A.Enum _ -> i32_t
-  | _ -> raise (Error "haven't figured this out yet") in
+
+  (* Helper functions *)
+  let lltype = function 
+    | A.Int -> i32_t
+    | A.Char -> i8_t
+    | A.Bool -> i1_t
+    | A.Enum _ -> i32_t
+    | _ -> raise (Error "haven't figured this out yet") in
+  let llop = function
+    | A.Add -> L.build_add
+    | A.Sub -> L.build_sub
+    | A.Mul -> L.build_mul
+    | A.Div -> L.build_sdiv
+    | A.Eq  -> L.build_icmp L.Icmp.Eq
+    | A.Neq -> L.build_icmp L.Icmp.Ne
+    | A.Lt  -> L.build_icmp L.Icmp.Slt
+    | A.Le  -> L.build_icmp L.Icmp.Sle
+    | A.Gt  -> L.build_icmp L.Icmp.Sgt
+    | A.Ge  -> L.build_icmp L.Icmp.Sge
+    | A.And -> L.build_and
+    | A.Or  -> L.build_or in
+  let lluop = function
+    | A.Neg -> L.build_neg
+    | A.Not -> L.build_not in
+  let llenum s = lltype (A.Enum s) in
+  let lldtype (t, _) = lltype t in
   let init v t = L.const_int (lltype t) v in
 
   (* New types *)
   let input_t =
-    let types = List.map (fun (t, _) -> lltype t) program.A.input in
-    let types = Array.of_list types in
+    let types = Array.of_list (List.map lldtype program.A.input) in
     L.struct_type context types in
   let output_t =
-    let types = List.map (fun (t, _) -> lltype t) program.A.output in
-    let types = Array.of_list types in
+    let types = Array.of_list (List.map lldtype program.A.output) in
     L.struct_type context types in
   let state_t =
-    let types = List.map (fun (_, _) -> lltype (A.Enum "")) program.A.input in
-    (* TODO: let types = types @ *)
-    let types = Array.of_list types in
+    let fsms = List.map (fun f -> f.A.fsm_name) program.A.fsms in
+    let states = List.map llenum fsms in
+    let public = List.map (fun (t, _, _) -> lltype t) program.A.public in
+    let types = Array.of_list (states @ public) in
     L.struct_type context types in
 
   (* Variables *)
@@ -83,24 +102,6 @@ let translate filename program =
     let ftype = L.function_type (L.pointer_type i8_t) formals in
     L.declare_function "memcpy" ftype sake in
 
-  (* Operation mappers *)
-  let llop = function 
-    | A.Add -> L.build_add
-    | A.Sub -> L.build_sub
-    | A.Mul -> L.build_mul
-    | A.Div -> L.build_sdiv
-    | A.Eq  -> L.build_icmp L.Icmp.Eq
-    | A.Neq -> L.build_icmp L.Icmp.Ne
-    | A.Lt  -> L.build_icmp L.Icmp.Slt
-    | A.Le  -> L.build_icmp L.Icmp.Sle
-    | A.Gt  -> L.build_icmp L.Icmp.Sgt
-    | A.Ge  -> L.build_icmp L.Icmp.Sge
-    | A.And -> L.build_and
-    | A.Or  -> L.build_or in
-  let lluop = function
-    | A.Neg -> L.build_neg
-    | A.Not -> L.build_not in
-
   (* Expression builder *)
   let rec expr builder = function
     | A.IntLit i -> L.const_int i32_t i
@@ -109,7 +110,7 @@ let translate filename program =
     | A.StringLit s -> L.const_stringz context s
     | A.Empty -> L.const_int i32_t 0
     | A.Variable s -> raise (Error "NIMP: Variable")(*L.build_load (lookup s) s builder*)
-    | A.Print (fmt, args) ->
+    | A.Printf (fmt, args) ->
         let fmt' = L.build_global_stringptr fmt "fmt" builder in
         let args = [fmt'; expr builder (List.hd args)] in
         (* let args = fmt :: (List.map (expr builder) args) in *)
@@ -127,15 +128,15 @@ let translate filename program =
         (* let e = expr builder e in (* TODO: fix assign *)
        let _ = L.build_store e (lookup s) builder in
         e *)
-    | A.Escape s -> raise (Error "NIMP: Escape")
-    | A.Range (s, e, i) -> raise (Error "NIMP: Range")
+    (*| A.Escape s -> raise (Error "NIMP: Escape")
+    | A.Range (s, e, i) -> raise (Error "NIMP: Range") *)
 (*    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit") *)
-    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") in
+(*    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") *) in
 
   let add_terminal builder f =
     match L.block_terminator (L.insertion_block builder) with
-      Some _ -> ()
-    | None -> ignore (f builder) in
+      | Some _ -> ()
+      | None -> ignore (f builder) in
 
   (* Statement builder *)
   let rec stmt fn builder = function
@@ -179,10 +180,10 @@ let translate filename program =
             iter (i + 1) tail in
         iter 0 cases; 
         L.builder_at_end context merge_bb 
-    | A.For (name, iter, body) ->
+    (*| A.For (name, iter, body) ->
         (* TODO: implement local variables for for loop *)
-        raise (Error "stop it")
-    | A.Ldecl (dtype, decls) -> raise (Error "stop it, i said")
+        raise (Error "stop it") *)
+    (*| A.Ldecl (dtype, decls) -> raise (Error "stop it, i said") *)
     | A.State name -> raise (Error "not this one!")
     | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
 

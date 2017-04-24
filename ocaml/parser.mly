@@ -10,7 +10,7 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
-%token TICK RESET PRINT ESCAPE
+%token TICK RESET PRINT 
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -31,7 +31,7 @@
 %token <int> RTOK
 %token <char> CHARLIT
 %token <string> STRINGLIT
-%token <string> ESCAPE
+//%token <string> ESCAPE
 %token <string> ID
 %token <string> TYPENAME
 
@@ -44,7 +44,7 @@ dtype:
 BOOL { Bool }
 | INT { Int }
 | CHAR { Char }
-| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
+//| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
 | ID { Enum($1) }  /*Q: Not sure if this is correct */
 
 lvalue:
@@ -56,8 +56,8 @@ INTLIT { IntLit($1) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 | STRINGLIT { StringLit ($1) }
-| ESCAPE { Escape ($1) }
-| RTOK RTOK INTLIT { Range($1, $2, $3) }
+//| ESCAPE { Escape ($1) }
+//| RTOK RTOK INTLIT { Range($1, $2, $3) }
 //| actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
@@ -76,7 +76,7 @@ INTLIT { IntLit($1) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
 | dtype ID ASSIGN expr { Assign($2, $4) }
-| PRINT LPAREN STRINGLIT COMMA actuals_list RPAREN { Print($3, List.rev $5) }
+| PRINT LPAREN STRINGLIT COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
 | ID DOT ID { Access($1, $3) }
 //| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
@@ -86,7 +86,7 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE ID NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
-| FOR ID IN LPAREN expr RPAREN stmt { For($2, $5, $7) }
+| FOR ID IN LPAREN INTLIT RTOK RTOK RPAREN stmt { For($2, $5, $6, $7, $9) }  
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
@@ -111,9 +111,9 @@ fsm_decl:
 {{
   fsm_name = $2;
   fsm_public = $5;
-  fsm_local = $6;
-  fsm_states = ["start"];
+  fsm_locals = $6;
   fsm_body = List.rev $7;
+  fsm_states = ["start"];
 }}
 
 program:
@@ -121,18 +121,18 @@ program:
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = [];
     types = List.rev $12;
     fsms = List.rev $13;
+    public = [];
   }}
-/* MAXIMUM JANKNESS */
-| public_opt type_list fsm_list EOF
+/* No input output */
+| type_list fsm_list EOF
   {{
     input = [];
     output = [];
-    public = $1;
-    types = List.rev $2;
-    fsms = List.rev $3;
+    types = List.rev $1;
+    fsms = List.rev $2;
+    public = [];
   }}
 
 

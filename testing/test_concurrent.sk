@@ -1,4 +1,12 @@
+input[int i, int o]
+output[int k, int l]
+
 fsm one {
+        public int j = 4
 }
 fsm two {
+        public int k = 3
+}
+fsm three {
+        public int f = 24
 }

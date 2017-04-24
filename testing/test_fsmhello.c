@@ -16,7 +16,7 @@ int main(){
 
     // Take one input at a time from the user
     char input[500];
-    printf("Please enter an input stream of 0s and 1s. (max. 50): ");
+    //printf("Please enter an input stream of 0s and 1s. (max. 50): ");
 
     /*
     // RUN THE SIMULATION MULTIPLE TIMES 

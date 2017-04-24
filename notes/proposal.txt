@@ -1,0 +1,93 @@
+type bit = True | False
+type color = Red | Green | Yellow
+
+fsm a {
+	public int pub = 0
+	public bit enum = Red
+	int local = 1
+
+state red
+	pub = pub + 1
+	enum = Red
+
+state blue
+	pub = pub - 1
+	enum = Blue	
+	goto red
+}
+
+fsm b {
+	public int x = ...
+
+state green
+	x = a.pub
+	
+state yellow
+}
+
+------------------------------------
+
+type action = Thinking | Hungry | Eating | Dead
+type condition = None | Waiting | Signalled
+type fork = Left | Right | None
+
+fsm forks[5] {
+	public fork utilise = None
+}
+
+fsm philosophers[5] {
+	public action a = Thinking
+	public condition c = None
+	public int hunger = 0
+	
+	~ Access: philosopher[0].state
+state thinking
+	a = Thinking
+	
+	hunger = hunger + 1
+	if (hunger > 10) { ~ try to get food
+		for (i in 0:5:1) {
+			if (philosophers[i].a == Dead) {
+				printf("Philosopher %d says, \"My comrade %d is dead!\"", ???, i);
+				~ access own number
+			}
+			(~
+			 ~ acquire both forks without deadlock -- dining philosophers problem
+			 ~)
+			goto eating
+		}
+	} else if (hunger > 1000) { ~ dead lock
+		state dead
+		a = Dead
+		goto dead ~ lock philosopher in death
+	}
+
+state eating
+	a = Eating
+	if ((hunger = hunger - 100) <= 0) {
+		hunger = 0
+		goto eating
+	}
+	goto thinking
+}
+
+---- HEADER FILE ----
+
+// Proposed new structure
+struct name {
+	struct {
+		int philosopher[5];
+		int philosopher_state[5];
+		int philosopher_condition[5];
+		int philosopher_hunger[5];
+	} state;
+	struct {} input;
+	struct {
+		int
+	}
+}
+
+// small proposal
+struct name_state {
+	int philosopher_state[5];
+}
