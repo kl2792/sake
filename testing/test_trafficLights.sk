@@ -24,7 +24,6 @@ fsm tl_one {
                         goto g1
                 }    
 }
-
 fsm tl_two {
         state r2
                 if (in_two == 1 && tl_one == r1) {
