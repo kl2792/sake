@@ -1,7 +1,7 @@
 fsm switchCase {
         int i = 1
         switch(i) {
-                case 0: print("%d", 0)
-		case 1: print("%d", 1)
+                case 0: printf("%d", 0)
+		case 1: printf("%d", 1)
         }
 }

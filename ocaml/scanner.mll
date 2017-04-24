@@ -53,7 +53,7 @@ rule token = parse
   | "string"   { STRING }
   | "true"   { TRUE }
   | "false"  { FALSE }
-  | "print"  { PRINT }
+  | "printf"  { PRINTF }
   | "fsm" { FSM }
   | "tick"   { TICK }
   | "reset"   { RESET }

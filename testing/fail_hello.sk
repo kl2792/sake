@@ -1,10 +1,10 @@
 fsm hello {
-        print (1*1)
-        print (2 * 3 - 4)
-        print (3)
-        print (5*4-16)
-        print (4+1)
-        print (6-0)
-        print (1+1+1+1+1+1+1)
-        print (1+2-3+4+4)
+        printf (1*1)
+        printf (2 * 3 - 4)
+        printf (3)
+        printf (5*4-16)
+        printf (4+1)
+        printf (6-0)
+        printf (1+1+1+1+1+1+1)
+        printf (1+2-3+4+4)
 }
