@@ -1,9 +1,9 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE NLINE UNDER
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES DOT LSQUARE RSQUARE NLINE UNDER
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT TRUE FALSE
-%token RETURN IF ELSE ELIF FOR WHILE IN
+%token IF ELSE ELIF FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
 %token CONTINUE BREAK
 %token EOF
@@ -117,20 +117,20 @@ fsm_decl:
 }}
 
 program:
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_list fsm_list EOF
+  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    types = List.rev $12;
+    types = $12;
     fsms = List.rev $13;
     public = [];
   }}
 /* No input output */
-| type_list fsm_list EOF
+| type_opt fsm_list EOF
   {{
     input = [];
     output = [];
-    types = List.rev $1;
+    types = $1;
     fsms = List.rev $2;
     public = [];
   }}
@@ -190,8 +190,12 @@ local_list:
 dstexpr { [$1] }
 | local_list NLINE dstexpr { $3 :: $1 }
 
+type_opt:
+/*nothing*/ {[] }
+| type_list NLINE { List.rev $1 }
+
 type_list:
-/* nothing */ { [] }
+type_decl { [] }
 | type_list type_decl { $2 :: $1}
 
 fsm_list:
