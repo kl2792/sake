@@ -3,7 +3,8 @@ type emma = shalva | ac | kc
 fsm variables {
         public int j = 4
         public int x = 7
-
+        public int q = 190
+        int p = false
         int l = 0
 
 }
