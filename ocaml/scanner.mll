@@ -14,7 +14,6 @@ rule token = parse
   | '.' { DOT }
   | '_' { UNDER }
   | '|' { BAR }
-  | '?' { QUESMARK }
   | '\n'     { NLINE }
   | '('      { LPAREN }
   | ')'      { RPAREN }
@@ -45,7 +44,6 @@ rule token = parse
   | "for"    { FOR }
   | "in"     { IN }
   | "while"  { WHILE }
-  | "return" { RETURN }
   | "continue"   { CONTINUE }
   | "break"   { BREAK }
   | "int"    { INT }
