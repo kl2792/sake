@@ -1,3 +1,5 @@
+type emma = shalva | ac | kc
+
 fsm variables {
         public int j = 4
         public int x = 7
