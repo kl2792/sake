@@ -131,7 +131,7 @@ let translate filename program =
     (*| A.Escape s -> raise (Error "NIMP: Escape")
     | A.Range (s, e, i) -> raise (Error "NIMP: Range") *)
 (*    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit") *)
-    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") in
+(*    | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") *) in
 
   let add_terminal builder f =
     match L.block_terminator (L.insertion_block builder) with
