@@ -110,7 +110,7 @@ let translate filename program =
     | A.StringLit s -> L.const_stringz context s
     | A.Empty -> L.const_int i32_t 0
     | A.Variable s -> raise (Error "NIMP: Variable")(*L.build_load (lookup s) s builder*)
-    | A.Print (fmt, args) ->
+    | A.Printf (fmt, args) ->
         let fmt' = L.build_global_stringptr fmt "fmt" builder in
         let args = [fmt'; expr builder (List.hd args)] in
         (* let args = fmt :: (List.map (expr builder) args) in *)
@@ -128,8 +128,8 @@ let translate filename program =
         (* let e = expr builder e in (* TODO: fix assign *)
        let _ = L.build_store e (lookup s) builder in
         e *)
-    | A.Escape s -> raise (Error "NIMP: Escape")
-    | A.Range (s, e, i) -> raise (Error "NIMP: Range")
+    (*| A.Escape s -> raise (Error "NIMP: Escape")
+    | A.Range (s, e, i) -> raise (Error "NIMP: Range") *)
 (*    | A.ArrayLit exps -> raise (Error "NIMP: ArrayLit") *)
     | A.Cond (cond, e1, e2) -> raise (Error "NIMP: Cond") in
 
@@ -180,10 +180,10 @@ let translate filename program =
             iter (i + 1) tail in
         iter 0 cases; 
         L.builder_at_end context merge_bb 
-    | A.For (name, iter, body) ->
+    (*| A.For (name, iter, body) ->
         (* TODO: implement local variables for for loop *)
-        raise (Error "stop it")
-    | A.Ldecl (dtype, decls) -> raise (Error "stop it, i said")
+        raise (Error "stop it") *)
+    (*| A.Ldecl (dtype, decls) -> raise (Error "stop it, i said") *)
     | A.State name -> raise (Error "not this one!")
     | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
 
