@@ -31,7 +31,7 @@ let get_op = function (* A.op *)
 | A.Or -> S.Or
 
 
-let get_expr = function (* A.expr *)
+let rec get_expr = function (* A.expr *)
 | A.BoolLit(bl) -> S.BoolLit(bl)
 | A.CharLit(ch) -> S.CharLit(ch)
 | A.IntLit(num) -> S.IntLit(num)
@@ -45,55 +45,55 @@ let get_expr = function (* A.expr *)
 | A.Empty -> S.Empty
 
 
-let get_cases = function (* (expr * stmt) list *)
+let rec get_cases = function (* (expr * stmt) list *)
 [] -> []
 | (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
 
-let get_e_list = function (* expr list *)
+let rec get_e_list = function (* expr list *)
 [] -> []
 | exp::tl -> (get_expr exp)::(get_e_list tl)
 
 
 
-let take_in = function
+let rec take_in = function
 [] -> []
 | (typ,name)::tl -> ((convert_type typ),name)::(take_in tl)
 
-let take_out = function
+let rec take_out = function
 [] -> []
 | (typ,name)::tl -> ((convert_type typ),name)::(take_out tl)
 
 
-let take_typ = function
+let rec take_typ = function
 [] -> []
 | {A.type_name = name; A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
 
 
-let take_fsm = function
+let rec take_fsm = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
     -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = states; S.fsm_body = (take_stmts body)}::(take_fsm tl)
 
 
-let take_pubs name = function (*(dtype * string * expr) list*)
+let rec take_pubs name = function (*(dtype * string * expr) list*)
 [] -> []
 | (typ,var_name,expr)::tl -> ((convert_type typ),name ^ "_" ^ var_name,(get_expr expr)):: (take_pubs name tl)
 
-let get_pubs = function
+let rec get_pubs = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
     -> (take_pubs pubs) @ (get_pubs tl)
 
 
-let copy_locals = function (*(dtype * string * expr) list*)
+let rec copy_locals = function (*(dtype * string * expr) list*)
 [] -> []
 | (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
 
-let take_stmts = function (*stmt list*)
+let rec take_stmts = function (*stmt list*)
 [] -> []
 | stm::tl -> (do_stmt stm)::(take_stmts tl)
 
-let do_stmt = function (* stmts *)
+let rec do_stmt = function (* stmts *)
 | A.Block(s_list) -> S.Block(take_stmts s_list)
 | A.State(name) -> S.State(name)
 | A.If(pred,sta,stb) -> S.If((get_expr pred),(do_stmt sta),(do_stmt stb))
