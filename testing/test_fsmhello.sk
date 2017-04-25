@@ -1,4 +1,4 @@
-input[int i, int o]
+input[string p, int i, int o]
 output[int k, int l]
 
 fsm hello {
