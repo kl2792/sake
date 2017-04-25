@@ -43,16 +43,15 @@ let rec get_expr = function (* A.expr *)
 | A.Assign(name,exp) -> S.Assign(name,(get_expr exp))
 | A.Printf(fmt, lst) -> S.Printf(fmt, (get_e_list lst))
 | A.Empty -> S.Empty
+and get_e_list = function (* expr list *)
+[] -> []
+| exp::tl -> (get_expr exp)::(get_e_list tl)
+
 
 
 let rec get_cases = function (* (expr * stmt) list *)
 [] -> []
 | (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
-
-let rec get_e_list = function (* expr list *)
-[] -> []
-| exp::tl -> (get_expr exp)::(get_e_list tl)
-
 
 
 let rec take_in = function
