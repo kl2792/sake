@@ -10,7 +10,6 @@ type expr =
   | IntLit of int
   | StringLit of string
   | Variable of string
-  | Access of string * string
   | Uop of uop * expr
   | Binop of expr * op * expr
   | Assign of string * expr
