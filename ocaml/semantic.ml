@@ -120,7 +120,7 @@ let check program =
 
 (************************)
 
-
+(*
 let check program =
   let public = 
     let rec get_names a n = function [] -> a
@@ -145,6 +145,8 @@ let check program =
     S.types = List.map stype program.A.types;
     S.fsms = List.map sfsm program.A.fsms;
   }
+
+*)
 
 (*
 let autre program = 
