@@ -169,8 +169,7 @@ let init t v = L.const_int (lltype t) v in
         let case = expr builder predicate in
         let merge_bb = L.append_block context "merge" fn in
         let switch_in = L.build_switch case merge_bb (List.length cases) builder in
-        let rec iter i = function
-          | [] -> ()
+        let rec iter i = function [] -> ()
           | (c, s) :: tail ->
               let onval = expr builder c in
               let case_bb = L.append_block context (Printf.sprintf "case_%d" i) fn in
@@ -180,44 +179,37 @@ let init t v = L.const_int (lltype t) v in
             iter (i + 1) tail in
         iter 0 cases; 
         L.builder_at_end context merge_bb 
-    | A.For (name, iter, body) ->
-        (* TODO: implement local variables for for loop *)
-        raise (Error "stop it")
-    | A.State name -> raise (Error "not this one!")
-    | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
+          | A.For (name, iter, body) ->
+              (* TODO: implement local variables for for loop *)
+              raise (Error "stop it")
+          | A.State name -> raise (Error "not this one!")
+          | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
 
   (* FSM functions *)
   let fsms =
-    let rec build_fsms = function
-      | [] -> []
-      | fsm :: fsms ->
-          let fn =
-            let types = [state_t; state_t; input_t; output_t] in
-            let pointers = Array.of_list (List.map L.pointer_type types) in
-            let ftype = L.function_type void_t pointers in
-            L.define_function fsm.A.fsm_name ftype sake in
-          let builder = L.builder_at_end context (L.entry_block fn) in
-          let add_local m (t, n, _) =
-            let alloca = L.build_alloca (lltype t) n builder in
-            StringMap.add n alloca m in
-          locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
-          add_terminal (stmt fn builder (A.Block fsm.A.fsm_body)) L.build_ret_void
-          (*(L.build_ret (L.const_int i32_t 0))*);
-          (fsm.A.fsm_name, fn) :: (build_fsms fsms) in
-    build_fsms program.A.fsms in
+    let build_fsm fsm =
+      let fn =
+        let types = [state_t; state_t; input_t; output_t] in
+        let pointers = Array.of_list (List.map L.pointer_type types) in
+        let ftype = L.function_type void_t pointers in
+        L.define_function fsm.A.fsm_name ftype sake in
+      let builder = L.builder_at_end context (L.entry_block fn) in
+      let add_local m (t, n, _) =
+        let alloca = L.build_alloca (lltype t) n builder in
+        StringMap.add n alloca m in
+      locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
+      add_terminal (stmt fn builder (A.Block fsm.A.fsm_body)) L.build_ret_void;
+      fn in
+    List.map build_fsm program.A.fsms in
 
   (* Tick function definition *)
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
   let calls = 
-    let rec call = function
-      | [] -> ()
-      | (name, fsm) :: tail ->
-          let args = L.params tick in
-          let args = Array.of_list (state :: (Array.to_list args)) in
-          L.build_call fsm args name builder;
-          call tail in
-    call fsms in
+    let args = L.params tick in
+    let args = Array.of_list (state :: (Array.to_list args)) in
+    let call fsm = L.build_call fsm args "" builder in
+    List.map call fsms in
   (*let args = List.map (fun s -> Printf.printf "%s " (L.string_of_llvalue s)) (Array.to_list (L.params fsm)); Printf.printf "\n" in*)
   (*let args = List.map L.const_pointer_null [state_t; state_t; input_t; output_t] in*)
   (*let _ = L.build_call fsm (Array.of_list args) name builder in*)
