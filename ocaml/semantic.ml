@@ -109,7 +109,7 @@ let convert = function
 *)
 let convert i o typs fsms = function
 [] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs fsms; S.types = take_typ typs; S.fsms = take_fsm fsms}
-| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
+(*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
 
 
 let check program =
