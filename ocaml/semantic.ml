@@ -4,6 +4,56 @@ module S = Sast
 module StringMap = Map.Make(String)
 
 
+let convert_type = function (* A.dtype *)
+| A.Bool -> S.Bool
+| A.Int -> S.Int
+| A.Char -> S.Char
+| A.String -> S.String
+| A.Enum(name) -> S.Enum(name)
+
+
+let get_expr = function (* A.expr *)
+| A.BoolLit(bl) -> S.BoolLit(bl)
+| A.CharLit(ch) -> S.CharLit(ch)
+| A.IntLit(num) -> S.IntLit(num)
+| A.StringLit(name) -> S.StringLit(name)
+| A.Variable(name) -> S.Variable(name)
+| A.Access (outer,inner) -> S.Access(outer,inner)
+| A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr exp))
+| A.Binop(e1,o,e2) -> S.Binop((get_expr e1), (get_op o) ,(get_expr e2))
+| A.Assign(name,exp) -> S.Assign(name,(get_expr exp))
+| A.Printf(fmt, lst) -> S.Printf(fmt, (get_e_list lst))
+| A.Empty -> S.Empty
+
+
+let get_cases = function (* (expr * stmt) list *)
+[] -> []
+| (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
+
+let get_uop = function (* A.uop *)
+| A.Neg -> S.Neg
+| A.Not -> S.Not
+
+let get_op = function (* A.op *)
+| A.Add -> S.Add
+| A.Sub -> S.Sub
+| A.Mul -> S.Mul
+| A.Div -> S.Div
+| A.Eq -> S.Eq
+| A.Neq -> S.Neq
+| A.Lt -> S.Lt
+| A.Le -> S.Le
+| A.Gt -> S.Gt
+| A.Ge -> S.Ge
+| A.And -> S.And
+| A.Or -> S.Or
+
+let get_e_list = function (* expr list *)
+[] -> []
+| exp::tl -> (get_expr exp)::(get_e_list tl)
+
+
+
 let take_in = function
 [] -> []
 | (typ,name)::tl -> ((convert_type typ),name)::(take_in tl)
@@ -52,55 +102,6 @@ let do_stmt = function (* stmts *)
 | A.Expr(e) -> S.Expr(get_expr e)
 | A.Goto(label) -> S.Goto(label)
 
-
-
-let convert_type = function (* A.dtype *)
-| A.Bool -> S.Bool
-| A.Int -> S.Int
-| A.Char -> S.Char
-| A.String -> S.String
-| A.Enum(name) -> S.Enum(name)
-
-
-let get_expr = function (* A.expr *)
-| A.BoolLit(bl) -> S.BoolLit(bl)
-| A.CharLit(ch) -> S.CharLit(ch)
-| A.IntLit(num) -> S.IntLit(num)
-| A.StringLit(name) -> S.StringLit(name)
-| A.Variable(name) -> S.Variable(name)
-| A.Access (outer,inner) -> S.Access(outer,inner)
-| A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr exp))
-| A.Binop(e1,o,e2) -> S.Binop((get_expr e1), (get_op o) ,(get_expr e2))
-| A.Assign(name,exp) -> S.Assign(name,(get_expr exp))
-| A.Printf(fmt, lst) -> S.Printf(fmt, (get_e_list lst))
-| A.Empty -> S.Empty
-
-
-let get_cases = function (* (expr * stmt) list *)
-[] -> []
-| (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
-
-let get_uop = function (* A.uop *)
-| A.Neg -> S.Neg
-| A.Not -> S.Not
-
-let get_op = function (* A.op *)
-| A.Add -> S.Add
-| A.Sub -> S.Sub
-| A.Mul -> S.Mul
-| A.Div -> S.Div
-| A.Eq -> S.Eq
-| A.Neq -> S.Neq
-| A.Lt -> S.Lt
-| A.Le -> S.Le
-| A.Gt -> S.Gt
-| A.Ge -> S.Ge
-| A.And -> S.And
-| A.Or -> S.Or
-
-let get_e_list = function (* expr list *)
-[] -> []
-| exp::tl -> (get_expr exp)::(get_e_list tl)
 
 
 (*
