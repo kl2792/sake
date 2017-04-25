@@ -98,7 +98,7 @@ stexpr:
   ID expr {$1, $2}
 
 cstmt:
-  CASE expr COLON stmt_list {$2, $4}
+  CASE expr COLON stmt {$2, $4}
 
 type_decl:
   TYPE ID ASSIGN string_opt NLINE 
