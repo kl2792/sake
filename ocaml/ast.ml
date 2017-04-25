@@ -34,13 +34,11 @@ type fsm_decl = {
   fsm_name  : string;
   fsm_public: (dtype * string * expr) list;
   fsm_locals: (dtype * string * expr) list;
-  fsm_states: string list;
   fsm_body  : stmt list;
 }
 type program = {
   input : lvalue list;
   output: lvalue list;
   types : type_decl list;
-  public: (dtype * string * expr) list;
   fsms  : fsm_decl list;
 }
