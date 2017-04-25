@@ -40,7 +40,7 @@ let copy_locals = function (*(dtype * string * expr) list*)
 
 let take_stmts = function (*stmt list*)
 [] -> []
-| stmt:tl -> (do_stmt stmt)::(take_stmts tl)
+| stm::tl -> (do_stmt stm)::(take_stmts tl)
 
 let do_stmt = function (* stmts *)
 | A.Block(s_list) -> S.Block(take_stmts s_list)
