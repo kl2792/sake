@@ -48,8 +48,19 @@ and get_e_list = function (* expr list *)
 | exp::tl -> (get_expr exp)::(get_e_list tl)
 
 
-
-let rec get_cases = function (* (expr * stmt) list *)
+let rec do_stmt = function (* stmts *)
+| A.Block(s_list) -> S.Block(take_stmts s_list)
+| A.State(name) -> S.State(name)
+| A.If(pred,sta,stb) -> S.If((get_expr pred),(do_stmt sta),(do_stmt stb))
+| A.For(str,na,nb,nc,stm) -> S.For(str,na,nb,nc,(do_stmt stm))
+| A.While(pred,stm) -> S.While((get_expr pred),(do_stmt stm))
+| A.Switch(exp, cases) -> S.Switch((get_expr exp),(get_cases cases))
+| A.Expr(e) -> S.Expr(get_expr e)
+| A.Goto(label) -> S.Goto(label)
+and take_stmts = function (*stmt list*)
+[] -> []
+| stm::tl -> (do_stmt stm)::(take_stmts tl)
+and get_cases = function (* (expr * stmt) list *)
 [] -> []
 | (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
 
@@ -87,20 +98,6 @@ let rec get_pubs = function
 let rec copy_locals = function (*(dtype * string * expr) list*)
 [] -> []
 | (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
-
-let rec take_stmts = function (*stmt list*)
-[] -> []
-| stm::tl -> (do_stmt stm)::(take_stmts tl)
-
-let rec do_stmt = function (* stmts *)
-| A.Block(s_list) -> S.Block(take_stmts s_list)
-| A.State(name) -> S.State(name)
-| A.If(pred,sta,stb) -> S.If((get_expr pred),(do_stmt sta),(do_stmt stb))
-| A.For(str,na,nb,nc,stm) -> S.For(str,na,nb,nc,(do_stmt stm))
-| A.While(pred,stm) -> S.While((get_expr pred),(do_stmt stm))
-| A.Switch(exp, cases) -> S.Switch((get_expr exp),(get_cases cases))
-| A.Expr(e) -> S.Expr(get_expr e)
-| A.Goto(label) -> S.Goto(label)
 
 
 
