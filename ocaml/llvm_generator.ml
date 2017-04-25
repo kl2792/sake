@@ -98,8 +98,8 @@ let translate filename program =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i32_t |] in
-    let ftype = L.function_type (L.pointer_type i8_t) formals in
+    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i32_t|] in 
+    let ftype = L.function_type (L.pointer_type state_t) formals in
     L.declare_function "memcpy" ftype sake in
 
   (* Expression builder *)
@@ -229,7 +229,7 @@ let translate filename program =
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
   let writing =
     let args = [|(L.params tick).(0); state; L.size_of state_t|] in
-    (*L.build_call memcpy args "memcpy" builder*)() in
+    L.build_call memcpy args "memcpy" builder in
   let terminal = add_terminal builder L.build_ret_void in
   sake
 
