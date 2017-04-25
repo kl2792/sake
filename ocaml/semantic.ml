@@ -15,7 +15,7 @@ let take_out = function
 
 let take_typ = function
 [] -> []
-| {type_decl.A.type_name=name; type_decl.A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
+| {A.type_name = name; A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
 
 
 let take_fsm = function
