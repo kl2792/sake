@@ -12,6 +12,7 @@ exception Not_found
 let translate filename program =
   let context = L.global_context () in
   let sake = L.create_module context "sake"
+    and i64_t  = L.i64_type context
     and i32_t  = L.i32_type  context
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
@@ -98,9 +99,9 @@ let translate filename program =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i32_t|] in 
+    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i64_t|] in 
     let ftype = L.function_type (L.pointer_type state_t) formals in
-    L.declare_function "memcpy" ftype sake in
+    L.declare_function "memcpy" ftype sake in 
 
   (* Expression builder *)
   let rec expr builder = function
@@ -229,7 +230,7 @@ let translate filename program =
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
   let writing =
     let args = [|(L.params tick).(0); state; L.size_of state_t|] in
-    L.build_call memcpy args "memcpy" builder in
+    L.build_call memcpy args "memcpy" builder in (*TO MAKE WORK: Comment out line and replace with () in *)
   let terminal = add_terminal builder L.build_ret_void in
   sake
 
