@@ -1,4 +1,4 @@
-module A = Ast
+module A = Sast
 
 exception Error_thing
 

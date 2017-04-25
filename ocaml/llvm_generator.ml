@@ -1,5 +1,5 @@
 module L = Llvm
-module A = Ast
+module A = Sast
 
 module StringMap = Map.Make(String)
 
