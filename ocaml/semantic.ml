@@ -100,7 +100,7 @@ let rec take_pubs name = function (*(dtype * string * expr) list*)
 
 let rec get_pubs = function
 [] -> []
-| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
+| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
     -> (take_pubs name pubs) @ (get_pubs tl)
 
 
