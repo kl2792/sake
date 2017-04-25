@@ -20,7 +20,7 @@ let take_typ = function
 
 let take_fsm = function
 [] -> []
-| {fsm_decl.A.fsm_name = name; fsm_decl.A.fsm_public = pubs; fsm_decl.A.fsm_locals = local; fsm_decl.A.fsm_states = states; fsm_decl.A.fsm_body =  body}::tl
+| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
     -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = states; S.fsm_body = (take_stmts body)}::(take_fsm tl)
 
 
@@ -30,7 +30,7 @@ let take_pubs name = function (*(dtype * string * expr) list*)
 
 let get_pubs = function
 [] -> []
-| {fsm_decl.A.fsm_name = name; fsm_decl.A.fsm_public = pubs; fsm_decl.A.fsm_locals = local; fsm_decl.A.fsm_states = states; fsm_decl.A.fsm_body =  body}::tl
+| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
     -> (take_pubs pubs) @ (get_pubs tl)
 
 
