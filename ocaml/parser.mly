@@ -44,6 +44,7 @@ dtype:
 BOOL { Bool }
 | INT { Int }
 | CHAR { Char }
+| STRING { String }
 //| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
 | ID { Enum($1) }  /*Q: Not sure if this is correct */
 
@@ -97,7 +98,7 @@ stexpr:
   ID expr {$1, $2}
 
 cstmt:
-  CASE expr COLON stmt {$2, $4}
+  CASE expr COLON stmt_list {$2, $4}
 
 type_decl:
   TYPE ID ASSIGN string_opt NLINE 

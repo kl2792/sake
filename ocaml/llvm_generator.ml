@@ -12,6 +12,7 @@ exception Not_found
 let translate filename program =
   let context = L.global_context () in
   let sake = L.create_module context "sake"
+    and i64_t  = L.i64_type context
     and i32_t  = L.i32_type  context
     and i8_t   = L.i8_type   context
     and i1_t   = L.i1_type   context
@@ -213,7 +214,7 @@ let init t v = L.const_int (lltype t) v in
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
   let writing =
     let args = [|(L.params tick).(0); state; L.size_of state_t|] in
-    (*L.build_call memcpy args "memcpy" builder*)() in
+    L.build_call memcpy args "memcpy" builder in (*TO MAKE WORK: Comment out line and replace with () in *)
   let terminal = add_terminal builder L.build_ret_void in
   sake
 

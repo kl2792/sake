@@ -3,24 +3,22 @@ output[char out]
 
 fsm trafficLight {
 	 state red
-                if (i == 1) {
-                        out = 'g' 
-                        goto green
-                }
-                else {
-                        out = 'r'
-                        goto red
-                }
+                switch(i) {
+                        case 1: 
+                                out = 'g'
+                                goto green
+                        case 0:
+                                out = 'r'
+                                goto red
         state yellow
                 out = 'r' 
                 goto red 
         state green
-                if (i == 0) {
-                        out = 'y'
-                        goto yellow
-                }
-                else {
-                        out = 'g'
-                        goto green
-                }    
+                switch(i) {
+                        case 1: 
+                                out = 'g'
+                                goto green
+                        case 0:
+                                out = 'y'
+                                goto yello 
 }
