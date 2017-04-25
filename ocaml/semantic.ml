@@ -79,6 +79,11 @@ let rec take_typ = function
 | {A.type_name = name; A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
 
 
+let rec copy_locals = function (*(dtype * string * expr) list*)
+[] -> []
+| (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
+
+
 let rec take_fsm = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
@@ -94,10 +99,6 @@ let rec get_pubs = function
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_states = states; A.fsm_body =  body}::tl
     -> (take_pubs pubs) @ (get_pubs tl)
 
-
-let rec copy_locals = function (*(dtype * string * expr) list*)
-[] -> []
-| (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
 
 
 
