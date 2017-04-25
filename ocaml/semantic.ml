@@ -3,6 +3,124 @@ module S = Sast
 
 module StringMap = Map.Make(String)
 
+
+let take_in = function
+[] -> []
+| (typ,name)::tl -> ((convert_type typ),name)::(take_in tl)
+
+let take_out = function
+[] -> []
+| (typ,name)::tl -> ((convert_type typ),name)::(take_out tl)
+
+
+let take_typ = function
+[] -> []
+| {type_decl.A.type_name=name; type_decl.A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
+
+
+let take_fsm = function
+[] -> []
+| {fsm_decl.A.fsm_name = name; fsm_decl.A.fsm_public = pubs; fsm_decl.A.fsm_locals = local; fsm_decl.A.fsm_states = states; fsm_decl.A.fsm_body =  body}::tl
+    -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = states; S.fsm_body = (take_stmts body)}::(take_fsm tl)
+
+
+let take_pubs name = function (*(dtype * string * expr) list*)
+[] -> []
+| (typ,var_name,expr)::tl -> ((convert_type typ),name ^ "_" ^ var_name,(get_expr expr)):: (take_pubs name tl)
+
+let get_pubs = function
+[] -> []
+| {fsm_decl.A.fsm_name = name; fsm_decl.A.fsm_public = pubs; fsm_decl.A.fsm_locals = local; fsm_decl.A.fsm_states = states; fsm_decl.A.fsm_body =  body}::tl
+    -> (take_pubs pubs) @ (get_pubs tl)
+
+
+let copy_locals = function (*(dtype * string * expr) list*)
+[] -> []
+| (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
+
+let take_stmts = function (*stmt list*)
+[] -> []
+| stmt:tl -> (do_stmt stmt)::(take_stmts tl)
+
+let do_stmt = function (* stmts *)
+| A.Block(s_list) -> S.Block(take_stmts s_list)
+| A.State(name) -> S.State(name)
+| A.If(pred,sta,stb) -> S.If((get_expr pred),(do_stmt sta),(do_stmt stb))
+| A.For(str,na,nb,nc,stm) -> S.For(str,na,nb,nc,(do_stmt stm))
+| A.While(pred,stm) -> S.While((get_expr pred),(do_stmt stm))
+| A.Switch(exp, cases) -> S.Switch((get_expr exp),(get_cases cases))
+| A.Expr(e) -> S.Expr(get_expr e)
+| A.Goto(label) -> S.Goto(label)
+
+
+
+let convert_type = function (* A.dtype *)
+| A.Bool -> S.Bool
+| A.Int -> S.Int
+| A.Char -> S.Char
+| A.String -> S.String
+| A.Enum(name) -> S.Enum(name)
+
+
+let get_expr = function (* A.expr *)
+| A.BoolLit(bl) -> S.BoolLit(bl)
+| A.CharLit(ch) -> S.CharLit(ch)
+| A.IntLit(num) -> S.IntLit(num)
+| A.StringLit(name) -> S.StringLit(name)
+| A.Variable(name) -> S.Variable(name)
+| A.Access (outer,inner) -> S.Access(outer,inner)
+| A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr exp))
+| A.Binop(e1,o,e2) -> S.Binop((get_expr e1), (get_op o) ,(get_expr e2))
+| A.Assign(name,exp) -> S.Assign(name,(get_expr exp))
+| A.Printf(fmt, lst) -> S.Printf(fmt, (get_e_list lst))
+| A.Empty -> S.Empty
+
+
+let get_cases = function (* (expr * stmt) list *)
+[] -> []
+| (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
+
+let get_uop = function (* A.uop *)
+| A.Neg -> S.Neg
+| A.Not -> S.Not
+
+let get_op = function (* A.op *)
+| A.Add -> S.Add
+| A.Sub -> S.Sub
+| A.Mul -> S.Mul
+| A.Div -> S.Div
+| A.Eq -> S.Eq
+| A.Neq -> S.Neq
+| A.Lt -> S.Lt
+| A.Le -> S.Le
+| A.Gt -> S.Gt
+| A.Ge -> S.Ge
+| A.And -> S.And
+| A.Or -> S.Or
+
+let get_e_list = function (* expr list *)
+[] -> []
+| exp::tl -> (get_expr exp)::(get_e_list tl)
+
+
+(*
+let convert = function
+{A.input = i; A.output=o; A.types = typs; A.fsms = fsms} -> {S.input = take_in i; S.output = take_out o; S.public = S.public(get_pubs fsms); S.types = take_typ typs; S.fsms = take_fsm fsms}
+| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
+*)
+let convert i o typs fsms = function
+[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs fsms; S.types = take_typ typs; S.fsms = take_fsm fsms}
+| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
+
+
+let check program =
+  convert program.A.input program.A.output program.A.types program.A.fsms []
+(* or convert program *)
+
+
+(************************)
+
+(*
 let check program =
   let public = 
     let rec get_names a n = function [] -> a
@@ -27,6 +145,8 @@ let check program =
     S.types = List.map stype program.A.types;
     S.fsms = List.map sfsm program.A.fsms;
   }
+
+*)
 
 (*
 let autre program = 

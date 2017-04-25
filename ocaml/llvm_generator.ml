@@ -124,7 +124,7 @@ let translate filename program =
         let build = llop op in
         let e1 = expr builder e1 and e2 = expr builder e2 in
         build e1 e2 "tmp" builder
-    | A.Assign (s, e) -> raise (Error "NIMP: Assign")
+    | A.Assign (s, e) -> raise (Error "NIMP: Assign. Also, Shalva wuz here")
         (* let e = expr builder e in (* TODO: fix assign *)
        let _ = L.build_store e (lookup s) builder in
         e *)
