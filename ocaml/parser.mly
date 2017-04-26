@@ -192,7 +192,7 @@ dstexpr { [$1] }
 
 type_opt:
 /*nothing*/ {[] }
-| type_list NLINE { List.rev $1 }
+| type_list NLINE NLINE { List.rev $1 }
 
 type_list:
 type_decl { [] }
