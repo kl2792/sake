@@ -17,7 +17,7 @@ int main() {
     }
 
     while (output.result == 1) {
-        printf("What's your decision?");
+        printf("Press the corresponding letter on your keyboard to make your choice: ");
         scanf("%c", &(input.decision));
         tick(&states, &input, &output);
     }
