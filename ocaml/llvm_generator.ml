@@ -69,7 +69,7 @@ let init t v = L.const_int (lltype t) v in
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i32_t |] in
+    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i64_t |] in
     let ftype = L.function_type (L.pointer_type i8_t) formals in
     L.declare_function "memcpy" ftype sake in
 
@@ -214,7 +214,7 @@ let init t v = L.const_int (lltype t) v in
     L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
   let writing =
     let args = [|(L.params tick).(0); state; L.size_of state_t|] in
-    L.build_call memcpy args "memcpy" builder in (*TO MAKE WORK: Comment out line and replace with () in *)
+   (* L.build_call memcpy args "memcpy" builder in (*TO MAKE WORK: Comment out line and replace with () in *)*) ()in
   let terminal = add_terminal builder L.build_ret_void in
   sake
 
