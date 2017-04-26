@@ -10,6 +10,7 @@ type expr =
   | CharLit of char
   | IntLit of int
   | StringLit of string
+  | EnumLit of string
   | Variable of string
   | Access of string * string
   | Uop of uop * expr
