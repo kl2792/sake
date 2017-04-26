@@ -65,12 +65,13 @@ let init t v = L.const_int (lltype t) v in
     let args = Array.of_list (List.map L.pointer_type types) in
     let ftype = L.function_type void_t args in
     L.define_function (filename ^ "_tick") ftype sake in
-  let print =
-    let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+  let ta = L.params tick in
+  let printf =
+    let ftype = L.var_arg_function_type i32_t [|L.pointer_type i8_t|] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let formals = [| L.pointer_type state_t; L.pointer_type state_t; i64_t |] in
-    let ftype = L.function_type (L.pointer_type state_t) formals in
+    let args = [|L.pointer_type state_t; L.pointer_type state_t; i64_t|] in
+    let ftype = L.function_type (L.pointer_type state_t) args in
     L.declare_function "memcpy" ftype sake in
 
   (* Variables *)
@@ -115,7 +116,7 @@ let init t v = L.const_int (lltype t) v in
         let args = [fmt'; expr builder (List.hd args)] in
         (* let args = fmt :: (List.map (expr builder) args) in *)
         let args = Array.of_list args in
-        L.build_call print args "printf" builder
+        L.build_call printf args "printf" builder
     | A.Uop (uop, e) ->
         let build = lluop uop in
         let e = expr builder e in
@@ -126,7 +127,7 @@ let init t v = L.const_int (lltype t) v in
         build e1 e2 "tmp" builder
     | A.Assign (s, e) ->
         let e = expr builder e in
-        L.build_store e (lookup output s) builder; e in
+        ignore (L.build_store e (lookup output s) builder); e in
 
   let add_terminal builder f =
     match L.block_terminator (L.insertion_block builder) with
@@ -201,21 +202,25 @@ let init t v = L.const_int (lltype t) v in
   (* Tick function definition *)
   let builder = L.builder_at_end context (L.entry_block tick) in
   let state = L.build_alloca state_t "state" builder in
-  let calls = 
-    let args = L.params tick in
-    let args = Array.of_list (state :: (Array.to_list args)) in
-    let call fsm = L.build_call fsm args "" builder in
-    List.map call fsms in
+  let fa = Array.of_list (state :: (Array.to_list ta)) in
+  let call fsm = ignore (L.build_call fsm fa "" builder) in
+  List.iter call fsms;
   (*let args = List.map (fun s -> Printf.printf "%s " (L.string_of_llvalue s)) (Array.to_list (L.params fsm)); Printf.printf "\n" in*)
   (*let args = List.map L.const_pointer_null [state_t; state_t; input_t; output_t] in*)
-  (*let _ = L.build_call fsm (Array.of_list args) name builder in*)
-  (*let calls =
-    let build (name, fn) = L.build_call fn () name builder  in
-    L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
-  let writing =
-    let args = [|(L.params tick).(0); state; L.size_of state_t|] in
-   (* L.build_call memcpy args "memcpy" builder in (*TO MAKE WORK: Comment out line and replace with () in *)*) ()in
-  let terminal = add_terminal builder L.build_ret_void in
+(*let _ = L.build_call fsm (Array.of_list args) name builder in*)
+(*let calls =
+  let build (name, fn) = L.build_call fn () name builder  in
+L.iter build fsms in (* TODO: use inputs to tick, alloc'ed memory *) *)
+
+  let write = L.append_block context "write" tick in
+  let wa = [|ta.(0); state; L.size_of state_t|] in
+  let wb = L.builder_at_end context write in
+  add_terminal (ignore (L.build_call memcpy wa "" wb); wb) L.build_ret_void;
+  let ret = L.append_block context "ret" tick in
+  let rb = L.builder_at_end context ret in
+  add_terminal rb L.build_ret_void;
+  let null = L.build_is_null wa.(0) "null" builder in
+  ignore (L.build_cond_br null ret write builder);
   sake
 
   (* L.function_type to create function (tick) *)
