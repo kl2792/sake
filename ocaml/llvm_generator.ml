@@ -41,7 +41,6 @@ let translate filename program =
   let lluop = function
     | A.Neg -> L.build_neg
     | A.Not -> L.build_not in
-  let llenum s = lltype (A.Enum s) in
   let lldtype (t, _) = lltype t in
   let init t v = L.const_int (lltype t) v in
   let bae = L.builder_at_end context in
@@ -56,22 +55,16 @@ let translate filename program =
     L.struct_type context types in
   let state_t =
     let fsms = List.map (fun f -> f.A.fsm_name) program.A.fsms in
-    let states = List.map llenum fsms in
     let public = List.map (fun (t, _, _) -> lltype t) program.A.public in
-    let types = Array.of_list (states @ public) in
+    let types = Array.of_list public in
     L.struct_type context types in
 
-  (* New and imported functions *)
-  let tick =
-    let types = [state_t; input_t; output_t] in
-    let args = Array.of_list (List.map L.pointer_type types) in
-    let ftype = L.function_type void_t args in
-    L.define_function (filename ^ "_tick") ftype sake in
+  (* External functions *)
   let printf =
-    let ftype = L.var_arg_function_type i32_t [|L.pointer_type i8_t|] in
+    let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
   let memcpy =
-    let args = [|L.pointer_type state_t; L.pointer_type state_t; i64_t|] in
+    let args = [| L.pointer_type state_t; L.pointer_type state_t; i64_t |] in
     let ftype = L.function_type (L.pointer_type state_t) args in
     L.declare_function "memcpy" ftype sake in
 
@@ -106,12 +99,12 @@ let translate filename program =
     | A.IntLit i -> L.const_int i32_t i
     | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
     | A.CharLit c -> L.const_int i8_t (int_of_char c)
-    | A.StringLit s -> L.const_stringz context s
+    | A.StringLit s -> L.build_global_stringptr s "string" builder
     | A.Empty -> L.const_int i32_t 0
     | A.Variable s -> L.build_load (lookup fn input s) s builder
     | A.Printf (fmt, args) ->
         let args = (List.map (expr fn builder) args) in
-        let args = (L.const_stringz context fmt) :: args in
+        let args = (L.build_global_stringptr fmt "fmt" builder) :: args in
         let args = Array.of_list args in
         L.build_call printf args "printf" builder
     | A.Uop (uop, e) -> (lluop uop) (expr fn builder e) "tmp" builder
@@ -140,14 +133,14 @@ let translate filename program =
         add_terminal builder (L.build_cond_br cond then_bb else_bb);
         bae merge_bb
     | A.While (predicate, body) ->
-      let pred_bb = abc "while" fn in
-      let body_bb = abc "while_body" fn in
-      let merge_bb = abc "merge" fn in
-      let value = expr fn (bae pred_bb) predicate in
-      add_terminal (stmt fn (bae body_bb) body) (L.build_br pred_bb);
-      add_terminal (bae pred_bb) (L.build_cond_br value body_bb merge_bb);
-      add_terminal builder (L.build_br pred_bb);
-      bae merge_bb
+        let pred_bb = abc "while" fn in
+        let body_bb = abc "while_body" fn in
+        let merge_bb = abc "merge" fn in
+        let value = expr fn (bae pred_bb) predicate in
+        add_terminal (stmt fn (bae body_bb) body) (L.build_br pred_bb);
+        add_terminal (bae pred_bb) (L.build_cond_br value body_bb merge_bb);
+        add_terminal builder (L.build_br pred_bb);
+        bae merge_bb
     | A.Switch (predicate, cases) ->
         let case = expr fn builder predicate in
         let merge_bb = abc "merge" fn in
@@ -186,8 +179,13 @@ let translate filename program =
     List.map build_fsm program.A.fsms in
 
   (* Tick function definition *)
+  let tick =
+    let types = [state_t; input_t; output_t] in
+    let args = Array.of_list (List.map L.pointer_type types) in
+    let ftype = L.function_type void_t args in
+    L.define_function (filename ^ "_tick") ftype sake in
   let builder = bae (L.entry_block tick) in
-  
+
   (* State allocation and modification *)
   let state = L.build_alloca state_t "state" builder in
   let ta = L.params tick in
