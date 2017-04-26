@@ -6,10 +6,28 @@ fsm one {
 
         int r = two.k 
 
+        state emma 
+                goto shavla
+        state shalva
+                goto emma
 }
 fsm two {
         public int k = 3
+        state kz 
+                k = 45
 }
 fsm three {
-        public int f = 24
+        int f = 24
+        state ac
+                z = 35 
+}
+fsm four {
+        int t = 132124
+        int s = 123123
+}
+fsm five {
+}
+fsm six {
+        state yay 
+                goto yay
 }
