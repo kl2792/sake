@@ -20,7 +20,7 @@ let macros_of_fsms name fsms =
   let macros a f =
     let macro a (v, i) =
       a ^ (Printf.sprintf "#define %s_%s_%s %d\n" name f.A.fsm_name v i) in
-    List.fold_left macro "" f.A.fsm_states in
+    a ^ "\n" ^ List.fold_left macro "" f.A.fsm_states in
   List.fold_left macros "" fsms
 
 (* generate macro definitions from named AST *)
