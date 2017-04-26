@@ -18,6 +18,7 @@ let macros_of_types name types =
 (* generate string of macro declarations for all fsms' state variables *)
 let macros_of_fsms name fsms =
   let macros a f =
+    Printf.printf "%s\n" f.A.fsm_name;
     List.iter (fun (s, i) -> Printf.printf "%s %d\n" s i) f.A.fsm_states;
     let macro a (v, i) =
       a ^ (Printf.sprintf "#define %s_%s_%s %d\n" name f.A.fsm_name v i) in
