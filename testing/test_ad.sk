@@ -6,7 +6,7 @@ fsm ekas {
                 if (decision == 's') {
                         printf("%s\n", "It’s May 8th and your PLT presentation is due tomorrow. Suddenly, you realize that your language sucks. What do you do?")
                         printf("%s\n", "a. Go to Edwards and beg for an extension.")
-                        printf("%s\n", "b. Sell your soul to Satan in the hopes he will help you pass.");
+                        printf("%s\n", "b. Sell your soul to Satan in the hopes he will help you pass.")
                         printf("%s\n", "c. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.") 
                         result = 1
                         goto s2 
@@ -29,7 +29,7 @@ fsm ekas {
                 else if (decision == 'b') {
                         printf("%s\n", "You go to Central Park Zoo to kidnap the nearest goat to make your blood sacrifice. Unfortunately the gate is locked! What should you do?")
                         printf("%s\n", "a. With your PLT skillz you think you can hack into the security system and open the doors.")
-                        printf("%s\n", "b. Give up and decide to beg Edwards for an extension.");
+                        printf("%s\n", "b. Give up and decide to beg Edwards for an extension.")
                         printf("%s\n", "c. Decide to sacrifice one of your group mates instead.") 
                         result = 1
                         goto s4 
@@ -53,7 +53,7 @@ fsm ekas {
                         printf("%s\n", "Realizing that PLT is not a security class and that you actually suck at hacking into anything.")
                         printf("%s\n", "You get caught within thirty seconds of trying to break in. As the police question you, what do you do? ")
                         printf("%s\n", "a. Admit everything")
-                        printf("%s\n", "b. Admit nothing");
+                        printf("%s\n", "b. Admit nothing")
                         result = 1
                         goto s6 
                 }
@@ -64,7 +64,7 @@ fsm ekas {
                 else if (decision == 'c') {
                         printf("%s\n", "But which group mate to sacrifice?")
                         printf("%s\n", "a. Shalva")
-                        printf("%s\n", "b. Shalva");
+                        printf("%s\n", "b. Shalva")
                         printf("%s\n", "c. Shalva") 
                         result = 1
                         goto s7 
@@ -84,7 +84,7 @@ fsm ekas {
                         printf("%s\n", "After looking at sorry looking college student in front of them, the police decide to let you go.")
                         printf("%s\n", "As you are walking back to college you debate your options. What do you do?")
                         printf("%s\n", "a. Decide to write a tell all book about your PLT adventures.")
-                        printf("%s\n", "b. Decide to sacrifice one of your group mates instead.");
+                        printf("%s\n", "b. Decide to sacrifice one of your group mates instead.")
                         printf("%s\n", "c. Try to break into the Zoo again because you think Satan will like a goat sacrifice more than a human one.") 
                         result = 1
                         goto s8 
@@ -93,7 +93,7 @@ fsm ekas {
                         printf("%s\n", "The police, taking none too kindly to the silent college student in front of them, decide to lock you up for the night.")
                         printf("%s\n", "The next morning they let you out right before your presentation. What do you do?")
                         printf("%s\n", "a. Ditch your group mates.")
-                        printf("%s\n", "b. Decide to go to the presentation and help them present your sucky language.");
+                        printf("%s\n", "b. Decide to go to the presentation and help them present your sucky language.")
                         result = 1
                         goto s9 
                 }                
@@ -115,7 +115,7 @@ fsm ekas {
                 else if (decision == 'b') {
                         printf("%s\n", " ")
                         printf("%s\n", "a. ")
-                        printf("%s\n", "b. ");
+                        printf("%s\n", "b. ")
                         printf("%s\n", "c. ") 
                         result = 1
                         goto s4 
