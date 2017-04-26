@@ -84,10 +84,6 @@ let rec copy_locals = function (*(dtype * string * expr) list*)
 | (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
 
 
-let make_state_map state_map num = function
-| _ as name -> StringMap.add name num state_map
-
-
 let rec get_states num = function (* body: stmt list *)
 [] -> []
 | A.State(name)::tl -> (name,num):: (get_states num+1 tl)
