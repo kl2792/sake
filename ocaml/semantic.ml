@@ -88,16 +88,16 @@ let make_state_map state_map num = function
 | _ as name -> StringMap.add name num state_map
 
 
-let rec get_states state_map num = function (* body: stmt list *)
+let rec get_states num = function (* body: stmt list *)
 [] -> []
-| A.State(name)::tl -> get_states (make_state_map state_map num name) num+1 tl
-| _ ::tl -> get_states state_map num tl
+| A.State(name)::tl -> (name,num):: (get_states num+1 tl)
+| _::tl -> get_states num tl
 
 let state_map = StringMap.empty in
 let rec take_fsm = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
-    -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = (get_states state_map 1 body); S.fsm_body = (take_stmts body)}::(take_fsm tl)
+    -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts body)}::(take_fsm tl)
 
 
 let rec take_pubs name = function (*(dtype * string * expr) list*)

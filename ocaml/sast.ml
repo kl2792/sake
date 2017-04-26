@@ -1,7 +1,4 @@
 (* SAST *)
-
-module StringMap = Map.Make(String)
-
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
@@ -33,7 +30,7 @@ type type_decl = {
 }
 type fsm_decl = {
   fsm_name  : string;
-  fsm_states: int StringMap;
+  fsm_states: (string * int) list;
   fsm_locals: (dtype * string * expr) list;
   fsm_body  : stmt list;
 }
