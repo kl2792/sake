@@ -93,7 +93,6 @@ let rec get_states num = function (* body: stmt list *)
 | A.State(name)::tl -> (name,num):: (get_states num+1 tl)
 | _::tl -> get_states num tl
 
-let state_map = StringMap.empty in
 let rec take_fsm = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
