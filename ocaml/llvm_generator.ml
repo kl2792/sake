@@ -70,7 +70,7 @@ let init t v = L.const_int (lltype t) v in
     L.declare_function "printf" ftype sake in
   let memcpy =
     let formals = [| L.pointer_type state_t; L.pointer_type state_t; i64_t |] in
-    let ftype = L.function_type (L.pointer_type i8_t) formals in
+    let ftype = L.function_type (L.pointer_type state_t) formals in
     L.declare_function "memcpy" ftype sake in
 
   (* Variables *)
