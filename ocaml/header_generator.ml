@@ -17,16 +17,11 @@ let macros_of_types name types =
 
 (* generate string of macro declarations for all fsms' state variables *)
 let macros_of_fsms name fsms =
-  let rec macros_of_fsm result = function
-    | [] -> result
-    | fsm :: fsms ->
-        let i = ref 0 in
-        let macro a v = (* accumulator and value *)
-          i := !i + 1; a ^ (Printf.sprintf "#define %s_%s_%s %d\n"
-          name fsm.A.fsm_name v !i) in
-        let macro = List.fold_left macro "" fsm.A.fsm_states in 
-        macros_of_fsm (result ^ macro) fsms in
-   macros_of_fsm "" fsms
+  let macros a f =
+    let macro a (v, i) =
+      a ^ (Printf.sprintf "#define %s_%s_%s %d\n" name f.A.fsm_name v i) in
+    List.fold_left macro "" f.A.fsm_states in
+  List.fold_left macros "" fsms
 
 (* generate macro definitions from named AST *)
 let macros_of_ast name ast =
