@@ -31,7 +31,7 @@
 %token <int> RTOK
 %token <char> CHARLIT
 %token <string> STRINGLIT
-//%token <string> ESCAPE
+%token <string> ESCAPE
 %token <string> ID
 %token <string> TYPENAME
 
