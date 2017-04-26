@@ -103,7 +103,7 @@ cstmt:
   CASE expr COLON stmt {$2, $4}
 
 type_decl:
-  TYPE ID ASSIGN string_opt NLINE 
+  TYPE TYPENAME ASSIGN string_opt 
   {{
     type_name = $2;
     type_values = $4;
