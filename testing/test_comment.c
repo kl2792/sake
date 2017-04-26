@@ -2,5 +2,11 @@
 #include "test_comment.h"
 
 int main() {
-	 test_comment_tick(NULL, NULL, NULL);
+	struct test_comment_input i;
+	struct test_comment_state s;
+
+	test_comment_tick(&s, NULL, NULL); 
+	test_comment_tick(&s, &i, NULL); 
+
+	return 0;
 }

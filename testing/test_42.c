@@ -2,6 +2,11 @@
 #include "test_42.h"
 
 int main() {
-    test_42_tick(NULL, NULL, NULL);
-    return 0;
+	struct test_42_input i;
+	struct test_42_state s;
+
+	test_42_tick(&s, NULL, NULL); 
+	test_42_tick(&s, &i, NULL); 
+
+	return 0;
 }

@@ -2,11 +2,11 @@
 #include "test_hello.h"
 
 int main() {
-    struct test_hello_input i;
-    struct test_hello_output p;
-    struct test_hello_state q;
-    
-    test_hello_tick(&q, &i, &p);
+	struct test_hello_input i;
+	struct test_hello_state s;
 
-    return 0;
+	test_hello_tick(&s, NULL, NULL); 
+	test_hello_tick(&s, &i, NULL); 
+
+	return 0;
 }
