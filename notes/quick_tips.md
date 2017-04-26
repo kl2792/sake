@@ -1,5 +1,7 @@
 Helpful shortcuts:
 
+Run ./testall -k to keep intermediary files
+
 SSH into VM: ssh -p 4115 plt@127.0.0.1
 
 To get LLVM code: clang -S -emit-llvm file-name.c
