@@ -44,6 +44,6 @@ parser.cmo: ast.cmo parser.cmi
 parser.cmx: ast.cmx parser.cmi
 scanner.cmo: parser.cmi
 scanner.cmx: parser.cmx
-# semantic.cmo : ast.cmo
-# semantic.cmx : ast.cmx
+semantic.cmo : ast.cmo
+semantic.cmx : ast.cmx
 parser.cmi: ast.cmo
