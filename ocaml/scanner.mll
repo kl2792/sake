@@ -74,6 +74,8 @@ rule token = parse
   | ':'dgt+ as num { RTOK (int_of_string num) }
   | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
   | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
+  | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
+
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
