@@ -86,7 +86,7 @@ let rec copy_locals = function (*(dtype * string * expr) list*)
 
 let rec get_states num = function (* body: stmt list *)
 [] -> []
-| A.State(name)::tl -> (name,num):: (get_states num+1 tl)
+| A.State(name)::tl -> (name,num):: (get_states (num+1) tl)
 | _::tl -> get_states num tl
 
 let rec take_fsm = function
