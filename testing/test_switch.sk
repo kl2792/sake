@@ -1,6 +1,5 @@
 fsm switchCase {
-        int i = 1
-        switch(i) {
+        switch(1) {
                 case 0: printf("%d", 0)
 		case 1: printf("%d", 1)
         }
