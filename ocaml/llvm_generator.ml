@@ -3,7 +3,7 @@ module A = Sast
 
 module StringMap = Map.Make(String)
 
-exception Error of string
+exception ENOSYS of string
 exception Not_found
 
 (* Note: () means "We have to write code here" *)
@@ -24,7 +24,7 @@ let translate filename program =
     | A.Char -> i8_t
     | A.Bool -> i1_t
     | A.Enum _ -> i32_t
-    | _ -> raise (Error "haven't figured this out yet") in
+    | A.String -> L.pointer_type i8_t in
   let llop = function
     | A.Add -> L.build_add
     | A.Sub -> L.build_sub
@@ -54,7 +54,6 @@ let translate filename program =
     let types = Array.of_list (List.map lldtype program.A.output) in
     L.struct_type context types in
   let state_t =
-    let fsms = List.map (fun f -> f.A.fsm_name) program.A.fsms in
     let public = List.map (fun (t, _, _) -> lltype t) program.A.public in
     let types = Array.of_list public in
     L.struct_type context types in
@@ -70,7 +69,7 @@ let translate filename program =
 
   (* Variables *)
   let map vars =
-    let merge map (dtype, name, value) = (* TODO: init with e *)
+    let merge map (dtype, name, _) = (* TODO: init with the last value *)
       let global = L.define_global name (init dtype 0) sake in
       StringMap.add name global map in
     List.fold_left merge StringMap.empty vars in
@@ -80,13 +79,8 @@ let translate filename program =
   let input = zmap program.A.input and output = zmap program.A.output in
   let locals = ref StringMap.empty in
 
-  (* Lookup functions *)
-  let value name = (* TODO: delete *)
-    let rec find_name i = function
-      | [] -> raise (Error "... y tho")
-      | enum :: tail -> if enum = name then i else find_name (i + 1) tail in
-    find_name 0 program.A.types in
-  let lookup fn io name = (* search for given name in specified maps *)
+  (* Lookup function *)
+  let lookup fn io name =
     try StringMap.find name !locals
     with Not_found ->
       try StringMap.find ((L.value_name fn) ^ "_" ^ name) public
@@ -154,9 +148,9 @@ let translate filename program =
               iter (i + 1) tail in
         iter 1 cases;
         bae merge_bb 
-    | A.For (name, iter, body) -> raise (Error "stop it")
-    | A.State name -> raise (Error "not this one!")
-    | A.Goto state -> raise (Error "don't be an idiot, goto isn't done yet") in
+    | A.For (name, iter, body) -> raise (ENOSYS "For")
+    | A.State name -> raise (ENOSYS "State")
+    | A.Goto state -> raise (ENOSYS "Goto") in
 
   (* FSM functions *)
   let fsms =
