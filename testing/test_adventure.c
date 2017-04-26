@@ -13,13 +13,13 @@ int main() {
     while (output.result == 0) {
         printf("Press s to start the adventure");
         scanf("%c", &(input.decision));
-        tick(&states, &input, &output);
+        test_adventure_tick(&states, &input, &output);
     }
 
     while (output.result == 1) {
         printf("Press the corresponding letter on your keyboard to make your choice: ");
         scanf("%c", &(input.decision));
-        tick(&states, &input, &output);
+        test_adventure_tick(&states, &input, &output);
     }
 
     if (output.result == 2) {
