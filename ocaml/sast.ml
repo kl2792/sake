@@ -30,7 +30,7 @@ type type_decl = {
 }
 type fsm_decl = {
   fsm_name  : string;
-  fsm_states: string list;
+  fsm_states: (string * int) list;
   fsm_locals: (dtype * string * expr) list;
   fsm_body  : stmt list;
 }

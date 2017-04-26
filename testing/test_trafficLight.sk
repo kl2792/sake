@@ -20,5 +20,5 @@ fsm trafficLight {
                                 goto green
                         case 0:
                                 out = 'y'
-                                goto yello 
+                                goto yellow 
 }
