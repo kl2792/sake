@@ -18,6 +18,7 @@ let macros_of_types name types =
 (* generate string of macro declarations for all fsms' state variables *)
 let macros_of_fsms name fsms =
   let macros a f =
+    List.iter (fun (s, i) -> Printf.printf "%s %d\n" s i) f.A.fsm_states;
     let macro a (v, i) =
       a ^ (Printf.sprintf "#define %s_%s_%s %d\n" name f.A.fsm_name v i) in
     a ^ "\n" ^ List.fold_left macro "" f.A.fsm_states in
@@ -34,22 +35,19 @@ let string_of_type = function
   | A.Char -> "char"
   | A.Bool -> "int"
   | A.String -> "char *"
-(*  | A.Array (_, _) -> "DON'T USE THIS" (* TODO: implement array *) *)
   | A.Enum _ -> "int" 
 
 (* generate input struct declarations *)
 let input_struct_of_ast name fsms =  
-  let var_of_tuple (t, n) = (string_of_type t) ^ " " ^ n in
-  let input_internals = List.map var_of_tuple fsms.A.input in 
-  let input_internals = String.concat ";\n\t" input_internals in
-    Printf.sprintf "struct %s_input {\n\t%s;\n};\n" name input_internals
+  let var_of_tuple (t, n) = Printf.sprintf "\t%s %s;\n" (string_of_type t) n in
+  let internals = String.concat "" (List.map var_of_tuple fsms.A.input) in 
+    Printf.sprintf "struct %s_input {\n%s};\n" name internals
 
 (* generate output struct declations *)
 let output_struct_of_ast name fsms =
-  let var_of_tuple (t, n) = (string_of_type t) ^ " " ^ n in
-  let output_internals = List.map var_of_tuple fsms.A.output in 
-  let output_internals = String.concat ";\n\t" output_internals in
-    Printf.sprintf "struct %s_output {\n\t%s;\n};\n" name output_internals
+  let var_of_tuple (t, n) = Printf.sprintf "\t%s %s;\n" (string_of_type t) n in
+  let internals = String.concat "" (List.map var_of_tuple fsms.A.output) in
+    Printf.sprintf "struct %s_output {\n%s};\n" name internals
 
 (* generate state struct declarations *)
 let state_struct_of_ast name program = 	
@@ -76,7 +74,7 @@ let tick_prototype name =
 (* the ifdef ... endif guard *)
 let header_guard name macros structs tick =
   let upper = name in
-  Printf.sprintf "#ifndef __%s_H__\n#define __%s_H__\n\n%s\n%s\n%s\n#endif" 
+  Printf.sprintf "#ifndef __%s_H__\n#define __%s_H__\n\n%s\n%s\n%s\n#endif\n" 
     upper upper macros structs tick
 
 			(* convert named AST to header file *)
