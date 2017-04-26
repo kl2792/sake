@@ -3,6 +3,8 @@ output[int k, int l]
 
 fsm one {
         public int j = 4
+
+        int r = two.k 
 }
 fsm two {
         public int k = 3
