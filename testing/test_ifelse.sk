@@ -8,6 +8,9 @@ fsm headerTest {
         else if (v == 7) {
                 v = 89
         }
+        else if (v == 123) {
+                v = 21
+        }
         else {
                 v = 9
         }
