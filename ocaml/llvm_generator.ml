@@ -148,7 +148,7 @@ let translate filename program =
               iter (i + 1) tail in
         iter 1 cases;
         bae merge_bb 
-    | A.For (name, iter, body) -> raise (ENOSYS "For")
+    | A.For (name, iter, body) -> raise (ENOSYS "For, When Shalva gets off her ass she will do this")
     | A.State name -> raise (ENOSYS "State")
     | A.Goto state -> raise (ENOSYS "Goto") in
 
