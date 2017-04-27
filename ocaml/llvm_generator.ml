@@ -4,6 +4,7 @@ module A = Sast
 module StringMap = Map.Make(String)
 
 exception ENOSYS of string
+exception Bug of string
 exception Not_found
 
 (* Note: () means "We have to write code here" *)
@@ -42,7 +43,6 @@ let translate filename program =
     | A.Neg -> L.build_neg
     | A.Not -> L.build_not in
   let lldtype (t, _) = lltype t in
-  let init t v = L.const_int (lltype t) v in
   let bae = L.builder_at_end context in
   let abc = L.append_block context in
 
@@ -94,7 +94,8 @@ let translate filename program =
           with Not_found -> StringMap.find name public in
         L.build_struct_gep pub_ptr pub_val name builder
       with Not_found ->
-        L.build_struct_gep io_ptr (StringMap.find name io) name builder in
+        try L.build_struct_gep io_ptr (StringMap.find name io) name builder
+        with Not_found -> raise (Bug (Printf.sprintf "no variable %s" name)) in
 
   (* Expression builder *)
   let rec expr fn builder = function
@@ -158,7 +159,13 @@ let translate filename program =
         bae merge_bb 
     | A.For (name, iter, body) -> raise (ENOSYS "For, When Shalva gets off her ass she will do this")
     | A.State name -> raise (ENOSYS "State")
-    | A.Goto state -> raise (ENOSYS "Goto") in
+    | A.Goto state ->
+        let _, i =
+          try StringMap.find state !states
+          with Not_found -> raise (Bug (Printf.sprintf "No state %s" state)) in
+        let pub = lookup fn output state builder in
+        ignore (L.build_store i pub builder);
+        bae (L.insertion_block builder) in
 
   (* FSM functions *)
   let fsms =
@@ -176,7 +183,10 @@ let translate filename program =
       (* Allocate appropriate memory and set variables *)
       let add_local m (t, n, _) = (* Local variable lazy allocation *)
         StringMap.add n (L.build_alloca (lltype t) n builder) m in
+      let add_state m (n, i) = (* Generated block for state *)
+        StringMap.add n (abc n fn, L.const_int i32_t i) m in
       locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
+      states := List.fold_left add_state StringMap.empty fsm.A.fsm_states;
       add_terminal (stmt fn builder (A.Block fsm.A.fsm_body)) L.build_ret_void;
       fn in
     List.map build_fsm program.A.fsms in
