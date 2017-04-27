@@ -76,7 +76,7 @@ let header_guard name macros structs tick =
   Printf.sprintf "#ifndef __%s_H__\n#define __%s_H__\n\n%s\n%s\n%s\n#endif\n" 
     upper upper macros structs tick
 
-			(* convert named AST to header file *)
+(* convert named AST to header file *)
 let translate name ast =
   let macros = macros_of_ast name ast
   and structs = structs_of_ast name ast 	
