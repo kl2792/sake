@@ -79,7 +79,7 @@ INTLIT { IntLit($1) }
 | ID ASSIGN expr { Assign($1, $3) }
 | dtype ID ASSIGN expr { Assign($2, $4) }
 | PRINTF LPAREN STRINGLIT COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
-| PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
+| PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3 ^ "\n", List.rev $5) }
 | ID DOT ID { Access($1, $3) }
 //| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }

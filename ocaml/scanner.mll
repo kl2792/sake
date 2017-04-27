@@ -1,4 +1,7 @@
-{ open Parser }
+{ open Parser 
+  let unescape u =
+	Scanf.sscanf("\"" ^ u ^ "\"") "%S%!" (fun x -> x)
+}
 
 let spc = [' ' '\t']
 let cap = ['A'-'Z']
@@ -73,8 +76,8 @@ rule token = parse
   | dgt+ as num { INTLIT (int_of_string num) }
   | ':'dgt+ as num { RTOK (int_of_string num) }
   | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
-  | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
-  | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
+  | '"'([^'"']* as st_litr)'"'            { STRINGLIT(unescape st_litr)}
+(*  | '"'([^'"']* as esc_litr)'\n' '"'    { ESCAPE(esc_litr)}*)
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
