@@ -5,7 +5,9 @@ fsm variables {
         public int x = 7
         public int q = 190
 
-        int p = false
+        bool p = false
         int l = 0
-
+        bool r = true
+        string w = "Hello"
+        char n = 'c'
 }

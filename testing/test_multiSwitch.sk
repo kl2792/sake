@@ -4,6 +4,8 @@ output[int o]
 fsm switchCase {
         switch(i) {
                 case 0: o = 42
+                        printf("%d\n", o)
 		case 1: o = 24
+                        printf("%d\n", o)
         }
 }

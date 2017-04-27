@@ -1,7 +1,12 @@
 fsm ifTest {
         if (true) {
-            if (false) {
-                 4
-            }    
+                if (true) {
+                        printf("%s\n", "True Loop")
+                }
+        }
+        if (true) {
+                if (false) {
+                        printf("%s\n", "False Loop")
+                }    
         } 
 }

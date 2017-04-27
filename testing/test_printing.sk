@@ -1,0 +1,8 @@
+fsm printing {
+        int n = 34
+        printf("%d\n", 1*1)
+        printf("%d %s\n", 42, "is a cool number!")
+        printf("%d %s\n", n, "is also a cool number!")
+        printf("%s %s %s %s\n", "This", "is", "multiple", "strings")
+        printf("\t%s", "tabbed in")
+}

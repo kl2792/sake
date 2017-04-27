@@ -1,0 +1,49 @@
+input[int inOne, int inTwo]
+output[char outOne, char outTwo] 
+
+fsm tlOne {
+        state r1
+                if (inOne == 1 && t1Two == r2) {
+                        outOne = 'y' 
+                        goto g1
+                }
+                else {
+                        outOne = 'r'
+                        goto r1
+                }
+        state y1
+                outOne = 'r'
+                goto r1
+        state g1
+                if (inOne == 0 || inTwo == 1) {
+                        outOne = 'y'
+                        goto y1 
+                }
+                else {
+                        outOne = 'g'
+                        goto g1
+                }    
+}
+fsm tlTwo {
+        state r2
+                if (inTwo == 1 && tlOne == r1) {
+                        outTwo = 'g' 
+                        goto g2
+                }
+                else {
+                        outTwo = 'r'
+                        goto r2
+                }
+        state y2
+                outTwo = 'r'
+                goto r2
+        state g2
+                if (inTwo == 0 || inOne == 1) {
+                        outTwo = 'y'
+                        goto y2 
+                }
+                else {
+                        outTwo = 'g'
+                        goto g2
+                }    
+}

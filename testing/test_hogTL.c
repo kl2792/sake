@@ -3,19 +3,19 @@
 
 int main() {
     
-    struct test_trafficLights_input input;
-    struct test_trafficLights_output output;    
-    struct test_trafficLights_state states;
+    struct test_hogTL_input input;
+    struct test_hogTL_output output;    
+    struct test_hogTL_state states;
 
     // TODO run tick with null values to do the reset
     //     output.result = 0;
            
-    test_trafficLights_tick(&states, NULL, &output);
+    test_hogTL_tick(&states, NULL, &output);
 
     input.inOne = 1;
     input.inTwo = 0;
 
-    test_trafficLights_tick(&states, &input, &output);
+    test_hogTL_tick(&states, &input, &output);
 
 
     printf("output 1: %c\n", output.outOne);
