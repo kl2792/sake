@@ -2,5 +2,11 @@
 #include "test_block.h"
 
 int main() {
-	 test_block_tick(NULL, NULL, NULL);
+	struct test_block_input i;
+	struct test_block_state s;
+
+	test_block_tick(&s, NULL, NULL); 
+	test_block_tick(&s, &i, NULL); 
+
+	return 0;
 }

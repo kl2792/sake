@@ -2,5 +2,11 @@
 #include "test_numbers.h"
 
 int main() {
-	 test_numbers_tick(NULL, NULL, NULL);
+	struct test_numbers_input i;
+	struct test_numbers_state s;
+
+	test_numbers_tick(&s, NULL, NULL); 
+	test_numbers_tick(&s, &i, NULL); 
+
+	return 0;
 }

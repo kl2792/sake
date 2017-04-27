@@ -2,5 +2,11 @@
 #include "test_bool.h"
 
 int main() {
-	 test_bool_tick(NULL, NULL, NULL);
+	struct test_bool_input i;
+	struct test_bool_state s;
+
+	test_bool_tick(&s, NULL, NULL); 
+	test_bool_tick(&s, &i, NULL); 
+
+	return 0;
 }

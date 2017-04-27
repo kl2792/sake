@@ -1,0 +1,24 @@
+input[char decision]
+output[char result]
+
+fsm ekas {
+        state s1
+                if (decision == 's') {
+                        printf("%s\n", "It’s May 8th and your PLT presentation is due tomorrow. Suddenly, you realize that your language sucks. What do you do?")
+                        printf("%s\n", "a. Go to Edwards and beg for an extension.")
+                        printf("%s\n", "b. Sell your soul to Satan in the hopes he will help you pass.")
+                        printf("%s\n", "c. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.") 
+                        result = 1
+                        goto s2 
+                }
+                else if (decision == 'e') {
+                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        result = 2
+                        goto s1 
+                }
+                else {
+                        printf("%s\n", "Don't just sit there. Get moving!")
+                        result = 0
+                        goto s1
+                }
+}

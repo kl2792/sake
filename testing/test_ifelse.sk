@@ -5,6 +5,12 @@ fsm headerTest {
         if (v == 5) {
                 v = 6
         }
+        else if (v == 7) {
+                v = 89
+        }
+        else if (v == 123) {
+                v = 21
+        }
         else {
                 v = 9
         }

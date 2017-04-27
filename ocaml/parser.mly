@@ -79,6 +79,7 @@ INTLIT { IntLit($1) }
 | ID ASSIGN expr { Assign($1, $3) }
 | dtype ID ASSIGN expr { Assign($2, $4) }
 | PRINTF LPAREN STRINGLIT COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
+| PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
 | ID DOT ID { Access($1, $3) }
 //| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
 // Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
@@ -102,7 +103,7 @@ cstmt:
   CASE expr COLON stmt {$2, $4}
 
 type_decl:
-  TYPE ID ASSIGN string_opt NLINE 
+  TYPE TYPENAME ASSIGN string_opt 
   {{
     type_name = $2;
     type_values = $4;
@@ -191,7 +192,7 @@ dstexpr { [$1] }
 
 type_opt:
 /*nothing*/ {[] }
-| type_list NLINE { List.rev $1 }
+| type_list NLINE NLINE { List.rev $1 }
 
 type_list:
 type_decl { [] }
