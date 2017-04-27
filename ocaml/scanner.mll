@@ -10,7 +10,7 @@ let aln = (ltr | dgt)
 rule token = parse
     spc { token lexbuf }
   | "/~" { comment lexbuf }
-  | "~" { line_comment lexbuf }
+  | '~' { line_comment lexbuf }
   | '.' { DOT }
   | '_' { UNDER }
   | '|' { BAR }
@@ -75,7 +75,6 @@ rule token = parse
   | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
   | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
   | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
-
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
@@ -83,9 +82,8 @@ rule token = parse
   *)
   | eof { EOF }
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
-
 and comment = parse
-    "~/" { token lexbuf }
+    "~/\n" { token lexbuf }
   | _    { comment lexbuf }
 and line_comment = parse
     '\n' { token lexbuf }
