@@ -67,26 +67,34 @@ let translate filename program =
     let ftype = L.function_type (L.pointer_type state_t) args in
     L.declare_function "memcpy" ftype sake in
 
-  (* Variables *)
-  let map vars =
-    let merge map (dtype, name, _) = (* TODO: init with the last value *)
-      let global = L.define_global name (init dtype 0) sake in
-      StringMap.add name global map in
-    List.fold_left merge StringMap.empty vars in
-  let zmap vars = map (List.map (fun (t, n) -> t, n, 0) vars) in
-  let public = map program.A.public in
-  let state = zmap (List.map (fun f -> A.Int, f.A.fsm_name) program.A.fsms) in
-  let input = zmap program.A.input and output = zmap program.A.output in
-  let locals = ref StringMap.empty in
+  (* Variable maps *)
+  let imap =
+    let rec imap i a = function [] -> a
+      | (_, n) :: tail -> imap (i + 1) (StringMap.add n i a) tail in
+    imap 0 StringMap.empty in
+  let rmap l = imap (List.map (fun (t, n, _) -> t, n) l) in
+  let public = rmap program.A.public
+  and input  = imap program.A.input
+  and output = imap program.A.output in
+
+  (* FSM-specific metadata *)
+  let locals = ref StringMap.empty
+  and states = ref StringMap.empty in
 
   (* Lookup function *)
-  let lookup fn io name =
+  let lookup fn io name builder =
     try StringMap.find name !locals
     with Not_found ->
-      try StringMap.find ((L.value_name fn) ^ "_" ^ name) public
+      let fa = L.params fn in
+      let pub_ptr = if io == input then fa.(1) else fa.(0) in
+      let io_ptr = if io == input then fa.(2) else fa.(3) in
+      try
+        let pub_val =
+          try StringMap.find ((L.value_name fn) ^ "_" ^ name) public
+          with Not_found -> StringMap.find name public in
+        L.build_struct_gep pub_ptr pub_val name builder
       with Not_found ->
-        try StringMap.find name public
-        with Not_found -> StringMap.find name io in
+        L.build_struct_gep io_ptr (StringMap.find name io) name builder in
 
   (* Expression builder *)
   let rec expr fn builder = function
@@ -95,7 +103,7 @@ let translate filename program =
     | A.CharLit c -> L.const_int i8_t (int_of_char c)
     | A.StringLit s -> L.build_global_stringptr s "string" builder
     | A.Empty -> L.const_int i32_t 0
-    | A.Variable s -> L.build_load (lookup fn input s) s builder
+    | A.Variable s -> L.build_load (lookup fn input s builder) s builder
     | A.Printf (fmt, args) ->
         let args = (List.map (expr fn builder) args) in
         let args = (L.build_global_stringptr fmt "fmt" builder) :: args in
@@ -106,7 +114,7 @@ let translate filename program =
         (llop op) (expr fn builder e1) (expr fn builder e2) "tmp" builder
     | A.Assign (s, e) ->
         let e = expr fn builder e in
-        ignore (L.build_store e (lookup fn output s) builder); e in
+        ignore (L.build_store e (lookup fn output s builder) builder); e in
 
   let add_terminal builder f =
     match L.block_terminator (L.insertion_block builder) with
@@ -164,9 +172,10 @@ let translate filename program =
 
       (* Allocate the appropriate memory and build the function *)
       let builder = bae (L.entry_block fn) in
+
+      (* Allocate appropriate memory and set variables *)
       let add_local m (t, n, _) = (* Local variable lazy allocation *)
-        let alloca = L.build_alloca (lltype t) n builder in
-        StringMap.add n alloca m in
+        StringMap.add n (L.build_alloca (lltype t) n builder) m in
       locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
       add_terminal (stmt fn builder (A.Block fsm.A.fsm_body)) L.build_ret_void;
       fn in
@@ -178,22 +187,25 @@ let translate filename program =
     let args = Array.of_list (List.map L.pointer_type types) in
     let ftype = L.function_type void_t args in
     L.define_function (filename ^ "_tick") ftype sake in
-  let builder = bae (L.entry_block tick) in
-
-  (* State allocation and modification *)
-  let state = L.build_alloca state_t "state" builder in
   let ta = L.params tick in
-  let fa = state :: (Array.to_list ta) in
-  let call fsm = ignore (L.build_call fsm (Array.of_list fa) "" builder) in
-  List.iter call fsms;
+  let builder = bae (L.entry_block tick) in
+  let update = abc "update" tick and reset = abc "reset" tick in
+  let null = L.build_is_null ta.(1) "null" builder in
+  add_terminal builder (L.build_cond_br null reset update);
 
-  (* Writing to user *)
-  let write = abc "write" tick and ret = abc "ret" tick in
-  let wa = [| ta.(0); state; L.size_of state_t |] and wb = bae write in
-  let null = L.build_is_null wa.(0) "null" builder in
-  add_terminal builder (L.build_cond_br null ret write);
-  add_terminal (ignore (L.build_call memcpy wa "" wb); wb) L.build_ret_void;
-  add_terminal (bae ret) L.build_ret_void;
+  (* State allocation, modification, and updating *)
+  let builder = bae update in
+  let state = L.build_alloca state_t "state" builder in
+  let fa = Array.of_list (state :: (Array.to_list ta)) in
+  let ma = [| ta.(0); state; L.size_of state_t |] in
+  List.iter (fun fsm -> ignore (L.build_call fsm fa "" builder)) fsms;
+  L.build_call memcpy ma "" builder;
+  add_terminal builder L.build_ret_void;
+
+  (* Resetting *)
+  let builder = bae reset in
+  
+  add_terminal builder L.build_ret_void;
 
   (* Enjoy :) *)
   sake
