@@ -1,5 +1,21 @@
-input[string p, int i, int o]
-output[int k, int l]
+input[int p, string q]
+output[int k]
 
 fsm hello {
+        state hello
+                if (i == 1) {
+                        printf("%s", "Hello")
+                        goto world
+                }
+                else {
+                        goto hello
+                }
+        state world
+                if (i == 1) {
+                        printf("%s%s\n", q, "'s World")
+                        goto hello
+                }
+                else {
+                        goto world
+                }
 }

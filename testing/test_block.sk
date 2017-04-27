@@ -1,3 +1,5 @@
 fsm comments {
         /~ hello ~/
+        printf("%s", "I successfully navigated a block comment!")
+        /~ world ~/
 }

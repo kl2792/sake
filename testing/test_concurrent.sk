@@ -1,33 +1,22 @@
-input[int i, int o]
-output[int k, int l]
+input[int i]
+output[int o]
 
 fsm one {
         public int j = 4
 
-        int r = two.k 
+        int r = two.k
 
-        state emma 
-                goto shavla
-        state shalva
+        state emma
+                r = two.k 
+                printf("%d\n", r) 
                 goto emma
 }
 fsm two {
         public int k = 3
-        state kz 
-                k = 45
-}
-fsm three {
-        int f = 24
-        state ac
-                z = 35 
-}
-fsm four {
-        int t = 132124
-        int s = 123123
-}
-fsm five {
-}
-fsm six {
-        state yay 
-                goto yay
+        state kz
+                if (i == 2) { 
+                        k = 45
+                }
+                printf("%d\n", k)
+                goto kz
 }

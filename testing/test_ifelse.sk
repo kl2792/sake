@@ -1,17 +1,17 @@
-input [int i, int o, char l]
-output [int p, int q]
+input [int v]
+output [int p]
 
 fsm headerTest {
         if (v == 5) {
-                v = 6
+                p = 6
         }
         else if (v == 7) {
-                v = 89
+                p = 89
         }
         else if (v == 123) {
-                v = 21
+                p = 21
         }
         else {
-                v = 9
+                p = 42
         }
 }

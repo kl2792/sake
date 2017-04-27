@@ -1,10 +1,10 @@
-input [int i, int o, char l]
-output [int p, int q]
+input [int i]
+output [int o]
 
 fsm headerTest {
-        public int k = 4
         public int v = 5
         while (v <= 10) {
                 v = v + 1
         }
+        o = v
 }

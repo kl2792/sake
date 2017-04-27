@@ -1,14 +1,38 @@
-input [int i, int o, char l]
-output [int p, int q]
+input[int i, int o]
+output[int k, int l]
 
-fsm headerTest {
+type Test = One | Two | Three
+
+fsm one {
+        public int j = 4
+
+        int r = two.k 
+
+        state emma 
+                goto shavla
+        state shalva
+                goto emma
+}
+fsm two {
+        public int k = 3
+        state kz 
+                k = 45
+}
+fsm three {
         public int k = 4
-        public int v = 5
 
-        int m = 4
+        int f = 24
 
-        state one 
-                m = 8
-        state two 
-                q = 12
+        state ac
+                z = 35 
+}
+fsm four {
+        int t = 132124
+        int s = 123123
+}
+fsm five {
+}
+fsm six {
+        state yay 
+                goto yay
 }

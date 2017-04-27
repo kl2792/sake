@@ -2,11 +2,32 @@
 #include "test_ifelse.h"
 
 int main() {
-	struct test_ifelse_input i;
-	struct test_ifelse_state s;
 
-	test_ifelse_tick(&s, NULL, NULL); 
-	test_ifelse_tick(&s, &i, NULL); 
+    struct test_ifelse_input i;
+    struct test_ifelse_state s;
+    struct test_ifelse_output o;
 
-	return 0;
+    test_ifelse_tick(&s, NULL, NULL); 
+
+    i.v = 5;
+    test_ifelse_tick(&s, &i, &o); 
+    prinf("%d\n", o.p);
+  
+    i.v = 1233;
+    test_ifelse_tick(&s, &i, &o); 
+    prinf("%d\n", o.p);
+
+    i.v = 123
+    test_ifelse_tick(&s, &i, &o); 
+    prinf("%d\n", o.p);
+
+    i.v = 7;
+    test_ifelse_tick(&s, &i, &o); 
+    prinf("%d\n", o.p);
+
+    i.v = 56;
+    test_ifelse_tick(&s, &i, &o); 
+    prinf("%d\n", o.p);
+
+    return 0;
 }
