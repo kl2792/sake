@@ -117,6 +117,128 @@ let convert i o typs fsms = function
 (*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
 
 
+
+
+
+
+
+
+(*
+
+let report_duplicate exceptf list =
+  let rec helper = function
+  n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
+  | _ :: t -> helper t
+  | [] -> ()
+  in helper (List.sort compare list)
+in
+
+
+
+let check_not_void exceptf = function
+| (Void, n) -> raise (Failure (exceptf n))
+| _ -> ()
+
+
+(* Raise an exception of the given rvalue type cannot be assigned to
+ the given lvalue type *)
+let check_assign lvaluet rvaluet err =
+ if lvaluet == rvaluet then lvaluet else raise err
+in
+
+(**** Checking Global Variables ****)
+
+let globals = program.A.input @ program.A.output in
+
+List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
+
+report_duplicate (fun n -> "duplicate global " ^ n) (List.map snd globals);
+
+(**** Checking Functions ****)
+
+(*  if List.mem "print" (List.map (fun fd -> fd.fsm_name) fsms)
+then raise (Failure ("function print may not be defined")) else (); *)
+
+report_duplicate (fun n -> "duplicate fsm " ^ n)
+(List.map (fun fd -> fd.fsm_name) fsms);
+
+(* Function declaration for a named function *)
+(*  let built_in_decls =  StringMap.add "print"
+ { typ = Void; fname = "print"; formals = [(Int, "x")];
+   locals = []; body = [] } (StringMap.add "printb"
+ { typ = Void; fname = "printb"; formals = [(Bool, "x")];
+   locals = []; body = [] } (StringMap.singleton "printbig"
+ { typ = Void; fname = "printbig"; formals = [(Int, "x")];
+   locals = []; body = [] }))
+in *)
+
+let fsm_decls = List.fold_left (fun m fd -> StringMap.add fd.fsm_name fd m)
+                     StringMap.empty fsms
+in
+
+let fsm_decl s = try StringMap.find s fsm_decls
+   with Not_found -> raise (Failure ("unrecognized fsm " ^ s))
+
+let check_fsm fsm =
+(**** Check FSM INSTANCE VARS: public and states ****)
+
+List.iter (check_not_void (fun n -> "illegal void public " ^ n ^
+  " in " ^ fsm.fsm_name)) fsm.fsm_public;
+
+report_duplicate (fun n -> "duplicate public " ^ n ^ " in " ^ fsm.fsm_name)
+  (List.map snd fsm.fsm_public);
+
+report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
+  fsm.fsm_states;
+
+List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+  " in " ^ fsm.fsm_name)) fsm.fsm_locals;
+
+report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.fsm_name)
+  (List.map snd fsm.fsm_locals);
+
+
+  
+type translation_environment = {
+scope : symbol_table;   (* symbol table for vars *)
+in_switch : bool;
+case_labels : list ref; (* known case labels *)
+state_labels : label list ref; (* labels on statements *)
+forward_gotos : label list ref; (* forward goto destinations *)
+}
+
+
+type symbol_table = {
+parent : symbol_table option;
+variables : variable_decl list
+}
+
+let rec find_variable (scope : symbol_table) name =
+try
+  List.find (fun (s, _, _, _) -> s = name) scope.variables
+with Not_found ->
+  match scope.parent with
+    Some(parent) -> find_variable parent name
+  | _ -> raise Not_found
+
+
+*)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let check program =
   convert program.A.input program.A.output program.A.types program.A.fsms []
 (* or convert program *)
