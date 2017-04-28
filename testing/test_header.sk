@@ -27,8 +27,10 @@ fsm three {
                 z = 35 
 }
 fsm four {
+        
         int t = 132124
         int s = 123123
+
 }
 fsm five {
 }

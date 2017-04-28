@@ -10,4 +10,5 @@ fsm variables {
         bool r = true
         string w = "Hello"
         char n = 'c'
+
 }
