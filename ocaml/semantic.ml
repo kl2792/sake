@@ -62,7 +62,7 @@ and take_stmts = function (*stmt list*)
 | stm::tl -> (do_stmt stm)::(take_stmts tl)
 and get_cases = function (* (expr * stmt) list *)
 [] -> []
-| (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
+| (e,s_list)::tl -> ((get_expr e),(take_stmts s_list))::(get_cases tl)
 
 
 let rec take_in = function
