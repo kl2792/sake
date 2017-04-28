@@ -57,7 +57,6 @@ INTLIT { IntLit($1) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 | STRINGLIT { StringLit ($1) }
-| TYPENAME {EnumLit ($1) }
 //| ESCAPE { Escape ($1) }
 //| RTOK RTOK INTLIT { Range($1, $2, $3) }
 //| actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
