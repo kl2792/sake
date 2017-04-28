@@ -99,7 +99,7 @@ stexpr:
   ID expr {$1, $2}
 
 cstmt:
-  CASE expr COLON stmt {$2, $4}
+  CASE expr COLON stmt_list {$2, List.rev $4}
 
 type_decl:
   TYPE TYPENAME ASSIGN string_opt 
