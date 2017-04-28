@@ -150,14 +150,14 @@ out:
 test_trafficLight
 
 sk: single traffic light that depending on traffic flow switches colors
-c: 
-out:
+c: test on single input stream
+out: look in c file and out
 
 test_hogTL
 
 sk: concurrent traffic lights that switch flow depending on flow traffic
-c: 
-out:
+c: tests on input1 and input2 streams 
+out: written in the c file and out
 
 test_brokenTL
 

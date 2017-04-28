@@ -10,8 +10,6 @@ int main() {
 
         char *inputOne = "11110000000011111000";
         char *inputTwo = "10000011110000011100";
-                        // OUTPUT ONE "rgggyrrrrrrrgggyrrrr"
-                        // OUTPUT TWO "rrrrrrggggyrrrrrrgyr"
 
         while (*inputOne) {
             input.inOne = *inputOne;
