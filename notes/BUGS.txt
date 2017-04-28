@@ -1,0 +1,5 @@
+BUGS:
+
+1. ASSIGN 
+value are not being assigned correctly in declarations. e.g. in test_printing:
+- declaration of int n = 34 but prints like -12344334 (crazy number)
