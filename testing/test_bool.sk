@@ -4,6 +4,7 @@ output [bool o]
 fsm test {
         ~ publics 
         public bool l = false
+
         if (l) {
                 printf("%s\n", "L is true")
         }

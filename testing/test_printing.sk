@@ -1,5 +1,4 @@
 fsm printing {
-
         int n = 34
         string w = "hello"
         char c = 'e'

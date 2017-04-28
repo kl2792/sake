@@ -2,6 +2,7 @@ input[int inOne, int inTwo]
 output[char outOne, char outTwo] 
 
 fsm tlOne {
+
         state r1
                 if (inOne == 1 && inTwo == 0 && t1Two == r2) {
                         outOne = 'g' 
@@ -25,6 +26,7 @@ fsm tlOne {
                 }    
 }
 fsm tlTwo {
+
         state r2
                 if (inTwo == 1 && inOne == 0 && tlOne == r1) {
                         outTwo = 'g' 

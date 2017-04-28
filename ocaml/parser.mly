@@ -57,9 +57,6 @@ INTLIT { IntLit($1) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 | STRINGLIT { StringLit ($1) }
-//| ESCAPE { Escape ($1) }
-//| RTOK RTOK INTLIT { Range($1, $2, $3) }
-//| actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | ID { Variable($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
@@ -76,12 +73,9 @@ INTLIT { IntLit($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-//| dtype ID ASSIGN expr { Assign($2, $4) }
 | PRINTF LPAREN STRINGLIT COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
 | PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3 ^ "\n", List.rev $5) }
 | ID DOT ID { Access($1, $3) }
-//| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-// Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
 
 stmt:
 LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
@@ -93,7 +87,6 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO ID NLINE { Goto ($2) }
-//| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
 
 stexpr:
   ID expr {$1, $2}
@@ -109,13 +102,41 @@ type_decl:
   }}
 
 fsm_decl:
-  FSM ID LBRACE NLINE public_opt local_opt stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt local_opt NLINE stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
-  fsm_public = $5;
-  fsm_locals = $6;
-  fsm_body = List.rev $7;
+  fsm_public = List.rev $5;
+  fsm_locals = List.rev $6;
+  fsm_body = List.rev $8;
+}} 
+/*| FSM ID LBRACE NLINE local_list NLINE NLINE stmt_list RBRACE NLINE
+{{
+  fsm_name = $2;
+  fsm_public = [];
+  fsm_locals = List.rev $5;
+  fsm_body = List.rev $8;
+}} 
+| FSM ID LBRACE NLINE public_list NLINE NLINE stmt_list RBRACE NLINE
+{{
+  fsm_name = $2;
+  fsm_public = List.rev $5;
+  fsm_locals = [];
+  fsm_body = List.rev $8;
 }}
+| FSM ID LBRACE NLINE NLINE stmt_list RBRACE NLINE 
+{{
+  fsm_name = $2;
+  fsm_public = [];
+  fsm_locals = [];
+  fsm_body = List.rev $6;
+}}
+| FSM ID LBRACE NLINE local_list RBRACE NLINE
+{{
+  fsm_name = $2;
+  fsm_public = [];
+  fsm_locals = List.rev $5;
+  fsm_body = []
+}} */
 
 program:
   INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
@@ -136,10 +157,6 @@ program:
 
 
 /*list definitions */
-
-//actuals_opt:
-//  /* nothing */ { [] }
-//| actuals_list { List.rev $1 }
 
 actuals_list:
   expr { [$1] }
@@ -183,7 +200,7 @@ public_list:
 //BUG: there is public, but no local then only one NLINE before stmt_list
 local_opt:
 /*nothing*/ { [] }
-| NLINE local_list NLINE NLINE {List.rev $2}
+| local_list NLINE {List.rev $1}
 
 local_list:
 dstexpr { [$1] }

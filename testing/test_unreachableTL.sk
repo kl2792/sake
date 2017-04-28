@@ -2,6 +2,7 @@ input[int inOne]
 output[char outOne] 
 
 fsm tlOne {
+
         state r1
                 if (inOne == 1) {
                         outOne = 'g' 

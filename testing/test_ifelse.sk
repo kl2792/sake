@@ -2,6 +2,7 @@ input [int v]
 output [int p]
 
 fsm headerTest {
+
         if (v == 5) {
                 p = 6
         }

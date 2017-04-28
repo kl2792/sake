@@ -3,6 +3,7 @@ output [int q]
 
 fsm headerTest {
         public int k = 4      
+
         for i in (0:2:1) {
                 for j in (0:5:1) {
                         k = k + 1

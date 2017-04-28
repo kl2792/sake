@@ -2,6 +2,7 @@ input[int i]
 output[char out] 
 
 fsm trafficLight {
+
 	 state red
                 switch(i) {
                         case 1: out = 'g'

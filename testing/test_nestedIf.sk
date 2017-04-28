@@ -1,4 +1,5 @@
 fsm ifTest {
+
         if (true) {
                 if (true) {
                         printf("%s\n", "True Loop")

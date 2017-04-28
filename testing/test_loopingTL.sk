@@ -2,8 +2,7 @@ input[int inTwo]
 output[char outOne, char outTwo] 
 
 fsm tlOne {
-        public int turnOne = 1
-        
+        public int turnOne = 1        
         int count = 0
         
         state r1
@@ -36,7 +35,6 @@ fsm tlOne {
 }
 fsm tlTwo {
         public int turnTwo = 0 
-
         int count = 0 
         
         state r2

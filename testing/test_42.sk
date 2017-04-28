@@ -1,3 +1,4 @@
 fsm fortytwo {
+
         printf("%d", 42)
 }

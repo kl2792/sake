@@ -1,6 +1,7 @@
 fsm test {
         public int k = 4   
-        for k in (0:4:1) {
+        
+	for k in (0:4:1) {
                 k = k + 1
         }
         printf("%d", k)
