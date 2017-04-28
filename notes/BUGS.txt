@@ -3,3 +3,18 @@ BUGS:
 1. ASSIGN 
 value are not being assigned correctly in declarations. e.g. in test_printing:
 - declaration of int n = 34 but prints like -12344334 (crazy number)
+
+1.5. ASSIGNMENT WITH OUTPUT AND LOOKING AT INPUT
+generating exception not found problems (check out test_ifelse.sk)
+
+2. SWITCH
+multi line switch statements
+
+3. STATES 
+Get states working for test cases
+
+4. FOR 
+int of string issue
+
+5. Newlines and declaration of publics and ints
+
