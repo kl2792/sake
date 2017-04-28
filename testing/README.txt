@@ -73,13 +73,19 @@ out:
 
 test_printing:
 
-sk: testing prints with %d and %s combinations
+sk: testing prints with %d and %s combinations AND ALL escape characters
 out:
 1
 42 is a cool number!
 34 is also a cool number!
+hello world!
+e is the coolest letter!
 This is multiple strings
-        tabbed in
+        This is tabbed in
+ is a backspace
+Carriage return
+\ is a backslash
+' is a single quote
 
 test_ifelse:
 
@@ -143,25 +149,30 @@ out:
 
 test_trafficLight
 
-sk:
+sk: single traffic light that depending on traffic flow switches colors
 c: 
 out:
 
 test_hogTL
 
-sk:
+sk: concurrent traffic lights that switch flow depending on flow traffic
 c: 
 out:
 
 test_brokenTL
 
-sk:
+sk: concurrent traffic lights that only look at own flow (i.e. both could go green at the same time - he he he)
 c: 
 out:
 
+test_unreachableTL
+
+sk: single traffic light that goes through the motions but gets stuck in yello
+out: 
+
 test_loopingTL
 
-sk:
+sk: traffic lights that loop together stay together 
 c: 
 out:
 
