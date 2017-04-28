@@ -11,14 +11,14 @@ int main() {
         char *input = "00011111000";
               
         while (*input) {
+            input.i = *input;
+
+            test_trafficLight_tick(&s, &i, &o);
+
+            printf("%c\n", o.out);
+
+            input++;
         }
-
-
-           //         = "rrrgggggyrr
-
-
-
-	test_trafficLight_tick(&s, &i, NULL); 
 
 	return 0;
 }
