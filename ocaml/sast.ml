@@ -38,6 +38,7 @@ type program = {
   input : (dtype * string) list;
   output: (dtype * string) list;
   public: (dtype * string * expr) list;
+(* types: (string * (string * int) list) list; *)
   types : type_decl list;
   fsms  : fsm_decl list;
 }

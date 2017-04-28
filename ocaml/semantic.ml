@@ -79,6 +79,18 @@ let rec take_typ = function
 | {A.type_name = name; A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
 
 
+(*
+
+let rec make_enum_list num = function
+| [] -> []
+| name::tl -> (name,num)::(make_enum_list (num+1) tl)
+
+let rec take_typ = function
+| [] -> []
+| {A.type_name = name; A.type_values=vals}::tl -> (name,(make_enum_list 0 vals))::(take_typ tl)
+
+*)
+
 let rec copy_locals = function (*(dtype * string * expr) list*)
 [] -> []
 | (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
