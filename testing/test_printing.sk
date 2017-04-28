@@ -1,5 +1,4 @@
 fsm printing {
-        public int p = 42
 
         int n = 34
         string w = "hello"
