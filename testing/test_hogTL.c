@@ -1,29 +1,30 @@
 #include <stdio.h>
-#include "test_trafficLights.h"
+#include "test_hogTL.h"
 
 int main() {
-    
-    struct test_hogTL_input input;
-    struct test_hogTL_output output;    
-    struct test_hogTL_state states;
+	struct test_hogTL_input i;
+	struct test_hogTL_state s;
+	struct test_hogTL_output o;
 
-    // TODO run tick with null values to do the reset
-    //     output.result = 0;
-           
-    test_hogTL_tick(&states, NULL, &output);
+	test_hogTL_tick(&s, NULL, NULL); 
 
-    input.inOne = 1;
-    input.inTwo = 0;
+        char *inputOne = "11110000000011111000";
+        char *inputTwo = "10000011110000011100";
+                        // OUTPUT ONE "rgggyrrrrrrrgggyrrrr"
+                        // OUTPUT TWO "rrrrrrggggyrrrrrrgyr"
 
-    test_hogTL_tick(&states, &input, &output);
+        while (*inputOne) {
+            input.inOne = *inputOne;
+            input.inTwo = *inputTwo;
 
+            test_trafficLight_tick(&s, &i, &o);
 
-    printf("output 1: %c\n", output.outOne);
-    printf("output 2: %c\n", output.outTwo);
+            printf("TL 1: %c\n", o.outOne);
+            printf("TL 2: %c\n", o.outTwo);
 
-    //input[int inOne, int inTwo]
-    //output[char outOne, char outTwo] 
+            inputOne++;
+            inputTwo++:
+        }
 
-     
-
+	return 0;
 }
