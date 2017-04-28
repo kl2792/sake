@@ -3,3 +3,15 @@ BUGS:
 1. ASSIGN 
 value are not being assigned correctly in declarations. e.g. in test_printing:
 - declaration of int n = 34 but prints like -12344334 (crazy number)
+
+2. SWITCH
+multi line switch statements
+
+3. STATES 
+Get states working for test cases
+
+4. FOR 
+int of string issue
+
+5. Newlines and declaration of publics and ints
+
