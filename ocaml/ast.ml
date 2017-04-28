@@ -23,7 +23,7 @@ type stmt =
   | If of expr * stmt * stmt
   | For of string * int * int * int * stmt
   | While of expr * stmt
-  | Switch of expr * (expr * stmt) list (*CHANGE MADE HERE*)
+  | Switch of expr * (expr * stmt list) list (*CHANGE MADE HERE*)
   | Expr of expr
   | Goto of string (* for FSM transitions *)
 type type_decl = {
