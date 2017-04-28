@@ -162,13 +162,12 @@ out: written in the c file and out
 test_brokenTL
 
 sk: concurrent traffic lights that only look at own flow (i.e. both could go green at the same time - he he he)
-c: 
-out:
+c: input 1 and input 2 streams that show both traffic lights being able to be in g etc at same time 
 
 test_unreachableTL
 
 sk: single traffic light that goes through the motions but gets stuck in yello
-out: 
+out: go r->g->y and get stuck in yello no matter what the input is etc. 
 
 test_loopingTL
 
