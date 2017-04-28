@@ -4,7 +4,7 @@ output[char outOne, char outTwo]
 fsm tlOne {
         state r1
                 if (inOne == 1) {
-                        outOne = 'y' 
+                        outOne = 'g' 
                         goto g1
                 }
                 else {
