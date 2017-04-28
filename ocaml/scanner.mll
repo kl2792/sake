@@ -74,7 +74,6 @@ rule token = parse
   | cap aln*  as lxm { TYPENAME (lxm) }
   | low aln* as lxm { ID (lxm) }
   | dgt+ as num { INTLIT (int_of_string num) }
-  | ':'dgt+ as num { RTOK (int_of_string num) }
   | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
   | '"'([^'"']* as st_litr)'"'            { STRINGLIT(unescape st_litr)}
 (*  | '"'([^'"']* as esc_litr)'\n' '"'    { ESCAPE(esc_litr)}*)
