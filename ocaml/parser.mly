@@ -77,7 +77,7 @@ INTLIT { IntLit($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-| dtype ID ASSIGN expr { Assign($2, $4) }
+//| dtype ID ASSIGN expr { Assign($2, $4) }
 | PRINTF LPAREN STRINGLIT COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
 | PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3 ^ "\n", List.rev $5) }
 | ID DOT ID { Access($1, $3) }
