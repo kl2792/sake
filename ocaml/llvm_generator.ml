@@ -144,8 +144,8 @@ let translate filename program =
         add_terminal (bae pred_bb) (L.build_cond_br value body_bb merge_bb);
         add_terminal builder (L.build_br pred_bb);
         bae merge_bb
-    | A.Switch (predicate, cases) ->
-        let case = expr fn builder predicate in
+    | A.Switch (predicate, cases) -> raise ( ENOSYS "Under construction")
+       (* let case = expr fn builder predicate in
         let merge_bb = abc "merge" fn in
         let switch_in = L.build_switch case merge_bb (List.length cases) builder in
         let rec iter i = function [] -> ()
@@ -156,7 +156,7 @@ let translate filename program =
               add_terminal (stmt fn (bae case_bb) s) (L.build_br merge_bb);
               iter (i + 1) tail in
         iter 1 cases;
-        bae merge_bb 
+        bae merge_bb *) 
     | A.For (name, iter, body) -> raise (ENOSYS "For, When Shalva gets off her ass she will do this")
     | A.State name ->
         let block, value =

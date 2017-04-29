@@ -6,7 +6,8 @@ fsm bc {
          ~ multiple 
          ~ lines 
          ~/
-        printf("%s", "I successfully navigated a block comment!")
+        
+	printf("%s", "I successfully navigated a block comment!")
         /~ block
            comment
          ~/

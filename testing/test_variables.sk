@@ -4,10 +4,10 @@ fsm variables {
         public int j = 4
         public int x = 7
         public int q = 190
-
         bool p = false
         int l = 0
         bool r = true
         string w = "Hello"
-        char n = 'c'
+        char n = 'c' 
+
 }

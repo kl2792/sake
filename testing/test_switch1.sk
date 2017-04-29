@@ -1,6 +1,7 @@
 fsm test {
         public int y = 4
-        switch(y) {
+      
+   	switch(y) {
                 case 4: printf("%d", y)
         }
 }

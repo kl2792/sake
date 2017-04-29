@@ -2,6 +2,7 @@ input[int i]
 output[int o]
 
 fsm switchCase {
+
         switch(i) {
                 case 0: o = 42
                         printf("%d\n", o)

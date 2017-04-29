@@ -62,7 +62,7 @@ and take_stmts = function (*stmt list*)
 | stm::tl -> (do_stmt stm)::(take_stmts tl)
 and get_cases = function (* (expr * stmt) list *)
 [] -> []
-| (e,s)::tl -> ((get_expr e),(do_stmt s))::(get_cases tl)
+| (e,s_list)::tl -> ((get_expr e),(take_stmts s_list))::(get_cases tl)
 
 
 let rec take_in = function
@@ -78,6 +78,18 @@ let rec take_typ = function
 [] -> []
 | {A.type_name = name; A.type_values=vals}::tl -> {S.type_name = name; S.type_values = vals}::(take_typ tl)
 
+
+(*
+
+let rec make_enum_list num = function
+| [] -> []
+| name::tl -> (name,num)::(make_enum_list (num+1) tl)
+
+let rec take_typ = function
+| [] -> []
+| {A.type_name = name; A.type_values=vals}::tl -> (name,(make_enum_list 0 vals))::(take_typ tl)
+
+*)
 
 let rec copy_locals = function (*(dtype * string * expr) list*)
 [] -> []

@@ -1,33 +1,49 @@
-input[int inOne, int inTwo]
+input[int inTwo]
 output[char outOne, char outTwo] 
 
 fsm tlOne {
+        public int turnOne = 1        
+        int count = 0
+        
         state r1
-                if (inOne == 1 && t1Two == r2) {
-                        outOne = 'y' 
-                        goto g1
-                }
-                else {
+                if (tlTwo.turnTwo == 1) {
                         outOne = 'r'
+                        count = 0
                         goto r1
                 }
-        state y1
+                else {        
+                        if (count < 1) { 
+                                count = count + 1
+                                outOne = 'r'
+                                goto r1
+                        }
+                        count = 0
+                        outOne = 'g'
+                        goto g1    
+                }    
+        state y1               
                 outOne = 'r'
+                count = 0
                 goto r1
         state g1
-                if (inOne == 0 || inTwo == 1) {
-                        outOne = 'y'
-                        goto y1 
-                }
-                else {
+                if (tlTwo.turnTwo == 0) {
                         outOne = 'g'
                         goto g1
-                }    
+                }
+                outOne = 'y'
+                goto y1 
 }
 fsm tlTwo {
+        public int turnTwo = 0 
+        int count = 0 
+        
         state r2
-                if (inTwo == 1 && tlOne == r1) {
+                if (inTwo == 1) {
+                        turnTwo = 1
+                }
+                if (turnTwo == 1 && tlOne == r1) {
                         outTwo = 'g' 
+                        count = 0 
                         goto g2
                 }
                 else {
@@ -36,14 +52,14 @@ fsm tlTwo {
                 }
         state y2
                 outTwo = 'r'
+                turnTwo = 0
                 goto r2
         state g2
-                if (inTwo == 0 || inOne == 1) {
-                        outTwo = 'y'
-                        goto y2 
-                }
-                else {
+                while (count < 10) {
+                        count = count + 1
                         outTwo = 'g'
                         goto g2
-                }    
+                } 
+                outTwo = 'y'
+                goto y2 
 }

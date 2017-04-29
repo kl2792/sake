@@ -2,9 +2,10 @@ input[int inOne, int inTwo]
 output[char outOne, char outTwo] 
 
 fsm tlOne {
-        state r1
-                if (inOne == 1 && t1Two == r2) {
-                        outOne = 'y' 
+        
+	state r1
+                if (inOne == 1) {
+                        outOne = 'g' 
                         goto g1
                 }
                 else {
@@ -15,7 +16,7 @@ fsm tlOne {
                 outOne = 'r'
                 goto r1
         state g1
-                if (inOne == 0 || inTwo == 1) {
+                if (inOne == 0) {
                         outOne = 'y'
                         goto y1 
                 }
@@ -25,8 +26,9 @@ fsm tlOne {
                 }    
 }
 fsm tlTwo {
-        state r2
-                if (inTwo == 1 && tlOne == r1) {
+ 
+       state r2
+                if (inTwo == 1) {
                         outTwo = 'g' 
                         goto g2
                 }
@@ -38,7 +40,7 @@ fsm tlTwo {
                 outTwo = 'r'
                 goto r2
         state g2
-                if (inTwo == 0 || inOne == 1) {
+                if (inTwo == 0) {
                         outTwo = 'y'
                         goto y2 
                 }

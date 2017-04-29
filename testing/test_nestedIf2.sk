@@ -1,6 +1,7 @@
 fsm ifTest {
         int n = 4
         int m = 5
+
         if (n == 4) {
                 n = n + 5
                 if (m == 5) {

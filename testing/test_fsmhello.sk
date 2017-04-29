@@ -2,7 +2,8 @@ input[int p, string q]
 output[int k]
 
 fsm hello {
-        state hello
+        
+	state hello
                 if (i == 1) {
                         printf("%s", "Hello")
                         goto world

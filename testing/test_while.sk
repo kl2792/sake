@@ -3,6 +3,7 @@ output [int o]
 
 fsm headerTest {
         public int v = 5
+
         while (v <= 10) {
                 v = v + 1
         }

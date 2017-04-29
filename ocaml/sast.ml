@@ -21,7 +21,7 @@ type stmt =
   | If of expr * stmt * stmt
   | For of string * (int * int * int) * stmt
   | While of expr * stmt
-  | Switch of expr * (expr * stmt) list
+  | Switch of expr * (expr * stmt list) list
   | Expr of expr
   | Goto of string (* for FSM transitions *)
 type type_decl = {
@@ -38,6 +38,7 @@ type program = {
   input : (dtype * string) list;
   output: (dtype * string) list;
   public: (dtype * string * expr) list;
+(* types: (string * (string * int) list) list; *)
   types : type_decl list;
   fsms  : fsm_decl list;
 }
