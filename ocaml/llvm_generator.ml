@@ -158,13 +158,18 @@ let translate filename program =
         iter 1 cases;
         bae merge_bb 
     | A.For (name, iter, body) -> raise (ENOSYS "For, When Shalva gets off her ass she will do this")
-    | A.State name -> raise (ENOSYS "State")
+    | A.State name ->
+        let block, value =
+          try StringMap.find name !states
+          with Not_found -> raise (Bug (Printf.sprintf "No state found: %s" name)) in
+        raise (ENOSYS "State");
+        bae block;
     | A.Goto state ->
-        let _, i =
+        let _, value =
           try StringMap.find state !states
           with Not_found -> raise (Bug (Printf.sprintf "No state %s" state)) in
         let pub = lookup fn output state builder in
-        ignore (L.build_store i pub builder);
+        ignore (L.build_store value pub builder);
         bae (L.insertion_block builder) in
 
   (* FSM functions *)
@@ -181,8 +186,10 @@ let translate filename program =
       let builder = bae (L.entry_block fn) in
 
       (* Allocate appropriate memory and set variables *)
-      let add_local m (t, n, _) = (* Local variable lazy allocation *)
-        StringMap.add n (L.build_alloca (lltype t) n builder) m in
+      let add_local m (t, n, e) = (* Local variable lazy allocation *)
+        let local = L.build_alloca (lltype t) n builder in
+        ignore (L.build_store (expr fn builder e) local builder);
+        StringMap.add n local m in
       let add_state m (n, i) = (* Generated block for state *)
         StringMap.add n (abc n fn, L.const_int i32_t i) m in
       locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
@@ -195,11 +202,13 @@ let translate filename program =
   let tick =
     let types = [state_t; input_t; output_t] in
     let args = Array.of_list (List.map L.pointer_type types) in
-    let ftype = L.function_type void_t args in
+    let ftype = L.function_type i32_t args in
     L.define_function (filename ^ "_tick") ftype sake in
   let ta = L.params tick in
   let builder = bae (L.entry_block tick) in
-  let update = abc "update" tick and reset = abc "reset" tick in
+  let update = abc "update" tick
+  and reset = abc "reset" tick
+  and halt = abc "halt" tick in
   let null = L.build_is_null ta.(1) "null" builder in
   add_terminal builder (L.build_cond_br null reset update);
 
@@ -209,12 +218,17 @@ let translate filename program =
   let fa = Array.of_list (state :: (Array.to_list ta)) in
   let ma = [| ta.(0); state; L.size_of state_t |] in
   List.iter (fun fsm -> ignore (L.build_call fsm fa "" builder)) fsms;
-  L.build_call memcpy ma "" builder;
+  ignore (L.build_call memcpy ma "" builder);
   add_terminal builder L.build_ret_void;
 
   (* Resetting *)
   let builder = bae reset in
   
+  add_terminal builder L.build_ret_void;
+
+  (* Halting *)
+  let builder = bae halt in
+
   add_terminal builder L.build_ret_void;
 
   (* Enjoy :) *)
