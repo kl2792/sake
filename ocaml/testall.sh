@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Path to the LLVM interpreter
 LLI="lli"
@@ -13,6 +13,13 @@ CC="gcc"
 # Path to sake compiler - usually just ./sake.native 
 #SAKE="./sake"
 SAKE="_build/sake.native"
+
+e="\033"
+green="\[$e[38;5;22m\]"
+blue="\[$e[38;5;27m\]"
+brown="\[$e[38;5;94m\]"
+reset="\[$e[0m\]"
+red="$e[31m"
 
 # Set time limit for all operations
 ulimit -t 30
@@ -80,7 +87,7 @@ Check() {
     #echo $wrapper 
     #echo "../testing/$wrapper"
 
-    echo -n "$basename..."
+    echo -en "$basename... "
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
 
@@ -137,7 +144,7 @@ CheckFail() {
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
-    echo -n "$basename..."
+    echo -en "$basename... "
 
     echo 1>&2     
     echo "###### Testing $basename" 1>&2

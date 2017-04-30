@@ -239,9 +239,11 @@ let translate filename program =
   Printf.printf "OUPUT STRUCT: %s\n" (L.string_of_llvalue ta.(2));
   let sm = StringMap.bindings public in
   Printf.printf "LIST OF PUBLICS (%d): %s\n" (List.length sm) (List.fold_left (fun a (k, _) -> a ^ k) "" sm);
-  let state = L.build_struct_gep ta.(0) 0 "check" builder in
-  (*let halt = L.build_load *)
-  add_terminal builder (L.build_cond_br (L.const_int i1_t 0) halted update);
+  let halt =
+    let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
+    let halt = L.build_load state "state" builder in
+    (llop A.Eq) halt neg1 "halt" builder in
+  add_terminal builder (L.build_cond_br halt halted update); (*TODO: use halt*)
 
   (* State allocation, modification, and updating *)
   let builder = bae update in
