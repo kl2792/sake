@@ -84,7 +84,7 @@ let translate filename program =
   let public =
     let fsms = List.map (fun f -> (A.Int, f.A.fsm_name)) program.A.fsms in
     let public = List.map (fun (t, n, e) -> (t, n)) program.A.public in
-    imap (fsms @ public)
+    imap ((A.Int, "_running") :: fsms @ public)
   and input  = imap program.A.input
   and output = imap program.A.output in
 
@@ -238,12 +238,12 @@ let translate filename program =
   Printf.printf "INPUT STRUCT: %s\n" (L.string_of_llvalue ta.(1));
   Printf.printf "OUPUT STRUCT: %s\n" (L.string_of_llvalue ta.(2));
   let sm = StringMap.bindings public in
-  Printf.printf "LIST OF PUBLICS (%d): %s\n" (List.length sm) (List.fold_left (fun a (k, _) -> a ^ k) "" sm);
+  Printf.printf "LIST OF PUBLICS (%d): %s\n" (List.length sm) (List.fold_left (fun a (k, _) -> a ^ " " ^ k) "" sm);
   let halt =
     let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
     let halt = L.build_load state "state" builder in
     (llop A.Eq) halt neg1 "halt" builder in
-  add_terminal builder (L.build_cond_br halt halted update); (*TODO: use halt*)
+ add_terminal builder (L.build_cond_br halt halted update); (*TODO: use halt*)
 
   (* State allocation, modification, and updating *)
   let builder = bae update in
@@ -254,10 +254,14 @@ let translate filename program =
   ignore (L.build_call memcpy ma "" builder);
   add_terminal builder (L.build_ret pos1);
 
-  (* Halted *)
+  (* Halted: return 0 iff halted before when tick was called *)
   let builder = bae halted in
-  
-  add_terminal builder (L.build_ret zero);
+  let halt =
+    let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
+    let halt = L.build_load state "state" builder in
+    (llop A.Eq) halt neg1 "halt" builder in
+  let cast = L.build_zext_or_bitcast halt i32_t "ext" builder in
+  add_terminal builder (L.build_ret cast);
 
   (* Enjoy :) *)
   sake
