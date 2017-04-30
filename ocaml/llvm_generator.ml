@@ -46,6 +46,12 @@ let translate filename program =
   let bae = L.builder_at_end context in
   let abc = L.append_block context in
 
+  let zero = L.const_int i32_t 0
+  and pos1 = L.const_int i32_t 1
+  and neg1 = L.const_int i32_t (-1)
+  and ltrue = L.const_int i1_t 1
+  and lfalse = L.const_int i1_t 0 in
+
   (* New types *)
   let input_t =
     let types = Array.of_list (List.map lldtype program.A.input) in
@@ -54,7 +60,10 @@ let translate filename program =
     let types = Array.of_list (List.map lldtype program.A.output) in
     L.struct_type context types in
   let state_t =
-    let public = List.map (fun (t, _, _) -> lltype t) program.A.public in
+    let public =
+      let fsms = List.map (fun _ -> lltype A.Int) program.A.fsms in
+      let public = List.map (fun (t, _, _) -> lltype t) program.A.public in
+      fsms @ public in
     let types = Array.of_list public in
     L.struct_type context types in
 
@@ -72,8 +81,10 @@ let translate filename program =
     let rec imap i a = function [] -> a
       | (_, n) :: tail -> imap (i + 1) (StringMap.add n i a) tail in
     imap 0 StringMap.empty in
-  let rmap l = imap (List.map (fun (t, n, _) -> t, n) l) in
-  let public = rmap program.A.public
+  let public =
+    let fsms = List.map (fun f -> (A.Int, f.A.fsm_name)) program.A.fsms in
+    let public = List.map (fun (t, n, e) -> (t, n)) program.A.public in
+    imap (fsms @ public)
   and input  = imap program.A.input
   and output = imap program.A.output in
 
@@ -162,7 +173,7 @@ let translate filename program =
         let block, value =
           try StringMap.find name !states
           with Not_found -> raise (Bug (Printf.sprintf "No state found: %s" name)) in
-        raise (ENOSYS "State");
+        add_terminal builder (L.build_br block);(*(L.build_ret neg1);*)
         bae block;
     | A.Goto state ->
         let _, value =
@@ -194,7 +205,12 @@ let translate filename program =
         StringMap.add n (abc n fn, L.const_int i32_t i) m in
       locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
       states := List.fold_left add_state StringMap.empty fsm.A.fsm_states;
-      add_terminal (stmt fn builder (A.Block fsm.A.fsm_body)) L.build_ret_void;
+
+      (* Build all statements, halting in the last state *)
+      let builder = stmt fn builder (A.Block fsm.A.fsm_body) in
+      (*let halt = L.build_struct_gep (L.params fn).(0) 0 "halt" builder in
+      ignore (L.build_store neg1 halt builder);*)
+      add_terminal builder L.build_ret_void;
       fn in
     List.map build_fsm program.A.fsms in
 
@@ -206,11 +222,26 @@ let translate filename program =
     L.define_function (filename ^ "_tick") ftype sake in
   let ta = L.params tick in
   let builder = bae (L.entry_block tick) in
-  let update = abc "update" tick
-  and reset = abc "reset" tick
-  and halt = abc "halt" tick in
+  let reset = abc "reset" tick and check = abc "check" tick
+  and update = abc "update" tick and halted = abc "halted" tick in
   let null = L.build_is_null ta.(1) "null" builder in
-  add_terminal builder (L.build_cond_br null reset update);
+  add_terminal builder (L.build_cond_br null reset check);
+
+  (* Resetting *)
+  let builder = bae reset in
+  
+  add_terminal builder (L.build_ret pos1);
+
+  (* Check if halted *)
+  let builder = bae check in
+  Printf.printf "STATE STRUCT: %s\n" (L.string_of_llvalue ta.(0));
+  Printf.printf "INPUT STRUCT: %s\n" (L.string_of_llvalue ta.(1));
+  Printf.printf "OUPUT STRUCT: %s\n" (L.string_of_llvalue ta.(2));
+  let sm = StringMap.bindings public in
+  Printf.printf "LIST OF PUBLICS (%d): %s\n" (List.length sm) (List.fold_left (fun a (k, _) -> a ^ k) "" sm);
+  let state = L.build_struct_gep ta.(0) 0 "check" builder in
+  (*let halt = L.build_load *)
+  add_terminal builder (L.build_cond_br (L.const_int i1_t 0) halted update);
 
   (* State allocation, modification, and updating *)
   let builder = bae update in
@@ -219,17 +250,12 @@ let translate filename program =
   let ma = [| ta.(0); state; L.size_of state_t |] in
   List.iter (fun fsm -> ignore (L.build_call fsm fa "" builder)) fsms;
   ignore (L.build_call memcpy ma "" builder);
-  add_terminal builder L.build_ret_void;
+  add_terminal builder (L.build_ret pos1);
 
-  (* Resetting *)
-  let builder = bae reset in
+  (* Halted *)
+  let builder = bae halted in
   
-  add_terminal builder L.build_ret_void;
-
-  (* Halting *)
-  let builder = bae halt in
-
-  add_terminal builder L.build_ret_void;
+  add_terminal builder (L.build_ret zero);
 
   (* Enjoy :) *)
   sake
