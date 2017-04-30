@@ -83,7 +83,7 @@ let translate filename program =
     imap 0 StringMap.empty in
   let public =
     let fsms = List.map (fun f -> (A.Int, f.A.fsm_name)) program.A.fsms in
-    let public = List.map (fun (t, n, e) -> (t, n)) program.A.public in
+    let public = List.map (fun (t, n, _) -> (t, n)) program.A.public in
     imap ((A.Int, "_running") :: fsms @ public)
   and input  = imap program.A.input
   and output = imap program.A.output in
@@ -155,19 +155,17 @@ let translate filename program =
         add_terminal (bae pred_bb) (L.build_cond_br value body_bb merge_bb);
         add_terminal builder (L.build_br pred_bb);
         bae merge_bb
-    | A.Switch (predicate, cases) -> raise ( ENOSYS "Under construction")
-       (* let case = expr fn builder predicate in
-        let merge_bb = abc "merge" fn in
-        let switch_in = L.build_switch case merge_bb (List.length cases) builder in
-        let rec iter i = function [] -> ()
-          | (c, s) :: tail ->
-              let onval = expr fn builder c in
-              let case_bb = abc (Printf.sprintf "case_%d" i) fn in
-              L.add_case switch_in onval case_bb;
-              add_terminal (stmt fn (bae case_bb) s) (L.build_br merge_bb);
-              iter (i + 1) tail in
-        iter 1 cases;
-        bae merge_bb *) 
+    | A.Switch (predicate, cases) ->
+        let merge = abc "merge" fn in
+        let value = expr fn builder predicate in
+        let switch = L.build_switch value merge (List.length cases) builder in
+        let build_case (onval, body) =
+          let case = abc "case" fn in
+          let body = A.Block body in
+          L.add_case switch (expr fn builder onval) case;
+          add_terminal (stmt fn (bae case) body) (L.build_br merge) in
+        List.iter build_case cases;
+        bae merge
     | A.For (name, iter, body) -> raise (ENOSYS "For, When Shalva gets off her ass she will do this")
     | A.State name ->
         let block, value =
@@ -243,7 +241,7 @@ let translate filename program =
     let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
     let halt = L.build_load state "state" builder in
     (llop A.Eq) halt neg1 "halt" builder in
- add_terminal builder (L.build_cond_br halt halted update); (*TODO: use halt*)
+  add_terminal builder (L.build_cond_br halt halted update);
 
   (* State allocation, modification, and updating *)
   let builder = bae update in
@@ -265,4 +263,3 @@ let translate filename program =
 
   (* Enjoy :) *)
   sake
-(* Note: evaluate assignments from right to left, not left to right *)
