@@ -81,7 +81,7 @@ let translate filename program =
     let rec imap i a = function [] -> a
       | (_, n) :: tail -> imap (i + 1) (StringMap.add n i a) tail in
     imap 0 StringMap.empty in
-  let public =
+  let public = (* int StringMap mapping names to struct indices *)
     let fsms = List.map (fun f -> (A.Int, f.A.fsm_name)) program.A.fsms in
     let public = List.map (fun (t, n, _) -> (t, n)) program.A.public in
     imap ((A.Int, "_running") :: fsms @ public)
@@ -219,24 +219,40 @@ let translate filename program =
     let ftype = L.function_type i32_t args in
     L.define_function (filename ^ "_tick") ftype sake in
   let ta = L.params tick in
+  let reset = abc "reset" tick
+  and check = abc "check" tick
+  and update = abc "update" tick
+  and halted = abc "halted" tick in
+
+  (* Reset if input is NULL; otherwise, proceed as normal *)
   let builder = bae (L.entry_block tick) in
-  let reset = abc "reset" tick and check = abc "check" tick
-  and update = abc "update" tick and halted = abc "halted" tick in
   let null = L.build_is_null ta.(1) "null" builder in
   add_terminal builder (L.build_cond_br null reset check);
 
-  (* Resetting *)
+  (* Reset *)
   let builder = bae reset in
-  
+  let sorted =
+    let sorter = (fun x y -> (snd x) - (snd y)) in
+    List.sort sorter (StringMap.bindings public) in
+  let store i v =
+    let ptr = L.build_struct_gep ta.(0) i "ptr" builder in
+    ignore (L.build_store ptr v builder) in
+ (* let init = function
+    | 0 -> store 0 pos1
+    | i when i <= List.length program.A.fsms -> store i zero
+    | i -> 
+        let i = i - List.length program.A.fsms - 1 in
+        let item = List.nth program.A.public i in
+        L.const_int (ltype i in*)
   add_terminal builder (L.build_ret pos1);
 
   (* Check if halted *)
   let builder = bae check in
-  Printf.printf "STATE STRUCT: %s\n" (L.string_of_llvalue ta.(0));
+  (*Printf.printf "STATE STRUCT: %s\n" (L.string_of_llvalue ta.(0));
   Printf.printf "INPUT STRUCT: %s\n" (L.string_of_llvalue ta.(1));
   Printf.printf "OUPUT STRUCT: %s\n" (L.string_of_llvalue ta.(2));
   let sm = StringMap.bindings public in
-  Printf.printf "LIST OF PUBLICS (%d): %s\n" (List.length sm) (List.fold_left (fun a (k, _) -> a ^ " " ^ k) "" sm);
+  Printf.printf "LIST OF PUBLICS (%d): %s\n" (List.length sm) (List.fold_left (fun a (k, _) -> a ^ " " ^ k) "" sm);*)
   let halt =
     let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
     let halt = L.build_load state "state" builder in
