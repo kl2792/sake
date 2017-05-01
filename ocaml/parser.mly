@@ -187,6 +187,7 @@ lvalue_list:
 
 dstexpr:
  dtype ID ASSIGN expr { $1, $2, $4 }
+| dtype ID { $1, $2, Empty}
 
 public_opt:
  /*nothing*/ { [] }
@@ -196,7 +197,6 @@ public_list:
  PUBLIC dstexpr { [$2] }
 | public_list NLINE PUBLIC dstexpr {$4 :: $1}
 
-//BUG: there is public, but no local then only one NLINE before stmt_list
 local_opt:
 /*nothing*/ { [] }
 | local_list NLINE {List.rev $1}

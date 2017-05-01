@@ -1,0 +1,4 @@
+fsm printing {
+        int p = "hello"
+
+}
