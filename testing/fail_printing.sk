@@ -1,23 +1,5 @@
 fsm printing {
-        int n = 34
-        string w = "hello"
         char c = 'e'
 
-        printf("%d\n", 1*1)
-        printf("%d %s\n", 42, "is a cool number!")
-        printf("%d %s\n", n, "is also a cool number!")
-        printf("%d %s\n", n+1, "is also a cool number!")
-        n = 54
-        printf("%d %s\n", n, "is also a cool number!")
-        n = n + 1
-        printf("%d %s\n", n, "is also a cool number!")
-        printf("%s %s\n", w, " world!")
-        printf("%c %s\n", c, " is the coolest letter!") 
         printf("%c %s\n", c+1, " is the coolest letter!") 
-        printf("%s %s %s %s\n", "This", "is", "multiple", "strings")
-        printf("\t%s\n", "This is tabbed in!")
-        printf("\b%s\n", " is a backspace")
-        printf("%s\r\n", "Carriage return")
-        printf("\\%s\n", " is a backslash")
-        printf("\'%s\n", " is a single quote")
 }
