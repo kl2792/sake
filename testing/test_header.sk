@@ -1,29 +1,28 @@
-input[int i, int o]
-output[int k, int l]
-
+~ input[int i, int o]
+~ output[int k, int l]
 type Test = One | Two | Three
 
 fsm one {
         public int j = 4
-        int r = two.k 
+        ~ int r = two.k 
 
         state emma 
-                goto shavla
+                goto shalva
         state shalva
                 goto emma
 }
 fsm two {
-        public int k = 3
+        public int f = 3
         
 	state kz 
-                k = 45
+                f = 45
 }
 fsm three {
         public int k = 4
         int f = 24
 
         state ac
-                z = 35 
+               z = 35 
 }
 fsm four {       
       int t = 132124
