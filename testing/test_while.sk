@@ -2,9 +2,9 @@ input [int i]
 output [int o]
 
 fsm headerTest {
-        public int v = 5
+        int v = 5
 
-        while (v <= 10) {
+        while (v < 15) {
                 v = v + 1
         }
         o = v

@@ -21,6 +21,7 @@ fsm two {
 fsm three {
         public int k = 4
         int f = 24
+        int z = 2
 
         state ac
                z = 35 
