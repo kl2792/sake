@@ -1,5 +1,6 @@
-~ input[int i, int o]
-~ output[int k, int l]
+input[int i, int o]
+output[int k, int l]
+
 type Test = One | Two | Three
 
 fsm one {
