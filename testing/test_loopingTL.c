@@ -11,7 +11,7 @@ int main() {
         char *inputTwo = "00001001110000000000000000111100";
                 
         while (*inputOne) {
-            input.inTwo = *inputTwo;
+            i.inTwo = *inputTwo;
 
             test_loopingTL_tick(&s, &i, &o); 
 
@@ -19,7 +19,7 @@ int main() {
             printf("TL 2: %c\n", o.outTwo);
 
             inputOne++;
-            inputTwo++:
+            inputTwo++;
         }
 
 	return 0;

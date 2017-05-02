@@ -12,8 +12,8 @@ int main() {
         char *inputTwo = "10000011110000011100";
 
         while (*inputOne) {
-            input.inOne = *inputOne;
-            input.inTwo = *inputTwo;
+            i.inOne = *inputOne;
+            i.inTwo = *inputTwo;
 
             test_trafficLight_tick(&s, &i, &o);
 
@@ -21,7 +21,7 @@ int main() {
             printf("TL 2: %c\n", o.outTwo);
 
             inputOne++;
-            inputTwo++:
+            inputTwo++;
         }
 
 	return 0;
