@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "test_switch.h"
+#include "test_multiSwitch.h"
 
 int main() {
 	struct test_multiSwitch_input i;
@@ -10,11 +10,11 @@ int main() {
 
         i.i = 0;
         test_multiSwitch_tick(&s, &i, &o); 
-        printf("%d\n", o.o);
+        printf("%d\n", o.out);
                 
         i.i = 1;
         test_multiSwitch_tick(&s, &i, &o); 
-        printf("%d\n", o.o);
+        printf("%d\n", o.out);
                 
 	return 0;
 }
