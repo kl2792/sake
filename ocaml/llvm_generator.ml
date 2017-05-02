@@ -169,13 +169,13 @@ let translate filename program =
         let l = try Some (StringMap.find name !locals) with Not_found -> None in
         let replace = L.build_alloca (lltype A.Int) name builder in
         locals := StringMap.add name replace !locals;
-        let cond = A.Binop (A.Variable name) A.Neq (A.IntLit (stop + step)) in
-        let increment = A.Assign name (A.Binop (A.Variable name) A.Add (A.IntLit step)) in
+        let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit (stop + step))) in
+        let increment = A.Expr (A.Assign (name, (A.Binop ((A.Variable name), A.Add, (A.IntLit step))))) in
         let body = A.Block [body; increment] in (* add increment to the end *)
-        let builder = stmt fn builder (A.While cond body) in
+        let builder = stmt fn builder (A.While (cond, body)) in
         locals := match l with
           | Some _ -> StringMap.add name l !locals
-          | None -> StringMap.remove name !locals;
+          | None -> StringMap.remove name !locals in 
         bae builder
     | A.State name ->
         let block, value =
