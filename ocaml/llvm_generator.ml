@@ -234,7 +234,7 @@ let translate filename program =
   let pub_iter i (_, _, e) = store (l + i) (expr tick builder e) in
   store 0 pos1;
   List.iteri (fun i _ -> store i zero) program.A.fsms;
-  (*List.iteri pub_iter program.A.public;*)
+  List.iteri pub_iter program.A.public;
   add_terminal builder (L.build_ret pos1);
 
   (* Check if halted *)
