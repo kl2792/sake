@@ -165,7 +165,18 @@ let translate filename program =
           add_terminal (stmt fn (bae case) body) (L.build_br merge) in
         List.iter build_case cases;
         bae merge
-    | A.For (name, iter, body) -> raise (ENOSYS "For, When Shalva gets off her ass she will do this")
+    | A.For (name, (start, stop, step), body) ->
+        let l = try Some (StringMap.find name !locals) with Not_found -> None in
+        let replace = L.build_alloca (lltype A.Int) name builder in
+        locals := StringMap.add name replace !locals;
+        let cond = A.Binop (A.Variable name) A.Neq (A.IntLit (stop + step)) in
+        let increment = A.Assign name (A.Binop (A.Variable name) A.Add (A.IntLit step)) in
+        let body = A.Block [body; increment] in (* add increment to the end *)
+        let builder = stmt fn builder (A.While cond body) in
+        locals := match l with
+          | Some _ -> StringMap.add name l !locals
+          | None -> StringMap.remove name !locals;
+        bae builder
     | A.State name ->
         let block, value =
           try StringMap.find name !states
@@ -230,11 +241,11 @@ let translate filename program =
   let store i v =
     let ptr = L.build_struct_gep ta.(0) i "ptr" builder in
     ignore (L.build_store v ptr builder) in
-  let l =  List.length program.A.fsms + 1 in
+  let l = List.length program.A.fsms + 1 in
   let pub_iter i (_, _, e) = store (l + i) (expr tick builder e) in
-  store 0 pos1;
-  List.iteri (fun i _ -> store i zero) program.A.fsms;
-  List.iteri pub_iter program.A.public;
+  store 0 pos1; (* the _running variable *)
+  List.iteri (fun i _ -> store i zero) program.A.fsms; (* FSM states *)
+  List.iteri pub_iter program.A.public; (* public variables *)
   add_terminal builder (L.build_ret pos1);
 
   (* Check if halted *)
