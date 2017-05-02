@@ -165,17 +165,17 @@ let translate filename program =
           add_terminal (stmt fn (bae case) body) (L.build_br merge) in
         List.iter build_case cases;
         bae merge
-    | A.For (name, (start, stop, step), body) ->
+    | A.For (name, (start, stop, step), body) -> (*raise (ENOSYS ("bloop")) *)
         let l = try Some (StringMap.find name !locals) with Not_found -> None in
-        let replace = L.build_alloca (lltype A.Int) name builder in
-        locals := StringMap.add name replace !locals;
-        let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit (stop + step))) in
+        (*let replace = L.build_alloca (lltype A.Int) name builder in
+        locals := StringMap.add name replace !locals;*)
+        let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit stop)) in
         let increment = A.Expr (A.Assign (name, (A.Binop ((A.Variable name), A.Add, (A.IntLit step))))) in
         let body = A.Block [body; increment] in (* add increment to the end *)
         let builder = stmt fn builder (A.While (cond, body)) in
-        (locals := match l with
+       (* (locals := match l with
           | Some l -> StringMap.add name l !locals
-          | None -> StringMap.remove name !locals);
+          | None -> StringMap.remove name !locals);*)
         builder
     | A.State name ->
         let block, value =
