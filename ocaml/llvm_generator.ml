@@ -173,10 +173,10 @@ let translate filename program =
         let increment = A.Expr (A.Assign (name, (A.Binop ((A.Variable name), A.Add, (A.IntLit step))))) in
         let body = A.Block [body; increment] in (* add increment to the end *)
         let builder = stmt fn builder (A.While (cond, body)) in
-        locals := match l with
-          | Some _ -> StringMap.add name l !locals
-          | None -> StringMap.remove name !locals in 
-        bae builder
+        (locals := match l with
+          | Some l -> StringMap.add name l !locals
+          | None -> StringMap.remove name !locals);
+        builder
     | A.State name ->
         let block, value =
           try StringMap.find name !states
