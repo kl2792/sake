@@ -1,5 +1,5 @@
 fsm test {
-        public int k = 4   
+        int i = 0   
         
 	for k in (0:4:1) {
                 k = k + 1
