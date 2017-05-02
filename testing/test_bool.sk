@@ -3,14 +3,14 @@ output [bool o]
 
 fsm test {
         ~ publics 
-~        public bool l = false
+        public bool l = false
 
-~        if (l) {
-~                printf("%s\n", "L is true")
-~        }
-~        else {
-~                printf("%s\n", "L is false")
-~        }
+        if (l) {
+                printf("%s\n", "L is true")
+        }
+        else {
+                printf("%s\n", "L is false")
+        }
         if (i) {
                 printf("%s\n", "i is true")
         }
