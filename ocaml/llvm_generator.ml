@@ -230,7 +230,7 @@ let translate filename program =
   let store i v =
     let ptr = L.build_struct_gep ta.(0) i "ptr" builder in
     ignore (L.build_store v ptr builder) in
-  let l =  List.length program.A.fsms in
+  let l =  List.length program.A.fsms + 1 in
   let pub_iter i (_, _, e) = store (l + i) (expr tick builder e) in
   store 0 pos1;
   List.iteri (fun i _ -> store i zero) program.A.fsms;
