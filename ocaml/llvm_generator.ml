@@ -165,7 +165,7 @@ let translate filename program =
           add_terminal (stmt fn (bae case) body) (L.build_br merge) in
         List.iter build_case cases;
         bae merge
-    | A.For (name, (start, stop, step), body) -> (*raise (ENOSYS ("bloop")) *)
+    | A.For (name, (start, stop, step), body) -> 
         let l = try Some (StringMap.find name !locals) with Not_found -> None in
         (*let replace = L.build_alloca (lltype A.Int) name builder in
         locals := StringMap.add name replace !locals;*)
