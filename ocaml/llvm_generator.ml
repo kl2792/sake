@@ -62,7 +62,7 @@ let translate filename program =
     let public =
       let fsms = List.map (fun _ -> lltype A.Int) program.A.fsms in
       let public = List.map (fun (t, _, _) -> lltype t) program.A.public in
-      fsms @ public in
+      i32_t :: fsms @ public in
     let types = Array.of_list public in
     L.struct_type context types in
 
@@ -105,7 +105,7 @@ let translate filename program =
         L.build_struct_gep pub_ptr pub_val name builder
       with Not_found ->
         try L.build_struct_gep io_ptr (StringMap.find name io) name builder
-        with Not_found -> raise (Bug (Printf.sprintf "no variable %s" name)) in
+        with Not_found -> raise (Bug (Printf.sprintf "No variable found: %s" name)) in
 
   (* Expression builder *)
   let rec expr fn builder = function
@@ -169,14 +169,14 @@ let translate filename program =
     | A.State name ->
         let block, value =
           try StringMap.find name !states
-          with Not_found -> raise (Bug (Printf.sprintf "No state found: %s" name)) in
+          with Not_found -> raise (Bug (Printf.sprintf "No state in SAST: %s" name)) in
         add_terminal builder (L.build_br block);(*(L.build_ret neg1);*)
         bae block;
     | A.Goto state ->
         let _, value =
           try StringMap.find state !states
-          with Not_found -> raise (Bug (Printf.sprintf "No state %s" state)) in
-        let pub = lookup fn output state builder in
+          with Not_found -> raise (Bug (Printf.sprintf "No state found: %s" state)) in
+        let pub = lookup fn output (L.value_name fn) builder in
         ignore (L.build_store value pub builder);
         bae (L.insertion_block builder) in
 
@@ -227,24 +227,19 @@ let translate filename program =
 
   (* Reset *)
   let builder = bae reset in
-  let sorted =
-    let sorter = (fun x y -> (snd x) - (snd y)) in
-    List.sort sorter (StringMap.bindings public) in
   let store i v =
     let ptr = L.build_struct_gep ta.(0) i "ptr" builder in
     ignore (L.build_store v ptr builder) in
-  let init (_, i) = match i with
-    | 0 -> store 0 pos1
-    | i when i <= List.length program.A.fsms -> store i zero
-    | i -> 
-        let i = i - List.length program.A.fsms - 1 in
-        let t, _, e = List.nth program.A.public i in
-        store i (expr tick builder e) in
+  let l =  List.length program.A.fsms in
+  let pub_iter i (_, _, e) = store (l + i) (expr tick builder e) in
+  store 0 pos1;
+  List.iteri (fun i _ -> store i zero) program.A.fsms;
+  (*List.iteri pub_iter program.A.public;*)
   add_terminal builder (L.build_ret pos1);
 
   (* Check if halted *)
   let builder = bae check in
-  Printf.printf "STATE STRUCT: %s\n" (L.string_of_llvalue ta.(0));
+  (*Printf.printf "STATE STRUCT: %s\n" (L.string_of_llvalue ta.(0));
   Printf.printf "INPUT STRUCT: %s\n" (L.string_of_llvalue ta.(1));
   Printf.printf "OUPUT STRUCT: %s\n" (L.string_of_llvalue ta.(2));
   let print_sm str sm =
@@ -252,7 +247,7 @@ let translate filename program =
     Printf.printf "LIST OF %s (%d): %s\n" str (List.length sm) (List.fold_left (fun a (k, i) -> a ^ " " ^ (Printf.sprintf "(%s, %d)" k i)) "" sm) in
   print_sm "PUBLIC" public;
   print_sm "INPUT" input;
-  print_sm "OUTPUT" output;
+  print_sm "OUTPUT" output;*)
   let halt =
     let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
     let halt = L.build_load state "state" builder in
