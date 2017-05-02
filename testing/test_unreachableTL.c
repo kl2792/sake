@@ -14,6 +14,7 @@ int main() {
                 in.inOne = *input;
                 test_unreachableTL_tick(&s, &in, &o);
                 printf("%c\n", o.outOne);
+                input++;
         }
 
 	return 0;
