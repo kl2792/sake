@@ -1,12 +1,12 @@
 input[int i]
-output[int o]
+output[int out]
 
 fsm switchCase {
 
         switch(i) {
-                case 0: o = 42
-                        printf("%d\n", o)
-		case 1: o = 24
-                        printf("%d\n", o)
+                case 0: out = 42
+                        ~printf("%d\n", out)
+		case 1: out = 24
+                        ~printf("%d\n", out)
         }
 }
