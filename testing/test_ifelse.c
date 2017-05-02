@@ -11,23 +11,23 @@ int main() {
 
     i.v = 5;
     test_ifelse_tick(&s, &i, &o); 
-    prinf("%d\n", o.p);
+    printf("%d\n", o.p);
   
     i.v = 1233;
     test_ifelse_tick(&s, &i, &o); 
-    prinf("%d\n", o.p);
+    printf("%d\n", o.p);
 
-    i.v = 123
+    i.v = 123;
     test_ifelse_tick(&s, &i, &o); 
-    prinf("%d\n", o.p);
+    printf("%d\n", o.p);
 
     i.v = 7;
     test_ifelse_tick(&s, &i, &o); 
-    prinf("%d\n", o.p);
+    printf("%d\n", o.p);
 
     i.v = 56;
     test_ifelse_tick(&s, &i, &o); 
-    prinf("%d\n", o.p);
+    printf("%d\n", o.p);
 
     return 0;
 }
