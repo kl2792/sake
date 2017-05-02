@@ -2,7 +2,7 @@
 #include "test_trafficLight.h"
 
 int main() {
-	struct test_trafficLight_input i;
+	struct test_trafficLight_input in;
 	struct test_trafficLight_state s;
 	struct test_trafficLight_output o;
 
@@ -11,9 +11,9 @@ int main() {
         char *input = "00011111000";
               
         while (*input) {
-            input.i = *input;
+            in.i = *input;
 
-            test_trafficLight_tick(&s, &i, &o);
+            test_trafficLight_tick(&s, &in, &o);
 
             printf("%c\n", o.out);
 
