@@ -3,7 +3,7 @@ output[int o]
 
 fsm one {
         public int j = 4
-        int r = two.k
+       int r = two.k
 
         state emma
                 r = two.k 
