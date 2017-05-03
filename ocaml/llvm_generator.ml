@@ -1,3 +1,10 @@
+(* 
+ * Llvm_generator.translate converts a Sast.program to an Llvm.llmodule.
+ *
+ * Author: Kai-Zhan Lee
+ * Credits to Shalva Kohen for structure of A.Switch and debugging in A.For.
+ *)
+
 module L = Llvm
 module A = Sast
 
@@ -47,10 +54,8 @@ let translate filename program =
 
   let zero = L.const_int i32_t 0
   and pos1 = L.const_int i32_t 1
-  and neg1 = L.const_int i32_t (-1)
-  and ltrue = L.const_int i1_t 1
-  and lfalse = L.const_int i1_t 0 in
-
+  and neg1 = L.const_int i32_t (-1) in
+  
   (* New types *)
   let input_t =
     let types = Array.of_list (List.map lldtype program.A.input) in
@@ -93,19 +98,19 @@ let translate filename program =
 
   (* Lookup function *)
   let lookup fn io name builder =
-    try StringMap.find name !locals
-    with Not_found ->
+    try StringMap.find name !locals with
+    Not_found ->
       let fa = L.params fn in
       let pub_ptr = if io == input then fa.(1) else fa.(0) in
       let io_ptr = if io == input then fa.(2) else fa.(3) in
       try
         let pub_val =
-          try StringMap.find ((L.value_name fn) ^ "_" ^ name) public
-          with Not_found -> StringMap.find name public in
-        L.build_struct_gep pub_ptr pub_val name builder
-      with Not_found ->
-        try L.build_struct_gep io_ptr (StringMap.find name io) name builder
-        with Not_found -> raise (Bug (Printf.sprintf "No variable found: %s" name)) in
+          try StringMap.find ((L.value_name fn) ^ "_" ^ name) public with
+          Not_found -> StringMap.find name public in
+        L.build_struct_gep pub_ptr pub_val name builder with
+      Not_found ->
+        try L.build_struct_gep io_ptr (StringMap.find name io) name builder with
+        Not_found -> raise (Bug (Printf.sprintf "No variable found: %s" name)) in
 
   (* Expression builder *)
   let rec expr fn builder = function
@@ -154,54 +159,32 @@ let translate filename program =
         add_terminal (bae pred_bb) (L.build_cond_br value body_bb merge_bb);
         add_terminal builder (L.build_br pred_bb);
         bae merge_bb 
-
-(*	let pred_bb = L.append_block context "while" fn in
-	ignore(L.build_br pred_bb builder);
-
-	let body_bb = L.append_block context "while_body" fn in
-	add_terminal (stmt fn (L.builder_at_end context body_bb) body)
-		(L.build_br pred_bb);
-
-	let pred_builder = L.builder_at_end context pred_bb in 
-	let bool_val = expr fn (pred_builder) predicate in 
-
-	let merge_bb = L.append_block context "merge" fn in 
-	ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-	L.builder_at_end context merge_bb *)
-
-	| A.Switch (predicate, cases) ->
+    | A.Switch (predicate, cases) ->
         let merge = abc "merge" fn in
         let value = expr fn builder predicate in
         let switch = L.build_switch value merge (List.length cases) builder in
         let build_case (onval, body) =
           let case = abc "case" fn in
-	  let body = A.Block body in
+          let body = A.Block body in
           L.add_case switch (expr fn builder onval) case;
           add_terminal (stmt fn (bae case) body) (L.build_br merge) in
         List.iter build_case cases;
         bae merge
     | A.For (name, (start, stop, step), body) -> 
-        let l = try Some (StringMap.find name !locals) with Not_found -> None in
-        (*let replace = L.build_alloca (lltype A.Int) name builder in
-        locals := StringMap.add name replace !locals;*)
         let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit stop)) in
-        let increment = A.Expr (A.Assign (name, (A.Binop ((A.Variable name), A.Add, (A.IntLit step))))) in
-        let body = A.Block [body; increment] in (* add increment to the end *)
-        let builder = stmt fn builder (A.While (cond, body)) in
-       (* (locals := match l with
-          | Some l -> StringMap.add name l !locals
-          | None -> StringMap.remove name !locals);*)
-        builder
+        let increment =
+          let value = A.Binop ((A.Variable name), A.Add, (A.IntLit step)) in
+          A.Expr (A.Assign (name, value)) in
+        let body = A.Block [body; increment] in
+        stmt fn builder (A.While (cond, body))
     | A.State name ->
-        let block, value =
-          try StringMap.find name !states
-          with Not_found -> raise (Bug (Printf.sprintf "No state in SAST: %s" name)) in
-        add_terminal builder (L.build_br block);(*(L.build_ret neg1);*)
+        let block, _ = try StringMap.find name !states with
+          Not_found -> raise (Bug (Printf.sprintf "No SAST state: %s" name)) in
+        add_terminal builder (L.build_br block);
         bae block;
     | A.Goto state ->
-        let _, value =
-          try StringMap.find state !states
-          with Not_found -> raise (Bug (Printf.sprintf "No state found: %s" state)) in
+        let _, value = try StringMap.find state !states with
+          Not_found -> raise (Bug (Printf.sprintf "No state found: %s" state)) in
         let pub = lookup fn output (L.value_name fn) builder in
         ignore (L.build_store value pub builder);
         bae (L.insertion_block builder) in
