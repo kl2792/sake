@@ -172,11 +172,14 @@ let translate filename program =
         bae merge
     | A.For (name, (start, stop, step), body) -> 
         let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit stop)) in
+        let init = A.Expr (A.Assign (name, A.IntLit start)) in
         let increment =
           let value = A.Binop ((A.Variable name), A.Add, (A.IntLit step)) in
           A.Expr (A.Assign (name, value)) in
         let body = A.Block [body; increment] in
-        stmt fn builder (A.While (cond, body))
+        let loop = A.While (cond, body) in
+        let full = A.Block [init; loop] in
+       stmt fn builder full
     | A.State name ->
         let block, _ = try StringMap.find name !states with
           Not_found -> raise (Bug (Printf.sprintf "No SAST state: %s" name)) in
