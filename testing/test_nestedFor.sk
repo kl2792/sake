@@ -2,7 +2,9 @@ input [int p]
 output [int q]
 
 fsm headerTest {
-        int k = 4      
+        int k = 1
+	int i
+	int j       
 
         for i in (0:2:1) {
                 for j in (0:5:1) {

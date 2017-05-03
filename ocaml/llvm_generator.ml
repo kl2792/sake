@@ -153,29 +153,44 @@ let translate filename program =
         add_terminal (stmt fn (bae body_bb) body) (L.build_br pred_bb);
         add_terminal (bae pred_bb) (L.build_cond_br value body_bb merge_bb);
         add_terminal builder (L.build_br pred_bb);
-        bae merge_bb
-    | A.Switch (predicate, cases) ->
+        bae merge_bb 
+
+(*	let pred_bb = L.append_block context "while" fn in
+	ignore(L.build_br pred_bb builder);
+
+	let body_bb = L.append_block context "while_body" fn in
+	add_terminal (stmt fn (L.builder_at_end context body_bb) body)
+		(L.build_br pred_bb);
+
+	let pred_builder = L.builder_at_end context pred_bb in 
+	let bool_val = expr fn (pred_builder) predicate in 
+
+	let merge_bb = L.append_block context "merge" fn in 
+	ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+	L.builder_at_end context merge_bb *)
+
+	| A.Switch (predicate, cases) ->
         let merge = abc "merge" fn in
         let value = expr fn builder predicate in
         let switch = L.build_switch value merge (List.length cases) builder in
         let build_case (onval, body) =
           let case = abc "case" fn in
-          let body = A.Block body in
+	  let body = A.Block body in
           L.add_case switch (expr fn builder onval) case;
           add_terminal (stmt fn (bae case) body) (L.build_br merge) in
         List.iter build_case cases;
         bae merge
-    | A.For (name, (start, stop, step), body) ->
+    | A.For (name, (start, stop, step), body) -> 
         let l = try Some (StringMap.find name !locals) with Not_found -> None in
-        let replace = L.build_alloca (lltype A.Int) name builder in
-        locals := StringMap.add name replace !locals;
-        let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit (stop + step))) in
+        (*let replace = L.build_alloca (lltype A.Int) name builder in
+        locals := StringMap.add name replace !locals;*)
+        let cond = A.Binop ((A.Variable name), A.Neq, (A.IntLit stop)) in
         let increment = A.Expr (A.Assign (name, (A.Binop ((A.Variable name), A.Add, (A.IntLit step))))) in
         let body = A.Block [body; increment] in (* add increment to the end *)
         let builder = stmt fn builder (A.While (cond, body)) in
-        (locals := match l with
+       (* (locals := match l with
           | Some l -> StringMap.add name l !locals
-          | None -> StringMap.remove name !locals);
+          | None -> StringMap.remove name !locals);*)
         builder
     | A.State name ->
         let block, value =
@@ -202,7 +217,7 @@ let translate filename program =
         L.define_function fsm.A.fsm_name ftype sake in
 
       (* Allocate the appropriate memory and build the function *)
-      let builder = bae (L.entry_block fn) in
+	let builder = bae (L.entry_block fn) in
 
       (* Allocate appropriate memory and set variables *)
       let add_local m (t, n, e) = (* Local variable lazy allocation *)
