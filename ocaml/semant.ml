@@ -255,7 +255,7 @@ in
 
 
 let check program =
-  let sym_tab = {S.parents = None; S.variables = [] }
+  let sym_tab = {S.parent = None; S.variables = [] }
 in
   let env = {S.scope=sym_tab} in
   let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env}
