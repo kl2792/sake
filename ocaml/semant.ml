@@ -276,7 +276,7 @@ let check_body env fsm =
 
 let check_semant env fsm =
   let env' =
-    let local_sym = (add_local_vars fsm.S.fsm_locals env) @ env.S.scope.variables in
+    let local_sym = { env.scope with variables = (add_local_vars fsm.S.fsm_locals env) @ env.S.scope.variables }in
     { env with scope = local_sym}
 (*  let states_list = List.map (fun (name,ind) -> name) fsm.fsm_states *)
   in
