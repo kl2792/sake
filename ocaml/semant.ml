@@ -7,12 +7,12 @@ module StringMap = Map.Make(String)
 exception SemanticError of string
 
 
-
+(*
 type t =
   | Bool_t | Int_t | Char_t | String_t
   | Enum_t of string (* just the name of the enum *)
   | Exception of string
-
+*)
 
 let rec find_variable scope name =
 try
@@ -24,7 +24,7 @@ with Not_found ->
 
 
 let require_integer e msg =
-  if (e = Int_t) then ()
+  if (e = S.Int) then ()
   else raise (SemanticError msg)
 
 
@@ -122,10 +122,10 @@ let rec type_of_identifier scope name =
 
 
 let rec get_expr env = function (* A.expr *)
-| S.BoolLit(bl) -> Bool_t
-| S.CharLit(ch) -> Char_t
-| S.IntLit(num) -> Int_t
-| S.StringLit(name) -> String_t
+| S.BoolLit(bl) -> S.Bool
+| S.CharLit(ch) -> S.Char
+| S.IntLit(num) -> S.Int
+| S.StringLit(name) -> S.String
 | S.Variable(name) -> 
 (*
     let (_,vl) =
@@ -148,17 +148,17 @@ let rec get_expr env = function (* A.expr *)
 | S.Uop(op, e) ->
     let t = get_expr env e in
       (match op with
-      S.Neg when t = Int_t -> Int_t
-      | S.Not when t = Bool_t -> Bool_t
+      S.Neg when t = S.Int -> S.Int
+      | S.Not when t = S.Bool -> S.Bool
       | _ -> illegal_unary_operation_error
       )
 
 | S.Binop(e1,op,e2) -> 
 let t1 = expr env e1  and t2 = expr env e2 in
 ( match op with 
-  | S.Add | S.Sub | S.Mul | S.Div when t1 = Int_t && t2 = Int_t -> Int_t
-  | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> Bool_t
-  | S.And | S.Or when t1 = Bool_t && t2 = Bool_t -> Bool_t
+  | S.Add | S.Sub | S.Mul | S.Div when t1 = S.Int && t2 = S.Int -> S.Int
+  | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> S.Bool
+  | S.And | S.Or when t1 = S.Bool && t2 = S.Bool -> S.Bool
   | _  -> illegal_binary_operation_error
 )
 
@@ -198,7 +198,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 | S.If(pred,sta,stb) -> 
     let e = get_expr env pred in
     ignore((match e with
-      Int_t | Bool_t -> ()
+      S.Int | S.Bool -> ()
       | _ -> raise (SemanticError("Illegal predicate type"))));
     ignore(check_stmt env fsm sta); ignore(check_stmt env fsm stb) (**)
 
@@ -214,7 +214,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 | S.While(pred,stm) -> 
     let e = get_expr env pred in
     ignore((match e with
-      Int_t | Bool_t -> ()
+      S.Int | S.Bool -> ()
       | _ -> raise (SemanticError("Illegal predicate type"))));
     ignore(check_stmt env fsm stm) (**)
 
