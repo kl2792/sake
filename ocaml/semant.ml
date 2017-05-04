@@ -123,17 +123,23 @@ report_duplicate (fun n -> "duplicate public " ^ n )
 
 
 
-let rec type_of_identifier scope name =
+let rec type_of_identifier fsm scope name =
     let vdecl = try
       find_variable scope name
-    with Not_found -> undeclared_identifier_error name
+    with Not_found -> 
+    (
+      let vdecl = try
+        find_variable scope (fsm.S.fsm_name ^ "_" ^ name)
+      with Not_found -> 
+        undeclared_identifier_error name
+    )
   in
     let (_,typ) = vdecl in typ
 
 
 
 
-let rec get_expr env = function (* A.expr *)
+let rec get_expr fsm env = function (* A.expr *)
 | S.BoolLit(bl) -> S.Bool
 | S.CharLit(ch) -> S.Char
 | S.IntLit(num) -> S.Int
@@ -151,14 +157,20 @@ let rec get_expr env = function (* A.expr *)
     let var = try
         find_variable env.S.scope name
     with Not_found ->
-        raise (SemanticError("undeclared identifier " ^ name))
+      (
+            let var = try
+                find_variable env.S.scope (fsm.S.fsm_name ^ "_" ^ name)
+            with Not_found ->
+                raise (SemanticError("undeclared identifier " ^ name))
+      )
+
     in 
       let (_,vl) = var in vl
 
 (*        else ignore(env.scope.S.variables <- decl::env.scope.S.variables); S.Variable(name) *)
 
 | S.Uop(op, e) ->
-    let t = get_expr env e in
+    let t = get_expr fsm env e in
       (match op with
       S.Neg when t = S.Int -> S.Int
       | S.Not when t = S.Bool -> S.Bool
@@ -166,7 +178,7 @@ let rec get_expr env = function (* A.expr *)
       )
 
 | S.Binop(e1,op,e2) -> 
-let t1 = get_expr env e1  and t2 = get_expr env e2 in
+let t1 = get_expr fsm env e1  and t2 = get_expr fsm env e2 in
 ( match op with 
   | S.Add | S.Sub | S.Mul | S.Div when t1 = S.Int && t2 = S.Int -> S.Int
   | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> S.Bool
@@ -175,10 +187,10 @@ let t1 = get_expr env e1  and t2 = get_expr env e2 in
 )
 
 | S.Assign(name,exp) ->
-    let lt = type_of_identifier env.scope name and rt = get_expr env exp in
+    let lt = type_of_identifier fsm env.scope name and rt = get_expr fsm env exp in
     check_assign lt rt
   
-| S.Printf(fmt, lst) -> ignore(List.map (get_expr env) lst); S.Int
+| S.Printf(fmt, lst) -> ignore(List.map (get_expr fsm env) lst); S.Int
 | S.Empty -> S.Int
 
 (* OURS *)
@@ -208,7 +220,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 
 | S.State(name) -> ()
 | S.If(pred,sta,stb) -> 
-    let e = get_expr env pred in
+    let e = get_expr fsm env pred in
     ignore((match e with
       S.Int | S.Bool -> ()
       | _ -> raise (SemanticError("Illegal predicate type"))));
@@ -221,19 +233,19 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
     with Not_found ->
     ignore(env.S.scope.variables <- (str,Int)::env.S.scope.variables); (str,S.Int));
     
-    ignore(require_integer (get_expr env (S.IntLit(na)))); ignore(require_integer (get_expr env (S.IntLit(nb)))); ignore(require_integer (get_expr env (S.IntLit(nc)))); (check_stmt env fsm stm)
+    ignore(require_integer (get_expr fsm env (S.IntLit(na)))); ignore(require_integer (get_expr fsm env (S.IntLit(nb)))); ignore(require_integer (get_expr fsm env (S.IntLit(nc)))); (check_stmt env fsm stm)
 
 | S.While(pred,stm) -> 
-    let e = get_expr env pred in
+    let e = get_expr fsm env pred in
     ignore((match e with
       S.Int | S.Bool -> ()
       | _ -> raise (SemanticError("Illegal predicate type"))));
     ignore(check_stmt env fsm stm) (**)
 
 | S.Switch(exp, cases) -> 
-    ignore(get_expr env exp); ignore(check_cases env fsm cases);
+    ignore(get_expr fsm env exp); ignore(check_cases env fsm cases);
 
-| S.Expr(e) -> ignore (get_expr env e) (**)
+| S.Expr(e) -> ignore (get_expr fsm env e) (**)
 
 | S.Goto(label) ->
   ignore(try List.find (fun (s,_) -> s=label) fsm.S.fsm_states
@@ -242,7 +254,7 @@ with Not_found -> raise (SemanticError "No such state exists"))
 
 and check_cases env fsm = function (* (expr * stmt) list *)
 [] -> ()
-| (e,s_list)::tl -> ignore(get_expr env e); ignore(
+| (e,s_list)::tl -> ignore(get_expr fsm env e); ignore(
   let sl =
     let env' =
       let scope' =
