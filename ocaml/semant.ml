@@ -127,9 +127,9 @@ let rec type_of_identifier fsm scope name =
     let vdecl = try
       find_variable scope name
     with Not_found -> 
-        find_variable scope (fsm.S.fsm_name ^ "_" ^ name)
+      (  find_variable scope (fsm.S.fsm_name ^ "_" ^ name)
       with Not_found -> 
-        undeclared_identifier_error name
+        undeclared_identifier_error name )
   in
     let (_,typ) = vdecl in typ
 
