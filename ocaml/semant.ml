@@ -113,7 +113,7 @@ report_duplicate (fun n -> "duplicate public " ^ n )
 
 let rec type_of_identifier scope name =
     let vdecl = try
-      find variable scope name
+      find_variable scope name
     with Not_found -> undeclared_identifier_error name
   in
     let (_,typ) = vdecl in typ
