@@ -181,7 +181,7 @@ let sl =
     { env with scope = scope' }
   in
   List.map (fun s -> check_stmt env' fsm s) s_list
-in sl  
+in ignore(sl);
 
 
 (*
