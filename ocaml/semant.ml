@@ -209,7 +209,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
     with Not_found ->
     ignore(env.S.scope.variables <- (str,Int)::env.S.scope.variables); (str,S.Int));
     
-    ignore(require_integer na); ignore(require_integer nb); ignore(require_integer nc); (check_stmt env fsm stm)
+    ignore(require_integer (get_expr env na)); ignore(require_integer (get_expr env nb)); ignore(require_integer (get_expr env nc)); (check_stmt env fsm stm)
 
 | S.While(pred,stm) -> 
     let e = get_expr env pred in
