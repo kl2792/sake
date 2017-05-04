@@ -244,7 +244,7 @@ and check_cases env fsm = function (* (expr * stmt) list *)
 
 
 let check_body env fsm =
-  check_stmt env fsm S.Block(fsm.fsm_body)
+  check_stmt env fsm (S.Block(fsm.fsm_body))
 
 let check_semant env fsm =
   check_fsm_locals fsm;
