@@ -267,7 +267,7 @@ in
 in
   let env = { env with scope=new_syms} in
   (* check_fsm_decl program.S.fsms; *)
-  List.iter (check_semant env) S.fsms
+  List.iter (check_semant env) S.fsms in ()
 
 
 
