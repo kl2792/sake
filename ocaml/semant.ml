@@ -166,7 +166,7 @@ let t1 = get_expr env e1  and t2 = get_expr env e2 in
     let lt = type_of_identifier env.scope name and rt = get_expr env exp in
     check_assign lt rt
   
-| S.Printf(fmt, lst) -> ignore(List.map (get_expr env) lst); S.Empty
+| S.Printf(fmt, lst) -> ignore(List.map (get_expr env) lst); S.Int
 | S.Empty -> S.Empty
 
 (* OURS *)
