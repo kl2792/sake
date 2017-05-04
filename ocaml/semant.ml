@@ -295,7 +295,7 @@ in
 
   let new_syms1 = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
-  ignore(print_list new_syms1.S.variables);
+  (* ignore(print_list new_syms1.S.variables); *)
   let env2 = { env1 with scope=new_syms1} in
   ignore(check_fsm_decl program.S.fsms);
   ignore(List.iter (check_semant env2) program.S.fsms)
