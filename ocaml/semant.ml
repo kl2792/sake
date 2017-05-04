@@ -105,7 +105,7 @@ report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
 
 let check_pubs pubs env =
 report_duplicate (fun n -> "duplicate public " ^ n )
-  (List.map snd pubs);
+  (List.map (fun (_,s,_) -> s) pubs);
  List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.S.scope.variables pubs
 
 
