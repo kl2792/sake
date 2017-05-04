@@ -71,7 +71,7 @@ let check_assign lvaluet rvaluet = match lvaluet with
 let check_globals inp outp env = 
   let globals = inp @ outp in
 report_duplicate (fun n -> "duplicate global " ^ n) (List.map snd globals);
- List.fold_left (fun lst (typ,name) -> (name,typ)::lst) env.scope.S.variables globals
+ List.fold_left (fun lst (typ,name) -> (name,typ)::lst) env.S.scope.variables globals
 
 (**** Checking Functions ****)
 
