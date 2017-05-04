@@ -288,7 +288,7 @@ let check program =
                       {S.scope=sym_tab} in
                   {env.S.scope with variables = check_globals program.S.input program.S.output env} in
               { env with scope=new_syms} in
-          {new_syms with variables = check_pubs program.S.public env1} in
+          {env1.S.scope with variables = check_pubs program.S.public env1} in
       { env1 with scope=new_syms1} in
   check_fsm_decl program.S.fsms in
 List.iter (check_semant env) program.S.fsms in ()
