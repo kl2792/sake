@@ -144,22 +144,22 @@ let rec get_expr env = function (* A.expr *)
 | S.IntLit(num) -> Int_t
 | S.StringLit(name) -> String_t
 | S.Variable(name) -> 
-
-    ignore(let (_,vl) =
+(*
+    let (_,vl) =
       let var = try
           find_variable env.scope name
       with Not_found ->
           raise (SemanticError("undeclared identifier " ^ name))
       in
-    var); vl
-(*
+    var; vl
+*)
     let var = try
         find_variable env.scope name
     with Not_found ->
         raise (SemanticError("undeclared identifier " ^ name))
     in 
-      let (_,val) = var in val
-*)
+      let (_,vl) = var in vl
+
 (*        else ignore(env.scope.S.variables <- decl::env.scope.S.variables); S.Variable(name) *)
 
 | S.Uop(op, e) ->
