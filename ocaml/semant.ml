@@ -51,7 +51,7 @@ let report_duplicate exceptf list =
   | _ :: t -> helper t
   | [] -> ()
   in helper (List.sort compare list)
-in
+
 
 
 
@@ -62,24 +62,23 @@ let undeclared_identifier_error name =
 let illegal_assignment_error =
     let msg = sprintf "illegal assignment" in
     raise (SemanticError msg)
-in
+
 
 let illegal_unary_operation_error =
     let msg = sprintf "illegal unary operator" in
     raise (SemanticError msg)
-in
+
 
 let illegal_binary_operation_error =
     let msg = sprintf "illegal binary operator" in
     raise (SemanticError msg)
-in
+
 
 let check_assign lvaluet rvaluet = match lvaluet with
           S.Bool when rvaluet = S.Int -> lvaluet
         | S.Bool when rvaluet = Int_t -> lvaluet
         | _ -> if lvaluet == rvaluet then lvaluet else 
             illegal_assignment_error
-    in
 
 
 
