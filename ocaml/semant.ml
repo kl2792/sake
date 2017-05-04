@@ -91,7 +91,7 @@ in *)
 
 let check_fsm_decl fsms =
 report_duplicate (fun n -> "duplicate fsm " ^ n)
-(List.map (fun fd -> fd.fsm_name) fsms)
+(List.map (fun fd -> fd.S.fsm_name) fsms)
 
 
 let check_fsm_locals fsm =
