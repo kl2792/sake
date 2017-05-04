@@ -267,7 +267,7 @@ in
 in
   let env2 = { env1 with scope=new_syms1} in
   ignore(check_fsm_decl program.S.fsms);
-  ignore(List.iter (check_semant env) program.S.fsms)
+  ignore(List.iter (check_semant env2) program.S.fsms)
 
 
 
