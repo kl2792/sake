@@ -6,10 +6,17 @@ module StringMap = Map.Make(String)
 
 exception SemanticError of string
 
+let string_of_type = function
+| S.Bool -> "Bool"
+| S.Int -> "Int"
+| S.Char -> "Char"
+| S.String -> "String"
+| _ -> "other"
+
 
 let rec print_list = function 
 [] -> ()
-| (s,t)::l -> print_string "(" ; print_string s ; print_string "," ; print_string t ; print_string ")" ; print_string " " ; print_list l
+| (s,t)::l -> print_string "(" ; print_string s ; print_string "," ; print_string (string_of_type t) ; print_string ")" ; print_string " " ; print_list l
 
 
 (*
