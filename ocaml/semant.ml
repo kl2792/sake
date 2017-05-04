@@ -176,7 +176,7 @@ let rec check_stmt env fsm = function (* stmts *)
 let sl =
   let env' =
     let scope' =
-      { S.parent = Some(env.scope); S.variables = [] }
+      { S.parent = Some(env.S.scope); S.variables = [] }
     in
     { env with scope = scope' }
   in
