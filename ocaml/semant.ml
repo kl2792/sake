@@ -167,7 +167,7 @@ let t1 = get_expr env e1  and t2 = get_expr env e2 in
     check_assign lt rt
   
 | S.Printf(fmt, lst) -> ignore(List.map (get_expr env) lst); S.Int
-| S.Empty -> S.Empty
+| S.Empty -> S.Int
 
 (* OURS *)
 let rec check_stmt env fsm = function (* stmts *)
