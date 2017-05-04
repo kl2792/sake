@@ -14,7 +14,7 @@ type t =
   | Exception of string
 
 
-let rec find_variable (scope : S.symbol_table) name =
+let rec find_variable scope name =
 try
   List.find (fun (s, _) -> s = name) scope.S.variables
 with Not_found ->
@@ -26,17 +26,6 @@ with Not_found ->
 let require_integer e msg =
   if (e = Int_t) then ()
   else raise (SemanticError msg)
-
-
-  
-type translation_environment = {
-  scope : S.symbol_table;   (* symbol table for vars *)
-(*  in_switch : bool;
-  in_for : bool;
-  case_labels : list ref; (* known case labels *)
-  state_labels : label list ref; (* labels on statements *)
-  forward_gotos : label list ref; (* forward goto destinations *) *)
-}
 
 
 let report_duplicate exceptf list =
@@ -122,7 +111,7 @@ report_duplicate (fun n -> "duplicate public " ^ n )
 
 
 
-let rec type_of_identifier (scope: S.symbol_table) name =
+let rec type_of_identifier scope name =
     let vdecl = try
       find variable scope name
     with Not_found -> undeclared_identifier_error name
