@@ -14,7 +14,7 @@ type t =
   | Exception of string
 
 
-let rec find_variable (scope : symbol_table) name =
+let rec find_variable (scope : S.symbol_table) name =
 try
   List.find (fun (s, _) -> s = name) scope.S.variables
 with Not_found ->
@@ -122,7 +122,7 @@ report_duplicate (fun n -> "duplicate public " ^ n )
 
 
 
-let rec type_of_identifier (scope: symbol_table) name =
+let rec type_of_identifier (scope: S.symbol_table) name =
     let vdecl = try
       find variable scope name
     with Not_found -> undeclared_identifier_error name
