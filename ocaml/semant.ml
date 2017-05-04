@@ -224,8 +224,8 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 | S.Expr(e) -> ignore (get_expr env e) (**)
 
 | S.Goto(label) ->
-  try List.find (fun (s,_) -> s=label) fsm.S.fsm_states
-with Not_found -> raise (SemanticError "No such state exists")
+  ignore(try List.find (fun (s,_) -> s=label) fsm.S.fsm_states
+with Not_found -> raise (SemanticError "No such state exists"))
 
 
 and check_cases = function (* (expr * stmt) list *)
