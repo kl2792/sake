@@ -154,7 +154,7 @@ let rec get_expr env = function (* A.expr *)
       )
 
 | S.Binop(e1,op,e2) -> 
-let t1 = expr env e1  and t2 = expr env e2 in
+let t1 = get_expr env e1  and t2 = get_expr env e2 in
 ( match op with 
   | S.Add | S.Sub | S.Mul | S.Div when t1 = S.Int && t2 = S.Int -> S.Int
   | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> S.Bool
