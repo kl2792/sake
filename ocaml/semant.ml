@@ -203,11 +203,11 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
     ignore(check_stmt env fsm sta); ignore(check_stmt env fsm stb) (**)
 
 | S.For(str,(na,nb,nc),stm) ->
-
+  ignore(
     try
       List.find (fun (s, _) -> s = str) env.S.scope.variables
     with Not_found ->
-    env.S.scope.variables <- (str,Int) :: env.S.scope.variables;
+    env.S.scope.variables <- (str,Int) :: env.S.scope.variables);
     
     ignore(require_integer na); ignore(require_integer nb); ignore(require_integer nc); (check_stmt env fsm stm)
 
