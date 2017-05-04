@@ -266,8 +266,8 @@ in
   let new_syms = {sym_tab with variables = check_pubs program.S.public env}
 in
   let env = { env with scope=new_syms} in
-  check_fsm_decl program.S.fsms;
-  List.iter (check_semant env) program.S.fsms
+  ignore(check_fsm_decl program.S.fsms);
+  ignore(List.iter (check_semant env) program.S.fsms)
 
 
 
