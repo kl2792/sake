@@ -186,8 +186,6 @@ let t1 = expr env e1  and t2 = expr env e2 in
 | S.Printf(fmt, lst) -> ignore(List.map (get_expr env) lst);
 | S.Empty -> S.Empty
 
-in
-
 (* OURS *)
 let rec check_stmt env fsm = function (* stmts *)
 | S.Block(s_list) ->
