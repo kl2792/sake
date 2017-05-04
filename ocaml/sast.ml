@@ -55,7 +55,7 @@ type symbol_table = {
 
   
 type translation_environment = {
-  scope : S.symbol_table;   (* symbol table for vars *)
+  scope : symbol_table;   (* symbol table for vars *)
 (*  in_switch : bool;
   in_for : bool;
   case_labels : list ref; (* known case labels *)
