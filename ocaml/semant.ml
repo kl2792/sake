@@ -294,17 +294,19 @@ in
 
 
 let check program =
-  let env2 =
-      let new_syms1 = 
-          let env1 = 
-              let new_syms = 
-                  let env = 
-                      let sym_tab = 
-                      {parents = None; variables = [] } in
-                  {scope=sym_tab} in
-              {sym_tab with variables = check_globals program.S.input program.S.output env} in
-          { env with scope=new_syms} in
-      {new_syms with variables = check_pubs program.S.public env1} in
-  { env1 with scope=new_syms1} in
-  ignore( check_fsm_decl program.S.fsms;  List.iter (check_semant env) program.S.fsms )
+  let checked =
+      let env2 =
+          let new_syms1 = 
+              let env1 = 
+                  let new_syms = 
+                      let env = 
+                          let sym_tab = 
+                          {parents = None; variables = [] } in
+                      {scope=sym_tab} in
+                  {sym_tab with variables = check_globals program.S.input program.S.output env} in
+              { env with scope=new_syms} in
+          {new_syms with variables = check_pubs program.S.public env1} in
+      { env1 with scope=new_syms1} in
+  check_fsm_decl program.S.fsms in
+List.iter (check_semant env) program.S.fsms
 
