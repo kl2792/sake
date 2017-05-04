@@ -1,24 +1,4 @@
 (* SAST *)
-
-type variable_decl = (string * dtype)
-
-type symbol_table = {
-  parent : symbol_table option;
-  variables : variable_decl list
-}
-
-
-  
-type translation_environment = {
-  scope : S.symbol_table;   (* symbol table for vars *)
-(*  in_switch : bool;
-  in_for : bool;
-  case_labels : list ref; (* known case labels *)
-  state_labels : label list ref; (* labels on statements *)
-  forward_gotos : label list ref; (* forward goto destinations *) *)
-}
-
-
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
@@ -62,3 +42,24 @@ type program = {
   types : type_decl list;
   fsms  : fsm_decl list;
 }
+
+
+
+type variable_decl = (string * dtype)
+
+type symbol_table = {
+  parent : symbol_table option;
+  variables : variable_decl list
+}
+
+
+  
+type translation_environment = {
+  scope : S.symbol_table;   (* symbol table for vars *)
+(*  in_switch : bool;
+  in_for : bool;
+  case_labels : list ref; (* known case labels *)
+  state_labels : label list ref; (* labels on statements *)
+  forward_gotos : label list ref; (* forward goto destinations *) *)
+}
+
