@@ -240,7 +240,7 @@ and check_cases env fsm = function (* (expr * stmt) list *)
     in
     List.map (fun s -> check_stmt env' fsm s) s_list
   in sl  
-); ignore(check_cases tl)
+); ignore(check_cases env fsm tl)
 
 
 let check_body env fsm =
