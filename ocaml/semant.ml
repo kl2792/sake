@@ -270,8 +270,6 @@ in
   ignore(check_body env fsm);
 
 
-in
-
 
 let check program =
   let sym_tab = {parents = None; variables = [] }
