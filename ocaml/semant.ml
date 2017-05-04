@@ -14,15 +14,9 @@ type t =
   | Exception of string
 
 
-
-type symbol_table = {
-parent : symbol_table option;
-variables : variable_decl list
-}
-
 let rec find_variable (scope : symbol_table) name =
 try
-  List.find (fun (s, _) -> s = name) scope.variables
+  List.find (fun (s, _) -> s = name) scope.S.variables
 with Not_found ->
   match scope.parent with
     Some(parent) -> find_variable parent name
@@ -88,7 +82,7 @@ let check_assign lvaluet rvaluet = match lvaluet with
 let check_globals inp outp env = 
   let globals = inp @ outp in
 report_duplicate (fun n -> "duplicate global " ^ n) (List.map snd globals);
- List.fold_left (fun lst (typ,name) -> (name,typ)::lst) env.scope.variables globals
+ List.fold_left (fun lst (typ,name) -> (name,typ)::lst) env.scope.S.variables globals
 
 (**** Checking Functions ****)
 
@@ -123,7 +117,7 @@ report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.fsm_name)
 let check_pubs pubs env =
 report_duplicate (fun n -> "duplicate public " ^ n )
   (List.map snd pubs);
- List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.scope.variables pubs
+ List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.scope.S.variables pubs
 
 
 
@@ -222,7 +216,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 | S.For(str,(na,nb,nc),stm) ->
 
     try
-      List.find (fun (s, _) -> s = name) scope.variables
+      List.find (fun (s, _) -> s = str) env.scope.S.variables
     with Not_found ->
     env.scope.S.variables <- (str,Int) :: env.scope.S.variables;
     
