@@ -59,7 +59,7 @@ let illegal_binary_operation_error =
 
 let check_assign lvaluet rvaluet = match lvaluet with
           S.Bool when rvaluet = S.Int -> lvaluet
-        | S.Bool when rvaluet = Int_t -> lvaluet
+       (* | S.Bool when rvaluet = Int_t -> lvaluet *)
         | _ -> if lvaluet == rvaluet then lvaluet else 
             illegal_assignment_error
 
