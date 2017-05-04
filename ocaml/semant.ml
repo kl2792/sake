@@ -147,8 +147,9 @@ let rec get_expr env = function (* A.expr *)
     let var = try
         find_variable env.scope name
     with Not_found ->
-        raise (SemanticError("undeclared identifier " ^ name));
-    let (_,val) = var in val
+        raise (SemanticError("undeclared identifier " ^ name))
+    in 
+      ignore(let (_,val) = var); val
 (*        else ignore(env.scope.S.variables <- decl::env.scope.S.variables); S.Variable(name) *)
 
 | S.Uop(op, e) ->
