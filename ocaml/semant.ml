@@ -173,7 +173,7 @@ let rec get_expr env = function (* A.expr *)
 | S.Binop(e1,op,e2) -> 
 let t1 = expr env e1  and t2 = expr env e2 in
 ( match op with 
-  | S.Add | S.Sub | S.Mul | S.Div when (t1 = Int_t and t2 = Int_t) -> Int_t
+  | S.Add | S.Sub | S.Mul | S.Div when (t1 = Int_t) and (t2 = Int_t) -> Int_t
   | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> Bool_t
   | S.And | S.Or when t1 = Bool_t and t2 = Bool_t -> Bool_t
   | _  -> illegal_binary_operation_error
