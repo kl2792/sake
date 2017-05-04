@@ -219,7 +219,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
     ignore(check_stmt env fsm stm) (**)
 
 | S.Switch(exp, cases) -> 
-    ignore(get_expr env exp); ignore(check_cases env cases);
+    ignore(get_expr env exp); ignore(check_cases env fsm cases);
 
 | S.Expr(e) -> ignore (get_expr env e) (**)
 
@@ -228,7 +228,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 with Not_found -> raise (SemanticError "No such state exists"))
 
 
-and check_cases env = function (* (expr * stmt) list *)
+and check_cases env fsm = function (* (expr * stmt) list *)
 [] -> ()
 | (e,s_list)::tl -> ignore(get_expr env e); ignore(
   let sl =
