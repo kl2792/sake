@@ -154,12 +154,10 @@ let rec get_expr fsm env = function (* A.expr *)
     let var = try
         find_variable env.S.scope name
     with Not_found ->
-      (
-            let var = try
-                find_variable env.S.scope (fsm.S.fsm_name ^ "_" ^ name)
-            with Not_found ->
-                raise (SemanticError("undeclared identifier " ^ name))
-      )
+          try
+            find_variable env.S.scope (fsm.S.fsm_name ^ "_" ^ name)
+          with Not_found ->
+              raise (SemanticError("undeclared identifier " ^ name))
 
     in 
       let (_,vl) = var in vl
