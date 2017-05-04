@@ -263,7 +263,7 @@ in
   let env = { env with scope=new_syms} in
 
 
-  let new_syms = {sym_tab with variables = check_pubs program.S.public env}
+  let new_syms = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
   let env = { env with scope=new_syms} in
   ignore(check_fsm_decl program.S.fsms);
