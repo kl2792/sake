@@ -115,6 +115,15 @@ report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
   (List.map (fun (_,s,_) -> s) fsm.S.fsm_locals)
 
 
+
+let add_local_vars vars env =
+report_duplicate (fun n -> "duplicate local " ^ n )
+  (List.map (fun (_,s,_) -> s) vars);
+ List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.S.scope.variables vars
+
+
+
+
 let check_pubs pubs env =
 report_duplicate (fun n -> "duplicate public " ^ n )
   (List.map (fun (_,s,_) -> s) pubs);
@@ -266,10 +275,12 @@ let check_body env fsm =
   check_stmt env fsm (S.Block(fsm.fsm_body))
 
 let check_semant env fsm =
-  check_fsm_locals fsm;
-  let states_list = List.map (fun (name,ind) -> name) fsm.fsm_states
-in
-  ignore(check_body env fsm)
+  let env' =
+    let local_sym = (add_local_vars fsm.S.fsm_locals env) @ env.S.scope.variables in
+    { env with scope = local_sym}
+(*  let states_list = List.map (fun (name,ind) -> name) fsm.fsm_states *)
+  in
+  check_fsm_locals fsm; ignore(check_body env fsm)
 
 
 
