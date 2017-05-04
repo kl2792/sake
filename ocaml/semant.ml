@@ -176,7 +176,7 @@ let rec check_stmt env fsm = function (* stmts *)
 let sl =
   let env' =
     let scope' =
-      { parent = Some(env.scope); variables = [] }
+      { S.parent = Some(env.scope); S.variables = [] }
     in
     { env with scope = scope' }
   in
@@ -234,7 +234,7 @@ and check_cases = function (* (expr * stmt) list *)
   let sl =
     let env' =
       let scope' =
-        { parent = Some(env.scope); variables = [] }
+        { S.parent = Some(env.scope); S.variables = [] }
       in
       { env with scope = scope' }
     in
@@ -284,7 +284,7 @@ let check program =
                   let new_syms = 
                       let env = 
                           let sym_tab = 
-                          {parents = None; variables = [] } in
+                          {S.parent = None; S.variables = [] } in
                       {scope=sym_tab} in
                   {sym_tab with variables = check_globals program.S.input program.S.output env} in
               { env with scope=new_syms} in
