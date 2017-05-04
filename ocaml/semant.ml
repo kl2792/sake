@@ -100,7 +100,7 @@ report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
   (List.map fst fsm.S.fsm_states);
 
 report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
-  (List.map snd fsm.S.fsm_locals)
+  (List.map (fun (_,s,_) -> s) fsm.S.fsm_locals)
 
 
 let check_pubs pubs env =
