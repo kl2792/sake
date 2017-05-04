@@ -145,13 +145,13 @@ let rec get_expr env = function (* A.expr *)
 | S.StringLit(name) -> String_t
 | S.Variable(name) -> 
 
-    let (_,val) =
+    let (_,vl) =
       let var = try
           find_variable env.scope name
       with Not_found ->
           raise (SemanticError("undeclared identifier " ^ name))
       in
-    var; var
+    var; vl
 (*
     let var = try
         find_variable env.scope name
