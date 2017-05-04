@@ -308,5 +308,5 @@ let check program =
   check_fsm_decl program.S.fsms;
 
   List.iter (check_semant env) S.fsms
-
+in ()
 
