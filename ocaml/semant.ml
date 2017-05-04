@@ -207,7 +207,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
     try
       List.find (fun (s, _) -> s = str) env.S.scope.variables
     with Not_found ->
-    ignore(env.S.scope.variables <- (str,Int)::env.S.scope.variables); (str,Int));
+    ignore(env.S.scope.variables <- (str,Int)::env.S.scope.variables); (str,S.Int));
     
     ignore(require_integer na); ignore(require_integer nb); ignore(require_integer nc); (check_stmt env fsm stm)
 
