@@ -248,13 +248,16 @@ with Not_found -> raise (SemanticError "No such state exists")
 and check_cases = function (* (expr * stmt) list *)
 [] -> ()
 | (e,s_list)::tl -> ignore(get_expr env e); ignore(
-let scope' = { S.parent = Some(env.scope); S.variables = [] } 
- in
-         (* New environment: same, but with new symbol tables *)
-let env' = { env with scope = scope' } in
-         (* Check all the statements in the block *)
-let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
-); ignore(check_cases tl);
+  let sl =
+    let env' =
+      let scope' =
+        { parent = Some(env.scope); variables = [] }
+      in
+      { env with scope = scope' }
+    in
+    List.map (fun s -> check_stmt env' fsm s) s_list
+  in sl  
+); ignore(check_cases tl)
 
 
 let check_body env fsm =
