@@ -42,17 +42,17 @@ let undeclared_identifier_error name =
     let msg = sprintf "undeclared identifier %s" name in
     raise (SemanticError msg)
 
-let illegal_assignment_error =
+let illegal_assignment_error l =
     let msg = sprintf "illegal assignment" in
     raise (SemanticError msg)
 
 
-let illegal_unary_operation_error =
+let illegal_unary_operation_error l =
     let msg = sprintf "illegal unary operator" in
     raise (SemanticError msg)
 
 
-let illegal_binary_operation_error =
+let illegal_binary_operation_error l =
     let msg = sprintf "illegal binary operator" in
     raise (SemanticError msg)
 
@@ -61,7 +61,7 @@ let check_assign lvaluet rvaluet = match lvaluet with
           S.Bool when rvaluet = S.Int -> lvaluet
        (* | S.Bool when rvaluet = Int_t -> lvaluet *)
         | _ -> if lvaluet == rvaluet then lvaluet else 
-            illegal_assignment_error
+            illegal_assignment_error []
 
 
 
@@ -150,7 +150,7 @@ let rec get_expr env = function (* A.expr *)
       (match op with
       S.Neg when t = S.Int -> S.Int
       | S.Not when t = S.Bool -> S.Bool
-      | _ -> illegal_unary_operation_error
+      | _ -> illegal_unary_operation_error []
       )
 
 | S.Binop(e1,op,e2) -> 
@@ -159,7 +159,7 @@ let t1 = get_expr env e1  and t2 = get_expr env e2 in
   | S.Add | S.Sub | S.Mul | S.Div when t1 = S.Int && t2 = S.Int -> S.Int
   | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> S.Bool
   | S.And | S.Or when t1 = S.Bool && t2 = S.Bool -> S.Bool
-  | _  -> illegal_binary_operation_error
+  | _  -> illegal_binary_operation_error []
 )
 
 | S.Assign(name,exp) ->
