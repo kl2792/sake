@@ -285,7 +285,7 @@ let check program =
                       let env = 
                           let sym_tab = 
                           {S.parent = None; S.variables = [] } in
-                      {scope=sym_tab} in
+                      {S.scope=sym_tab} in
                   {sym_tab with variables = check_globals program.S.input program.S.output env} in
               { env with scope=new_syms} in
           {new_syms with variables = check_pubs program.S.public env1} in
