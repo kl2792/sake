@@ -260,12 +260,12 @@ in
   let env = {S.scope=sym_tab} in
   let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env}
 in
-  let env = { env with scope=new_syms} in
+  let env1 = { env with scope=new_syms} in
 
 
-  let new_syms = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
+  let new_syms1 = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
-  let env = { env with scope=new_syms} in
+  let env2 = { env1 with scope=new_syms} in
   ignore(check_fsm_decl program.S.fsms);
   ignore(List.iter (check_semant env) program.S.fsms)
 
