@@ -189,7 +189,7 @@ let t1 = expr env e1  and t2 = expr env e2 in
 (* OURS *)
 let rec check_stmt env fsm = function (* stmts *)
 | S.Block(s_list) ->
-
+(
 (* New scopes: parent is the existing scope, start out empty *)
 let scope' = { parent = Some(env.scope); variables = [] } 
  in
@@ -197,7 +197,7 @@ let scope' = { parent = Some(env.scope); variables = [] }
 let env' = { env with scope = scope' } in
          (* Check all the statements in the block *)
 let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
-
+)
 (* | S.State(name) -> S.State(name) *)
 | S.If(pred,sta,stb) -> 
     let e = get_expr env pred in
