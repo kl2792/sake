@@ -30,7 +30,7 @@ let require_integer e msg =
 
   
 type translation_environment = {
-  scope : symbol_table;   (* symbol table for vars *)
+  scope : S.symbol_table;   (* symbol table for vars *)
 (*  in_switch : bool;
   in_for : bool;
   case_labels : list ref; (* known case labels *)
