@@ -252,8 +252,8 @@ let check_semant env fsm =
 in
   ignore(check_body env fsm);
 
-
 (*
+
 let check program =
   let sym_tab = {parents = None; variables = [] }
 in
@@ -270,7 +270,6 @@ in
 
   List.iter (check_semant env) S.fsms
 
-*)
 
 
 
@@ -284,12 +283,30 @@ let check program =
                   let new_syms = 
                       let env = 
                           let sym_tab = 
-                          {S.parent = None; S.variables = [] } in
-                      {S.scope=sym_tab} in
-                  {env.S.scope with variables = check_globals program.S.input program.S.output env} in
-              { env with scope=new_syms} in
-          {env1.S.scope with variables = check_pubs program.S.public env1} in
-      { env1 with scope=new_syms1} in
-  check_fsm_decl program.S.fsms in
-List.iter (check_semant env) program.S.fsms in ()
+                              {S.parent = None; S.variables = [] } in
+                          {S.scope=sym_tab} in
+                      {env.S.scope with variables = check_globals program.S.input program.S.output env} in
+                  { env with scope=new_syms} in
+              {env1.S.scope with variables = check_pubs program.S.public env1} in
+          { env1 with scope=new_syms1} in
+      check_fsm_decl program.S.fsms in
+    List.iter (check_semant env2) program.S.fsms in ()
+
+*)
+
+
+
+let check program =
+  let sym_tab = {parents = None; variables = [] };
+  let env = {scope=sym_tab};
+  let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env};
+  let env = { env with scope=new_syms};
+
+
+  let new_syms = {sym_tab with variables = check_pubs program.S.public env};
+  let env = { env with scope=new_syms} in
+  check_fsm_decl program.S.fsms;
+
+  List.iter (check_semant env) S.fsms
+
 
