@@ -250,7 +250,7 @@ let check_semant env fsm =
   check_fsm_locals fsm;
   let states_list = List.map (fun (name,ind) -> name) fsm.fsm_states
 in
-  ignore(check_body env fsm);
+  ignore(check_body env fsm)
 
 
 
