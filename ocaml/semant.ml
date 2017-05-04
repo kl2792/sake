@@ -308,5 +308,5 @@ let check program =
           {new_syms with variables = check_pubs program.S.public env1} in
       { env1 with scope=new_syms1} in
   check_fsm_decl program.S.fsms in
-List.iter (check_semant env) program.S.fsms
+List.iter (check_semant env) program.S.fsms in ()
 
