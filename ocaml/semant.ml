@@ -96,17 +96,17 @@ report_duplicate (fun n -> "duplicate fsm " ^ n)
 
 let check_fsm_locals fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
-report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.fsm_name)
-  (List.map fst fsm.fsm_states);
+report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
+  (List.map fst fsm.S.fsm_states);
 
-report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.fsm_name)
-  (List.map snd fsm.fsm_locals)
+report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
+  (List.map snd fsm.S.fsm_locals)
 
 
 let check_pubs pubs env =
 report_duplicate (fun n -> "duplicate public " ^ n )
   (List.map snd pubs);
- List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.scope.S.variables pubs
+ List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.S.scope.variables pubs
 
 
 
@@ -137,7 +137,7 @@ let rec get_expr env = function (* A.expr *)
     var; vl
 *)
     let var = try
-        find_variable env.scope name
+        find_variable env.S.scope name
     with Not_found ->
         raise (SemanticError("undeclared identifier " ^ name))
     in 
