@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[ "$(uname)" == "Darwin" ] && [[ "$BASH" = *"bash"* ]] || exec bash $0 $@
+
 # Path to the LLVM interpreter
 LLI="lli"
 #LLI="/usr/local/opt/llvm/bin/lli"
