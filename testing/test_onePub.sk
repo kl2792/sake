@@ -1,0 +1,5 @@
+fsm onePub {
+    public bool fixed = false
+
+    ~fix = 42
+}

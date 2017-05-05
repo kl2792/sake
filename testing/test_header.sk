@@ -7,15 +7,15 @@ fsm one {
         public int j = 4
         ~ int r = two.k 
 
-        state emma 
-                goto shalva
-        state shalva
-                goto emma
+        state Emma 
+                goto Shalva
+        state Shalva
+                goto Emma
 }
 fsm two {
         public int f = 3
         
-	state kz 
+	state Kz 
                 f = 45
 }
 fsm three {
@@ -23,7 +23,7 @@ fsm three {
         int f = 24
         int z = 2
 
-        state ac
+        state Ac
                z = 35 
 }
 fsm four {       
@@ -36,6 +36,6 @@ fsm five {
 }
 fsm six {
 
-        state yay 
-                goto yay
+        state Yay 
+                goto Yay
 }

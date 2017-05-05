@@ -11,6 +11,7 @@ type expr =
   | IntLit of int
   | StringLit of string
   | Variable of string
+  | EnumLit of string
   | Access of string * string
   | Uop of uop * expr
   | Binop of expr * op * expr
@@ -26,6 +27,7 @@ type stmt =
   | Switch of expr * (expr * stmt list) list (*CHANGE MADE HERE*)
   | Expr of expr
   | Goto of string (* for FSM transitions *)
+  | Halt 
 type type_decl = {
   type_name   : string;
   type_values : string list;

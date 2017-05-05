@@ -5,18 +5,18 @@ fsm one {
         public int j = 4
         int r = two.k
 
-        state emma
+        state Emma
                 r = two.k 
                 printf("%d\n", r) 
-                goto emma
+                goto Emma
 }
 fsm two {
         public int k = 3
         
-	state kz
+	state Kz
                 if (i == 2) { 
                         k = 45
                 }
                 printf("%d\n", k)
-                goto kz
+                goto Kz
 }
