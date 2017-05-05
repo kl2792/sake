@@ -3,49 +3,49 @@ output[char outOne, char outTwo]
 
 fsm tlOne {
 
-        state r1
-                if (inOne == 1 && inTwo == 0 && t1Two == r2) {
+        state R1
+                if (inOne == 1 && inTwo == 0 && t1Two == R2) {
                         outOne = 'g' 
-                        goto g1
+                        goto G1
                 }
                 else {
                         outOne = 'r'
-                        goto r1
+                        goto R1
                 }
-        state y1
+        state Y1
                 outOne = 'r'
-                goto r1
-        state g1
+                goto R1
+        state G1
                 if (inOne == 0 || inTwo == 1) {
                         outOne = 'y'
-                        goto y1 
+                        goto Y1 
                 }
                 else {
                         outOne = 'g'
-                        goto g1
+                        goto G1
                 }    
 }
 fsm tlTwo {
 
-        state r2
-                if (inTwo == 1 && inOne == 0 && tlOne == r1) {
+        state R2
+                if (inTwo == 1 && inOne == 0 && tlOne == R1) {
                         outTwo = 'g' 
-                        goto g2
+                        goto G2
                 }
                 else {
                         outTwo = 'r'
-                        goto r2
+                        goto R2
                 }
-        state y2
+        state Y2
                 outTwo = 'r'
-                goto r2
-        state g2
+                goto R2
+        state G2
                 if (inTwo == 0 || inOne == 1) {
                         outTwo = 'y'
-                        goto y2 
+                        goto Y2 
                 }
                 else {
                         outTwo = 'g'
-                        goto g2
+                        goto G2
                 }    
 }

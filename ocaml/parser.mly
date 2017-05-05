@@ -78,14 +78,14 @@ INTLIT { IntLit($1) }
 
 stmt:
 LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
-| STATE ID NLINE { State($2) }
+| STATE TYPENAME NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
 | FOR ID IN LPAREN INTLIT COLON INTLIT COLON INTLIT RPAREN stmt { For($2, $5, $7, $9, $11) }  
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
-| GOTO ID NLINE { Goto ($2) }
+| GOTO TYPENAME NLINE { Goto ($2) }
 
 stexpr:
   ID expr {$1, $2}
