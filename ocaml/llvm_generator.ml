@@ -73,7 +73,7 @@ let translate filename program =
   let printf =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
-  let debug = false in
+  let debug = true in
   let lldebug s l builder =
     let args = Array.of_list (L.build_global_stringptr s "fmt" builder :: l) in
     if debug then ignore (L.build_call printf args "" builder) else () in
@@ -126,7 +126,7 @@ let translate filename program =
     | A.Empty -> L.const_int i32_t 0
     | A.Variable s ->
         let value = L.build_load (lookup fn input s builder) s builder in
-        lldebug "%s: %d\n" [L.build_global_stringptr s "str" builder; value] builder;
+        lldebug "access %s: %d\n" [gsp s builder; value] builder;
         value
     | A.Printf (fmt, args) ->
         let args = (List.map (expr fn builder) args) in
@@ -187,9 +187,8 @@ let translate filename program =
           let value = A.Binop ((A.Variable name), A.Add, (A.IntLit step)) in
           A.Expr (A.Assign (name, value)) in
         let body = A.Block [body; increment] in
-        let loop = A.While (cond, body) in
-        let full = A.Block [init; loop] in
-       stmt fn builder full
+        let body = A.Block [init; A.While (cond, body)] in
+        stmt fn builder body
     | A.State name ->
         let block, _ = try StringMap.find name !states with
           Not_found -> raise (Bug (Printf.sprintf "No SAST state: %s" name)) in
