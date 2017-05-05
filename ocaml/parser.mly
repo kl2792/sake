@@ -10,7 +10,7 @@
 
 /*tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
-%token TICK RESET PRINTF 
+%token TICK RESET PRINTF HALT
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -57,6 +57,7 @@ INTLIT { IntLit($1) }
 | CHARLIT { CharLit($1) }
 | STRINGLIT { StringLit ($1) }
 | ID { Variable($1) }
+| TYPENAME { EnumLit($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
 | expr ADD expr { Binop($1, Add, $3) }
@@ -86,6 +87,7 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO TYPENAME NLINE { Goto ($2) }
+| HALT NLINE { Halt }
 
 stexpr:
   ID expr {$1, $2}

@@ -50,11 +50,11 @@ fsm tlTwo {
                         outTwo = 'r'
                         goto R2
                 }
-        state y2
+        state Y2
                 outTwo = 'r'
                 turnTwo = 0
                 goto R2
-        state g2
+        state G2
                 while (count < 10) {
                         count = count + 1
                         outTwo = 'g'

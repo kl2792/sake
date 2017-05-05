@@ -71,6 +71,7 @@ rule token = parse
   | "output" { OUTPUT }
   | "sysin" { SYSIN }
   | "public" { PUBLIC }
+  | "halt" { HALT }
   | cap aln*  as lxm { TYPENAME (lxm) }
   | low aln* as lxm { ID (lxm) }
   | dgt+ as num { INTLIT (int_of_string num) }
