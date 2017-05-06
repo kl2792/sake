@@ -73,7 +73,7 @@ let translate filename program =
   let printf =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
-  let debug = true in
+  let debug = false in
   let lldebug s l builder =
     let args = Array.of_list (L.build_global_stringptr s "fmt" builder :: l) in
     if debug then ignore (L.build_call printf args "" builder) else () in
@@ -103,19 +103,20 @@ let translate filename program =
   (* Lookup function *)
   let lookup fn io name builder =
     try StringMap.find name !locals with
-    Not_found ->
-      let fa = L.params fn in
-      let pub_ptr = if io == input then fa.(1) else fa.(0) in
-      let io_ptr = if io == input then fa.(2) else fa.(3) in
-      try
-        let pub_val =
-          try StringMap.find ((L.value_name fn) ^ "_" ^ name) public with
-          Not_found -> StringMap.find name public in
-        L.build_struct_gep pub_ptr pub_val name builder with
       Not_found ->
-        lldebug "io for %s: %d\n" [gsp name builder; L.const_int i32_t (StringMap.find name io)] builder;
-        try L.build_struct_gep io_ptr (StringMap.find name io) name builder with
-        Not_found -> raise (Bug (Printf.sprintf "No variable: %s" name)) in
+        let fa = L.params fn in
+        let pub_ptr = if io == input then fa.(1) else fa.(0) in
+        let io_ptr = if io == input then fa.(2) else fa.(3) in
+        try
+          let pub_val =
+            try StringMap.find ((L.value_name fn) ^ "_" ^ name) public with
+              Not_found -> StringMap.find name public in
+          L.build_struct_gep pub_ptr pub_val name builder with
+        Not_found ->
+          let io_val = try StringMap.find name io with
+            Not_found -> raise (Bug (Printf.sprintf "No variable: %s" name)) in
+          lldebug "io for %s: %d\n" [gsp name builder; L.const_int i32_t io_val] builder;
+          L.build_struct_gep io_ptr io_val name builder in              
 
   (* Expression builder *)
   let rec expr fn builder = function
@@ -213,7 +214,7 @@ let translate filename program =
         L.define_function fsm.A.fsm_name ftype sake in
 
       (* Halt if invalid state; use unique names for blocks *)
-      let halt = abc "*halt" fn and dead = abc "*dead" fn in
+      let init = abc "*init" fn and halt = abc "*halt" fn in
       let builder = bae halt in
       let ptr = L.build_struct_gep (L.params fn).(0) 0 "ptr" builder in
       ignore (L.build_store zero ptr builder);
@@ -237,14 +238,12 @@ let translate filename program =
         let value = L.build_load value (L.value_name fn) builder in
         lldebug "state: %d\n" [value] builder;
         L.build_switch value halt (List.length bindings) builder in
-      let build_case (_, (block, value)) =
-        L.add_case switch value block in
-      List.iter build_case (("", (dead, zero)) :: bindings);
+      let build_case (_, (block, value)) = L.add_case switch value block in
+      List.iter build_case (("", (init, zero)) :: bindings);
 
-      (* Build the function body, halting in the last state *)
-	    let builder = bae dead in (* Begin with a dead code block *)
+      (* Build the function body; start with dead, loop in last state *)
       let body = A.Block fsm.A.fsm_body in
-      add_terminal (stmt fn builder body) (L.build_br halt);
+      add_terminal (stmt fn (bae init) body) L.build_ret_void;
       fn in
     List.map build_fsm program.A.fsms in
 
