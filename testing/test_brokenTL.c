@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "test_brokenTL.h"
 
 int main() {
@@ -10,10 +11,15 @@ int main() {
         
         char *inputOne = "1111001101";                
         char *inputTwo = "1110011011";
-                         
+            
+        char temp[1];
+
         while (*inputOne) {
-            i.inOne = *inputOne;
-            i.inTwo = *inputTwo;
+            
+            temp[0] = inputOne[0];
+            i.inOne = atoi(temp);
+            temp[0] = inputTwo[0];
+            i.inTwo = atoi(temp);
             
             test_brokenTL_tick(&s, &i, &o);
 
@@ -21,7 +27,7 @@ int main() {
             printf("TL 2: %c\n", o.outTwo);
 
             inputOne++;
-            inputTwo++;  
+            inputTwo++;
         }
 
 	return 0;

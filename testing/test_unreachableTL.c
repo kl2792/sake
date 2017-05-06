@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "test_unreachableTL.h"
 
 int main() {
@@ -9,9 +10,11 @@ int main() {
 	test_unreachableTL_tick(&s, NULL, NULL);
 
         char *input = "11101010101";
+        char temp[1];
 
         while(*input) {
-                in.inOne = *input;
+                temp[0] = input[0];
+                in.inOne = atoi(temp);
                 test_unreachableTL_tick(&s, &in, &o);
                 printf("%c\n", o.outOne);
                 input++;
