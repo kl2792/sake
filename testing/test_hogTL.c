@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "test_hogTL.h"
 
 int main() {
@@ -11,9 +12,14 @@ int main() {
         char *inputOne = "11110000000011111000";
         char *inputTwo = "10000011110000011100";
 
+        char temp[1];
+
         while (*inputOne) {
-            i.inOne = *inputOne;
-            i.inTwo = *inputTwo;
+             
+            temp[0] = inputOne[0];
+            i.inOne = atoi(temp);
+            temp[0] = inputTwo[0];
+            i.inTwo = atoi(temp);
 
             test_trafficLight_tick(&s, &i, &o);
 

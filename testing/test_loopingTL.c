@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "test_loopingTL.h"
 
 int main() {
@@ -9,16 +10,18 @@ int main() {
 	test_loopingTL_tick(&s, NULL, NULL); 
         
         char *inputTwo = "00001001110000000000000000111100";
-                
+               
+        char temp[1];
+
         while (*inputOne) {
-            i.inTwo = *inputTwo;
+            temp[0] = inputTwo[0];
+            i.inTwo = atoi(temp);
 
             test_loopingTL_tick(&s, &i, &o); 
 
             printf("TL 1: %c\n", o.outOne);
             printf("TL 2: %c\n", o.outTwo);
 
-            inputOne++;
             inputTwo++;
         }
 

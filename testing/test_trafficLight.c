@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "test_trafficLight.h"
 
 int main() {
@@ -9,9 +10,12 @@ int main() {
 	test_trafficLight_tick(&s, NULL, NULL); 
 
         char *input = "00011111000";
-              
+             
+        char temp[1];
+
         while (*input) {
-            in.i = *input;
+            temp[0] = input[0];
+            in.i = atoi(temp);
 
             test_trafficLight_tick(&s, &in, &o);
 
