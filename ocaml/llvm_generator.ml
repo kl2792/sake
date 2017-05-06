@@ -80,7 +80,7 @@ let translate filename program =
     L.declare_function "memcpy" ftype sake in
 
   (* Debugging *)
-  let debug = true in
+  let debug = false in
   let gsp s = L.build_global_stringptr s s in
   let lldebug s l builder =
     if debug then
