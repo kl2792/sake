@@ -68,7 +68,7 @@ let structs_of_ast name ast =
 
 (* generate prototype of tick function, given a name *)
 let tick_prototype name =
-  Printf.sprintf "void %s_tick(struct %s_state *, struct %s_input *, struct %s_output *);\n" 
+  Printf.sprintf "int %s_tick(struct %s_state *, struct %s_input *, struct %s_output *);\n" 
     name name name name
 
 (* the ifdef ... endif guard *)
