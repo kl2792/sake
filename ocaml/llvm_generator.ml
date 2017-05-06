@@ -2,7 +2,7 @@
  * Llvm_generator.translate converts a Sast.program to an Llvm.llmodule.
  *
  * Author: Kai-Zhan Lee
- * Credzz: Shalva Kohen for A.Switch structure and myriad small bug fixes.
+ * Credzz: Shalva Kohen for A.Switch structure and myriad minor bug fixes.
  *)
 
 module L = Llvm
@@ -138,7 +138,7 @@ let translate filename program =
         (llop op) (expr fn builder e1) (expr fn builder e2) "tmp" builder
     | A.Assign (s, e) ->
         let e = expr fn builder e in
-        L.dump_module sake;
+        lldebug "assign %s: %d\n" [gsp s builder; e] builder;
         ignore (L.build_store e (lookup fn output s builder) builder); e in
 
   let add_terminal builder f =
@@ -198,6 +198,7 @@ let translate filename program =
         let _, value = try StringMap.find state !states with
           Not_found -> raise (Bug (Printf.sprintf "No state: %s" state)) in
         let pub = lookup fn output (L.value_name fn) builder in
+        lldebug "goto %s: %d\n" [gsp state builder; value] builder;
         ignore (L.build_store value pub builder);
         bae (L.insertion_block builder) in
 
