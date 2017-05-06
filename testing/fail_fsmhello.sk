@@ -3,20 +3,20 @@ output[int k]
 
 fsm hello {
         
-	state hello
+	state Hello
                 if (i == 1) {
                         printf("%s", "Hello")
-                        goto world
+                        goto World
                 }
                 else {
-                        goto hello
+                        goto Hello
                 }
-        state world
+        state World
                 if (i == 1) {
                         printf("%s%s\n", q, "'s World")
-                        goto hello
+                        goto Hello
                 }
                 else {
-                        goto world
+                        goto World
                 }
 }

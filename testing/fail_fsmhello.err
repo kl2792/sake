@@ -1,1 +1,1 @@
-Fatal error: exception Llvm_generator.Bug("No variable found: i")
+Fatal error: exception Llvm_generator.Bug("No variable: i")
