@@ -15,7 +15,11 @@ Fix: fix details here, if applicable
 BUGS
 ----
 
-[ ] char/int type discrepancy in test cases
+[ ] get rid of random print statements that causing all test cases to fail
+
+[ ] problem with checking state of other fsms 
+
+[X] char/int type discrepancy in test cases
 For many of the failing traffic light tests, the C wrapper passes in chars,
 while the Sake file takes in ints (for example, passing in '1' and comparing
 that value to 1)
