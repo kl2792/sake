@@ -71,7 +71,7 @@ Check() {
     #echo $wrapper 
     #echo "../testing/$wrapper"
 
-    echo -n "$basename..."
+    echo "\n\n$basename..."
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
 
@@ -93,8 +93,7 @@ Check() {
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
-        Run "./${basename}.exe" > "${basename}.out" &&
-        Compare ${basename}.out ${reffile}.out ${basename}.diff
+        Run "./${basename}.exe" 
     else
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" &&     
         Run "$SAKE" " " $1 ${basename} &&
@@ -102,8 +101,7 @@ Check() {
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
-        Run "./${basename}.exe" > "${basename}.out" &&
-        Compare ${basename}.out ${reffile}.out ${basename}.diff
+        Run "./${basename}.exe" 
     fi
     
 
@@ -112,7 +110,7 @@ Check() {
         if [ $keep -eq 0 ] ; then
             rm -f $generatedfiles
         fi
-        echo "OK"
+        echo "\nOK"
         echo "###### SUCCESS" 1>&2
     else 
         echo "###### FAILED" 1>&2
