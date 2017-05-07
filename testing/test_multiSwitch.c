@@ -15,6 +15,10 @@ int main() {
         i.i = 1;
         test_multiSwitch_tick(&s, &i, &o); 
         printf("%d\n", o.out);
-                
+        
+        i.i = 0;
+        test_multiSwitch_tick(&s, &i, &o); 
+        printf("%d\n", o.out);
+
 	return 0;
 }
