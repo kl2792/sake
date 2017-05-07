@@ -6,8 +6,8 @@ fsm switchCase {
 
         switch(i) {
                 case 0: out = 42
-                        printf("%d\n", out)
+                        printf("%d\n", 42)
 		case 1: out = 24
-                        printf("%d\n", out)
+                        printf("%d\n", 24)
         }
 }
