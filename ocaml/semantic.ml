@@ -125,9 +125,9 @@ let rec take_typ = function
 
 *)
 
-let rec copy_locals = function (*(dtype * string * expr) list*)
+let rec copy_locals program = function (*(dtype * string * expr) list*)
 [] -> []
-| (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr expr)):: (copy_locals tl)
+| (typ,var_name,expr)::tl -> ((convert_type typ),var_name,(get_expr program expr)):: (copy_locals program tl)
 
 
 let rec get_states num = function (* body: stmt list *)
@@ -138,7 +138,7 @@ let rec get_states num = function (* body: stmt list *)
 let rec take_fsm program = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
-    -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts program body)}::(take_fsm program tl)
+    -> { S.fsm_name = name; S.fsm_locals = (copy_locals program local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts program body)}::(take_fsm program tl)
 
 
 let rec take_pubs name = function (*(dtype * string * expr) list*)
