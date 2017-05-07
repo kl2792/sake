@@ -66,7 +66,7 @@ let rec get_expr = function (* A.expr *)
 | A.EnumLit(vl) -> 
   let result =
     let enum_search =
-      List.map (look_for vl) A.types
+      List.map (look_for vl) program.A.types
     in
     is_there_res enum_search
   in if (result=-1) then (wrong_enum_error vl) else S.IntLit(result)
