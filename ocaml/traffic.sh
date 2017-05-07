@@ -101,7 +101,9 @@ Check() {
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
-        Run "./${basename}.exe" 
+        Run "./${basename}.exe" &&
+        Run "./${basename}.exe" > "${basename}.out" &&
+        Compare ${basename}.out ${reffile}.out ${basename}.diff
     fi
     
 
