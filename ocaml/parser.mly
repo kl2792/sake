@@ -45,7 +45,7 @@ BOOL { Bool }
 | CHAR { Char }
 | STRING { String }
 //| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
-| ID { Enum($1) }  /*Q: Not sure if this is correct */
+| TYPENAME { Enum($1) }  /*Q: Not sure if this is correct */
 
 lvalue:
  dtype ID { $1, $2 }
