@@ -39,9 +39,9 @@ fsm tlTwo {
         
         state R2
                 if (inTwo == 1) {
-                        tlTwo.turnTwo = 1
+                        turnTwo = 1
                 }
-                if (tlTwo.turnTwo == 1 && tlOne == R1) {
+                if (turnTwo == 1 && tlOne == R1) {
                         outTwo = 'g' 
                         count = 0 
                         goto G2
@@ -52,7 +52,7 @@ fsm tlTwo {
                 }
         state Y2
                 outTwo = 'r'
-                tlTwo.turnTwo = 0
+                turnTwo = 0
                 goto R2
         state G2
                 while (count < 10) {
