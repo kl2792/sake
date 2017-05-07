@@ -6,15 +6,15 @@ fsm ekas {
         state Sone
                 if (decision == 's') {
                         printf("\n%s\n", "Welcome to the story of the PLT presentation :)")
-                        printf("%s\n\n", "If at anytime you wish to leave simply press e instead of having the courage to make a choice!")
-                        printf("%s\n%s\n\n", "It’s May 9th and your PLT presentation is due tomorrow. Suddenly, you realize that your language", "sucks. What do you do?")
+                        printf("%s\n\n", "If at anytime you wish to leave, simply press e instead of having the courage to make a choice!")
+                        printf("%s\n%s\n\n", "It’s May 9th, and your PLT presentation is due tomorrow. Suddenly, you realize that your language", "sucks. What do you do?")
                         printf("%s\n", "a. Go to Edwards and beg for an extension.")
                         printf("%s\n\n", "b. Sell your soul to Satan in the hopes he will help you pass.")
                         result = 1
                         goto Stwo
                 }
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         result = 2
                         halt
                 }
@@ -42,7 +42,7 @@ fsm ekas {
                         goto Sfour  
                 }                            
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just could not handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just could not handle it.")
                         halt 
                 }
                 else if (decision == '(') {
@@ -70,7 +70,7 @@ fsm ekas {
                         goto Sfive 
                 } 
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -107,7 +107,7 @@ fsm ekas {
                         goto Sseven
                 }
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -145,7 +145,7 @@ fsm ekas {
                         halt
                 }
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 } 
                 else if (decision == '(') {
@@ -176,7 +176,7 @@ fsm ekas {
                         goto Seleven
                 }                
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -197,7 +197,7 @@ fsm ekas {
                         goto Snine
                 }            
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -223,7 +223,7 @@ fsm ekas {
                         halt
                 }                
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -252,7 +252,7 @@ fsm ekas {
                         goto Sthirteen
                 }                  
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt 
                 }
                 else if (decision == '(') {
@@ -294,7 +294,7 @@ fsm ekas {
                         goto Sfive 
                 }                  
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -318,7 +318,7 @@ fsm ekas {
                         halt
                 }                
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -341,7 +341,7 @@ fsm ekas {
                         halt
                 }                
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -368,7 +368,7 @@ fsm ekas {
                         goto Sfourteen
                 }                
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
@@ -403,7 +403,7 @@ fsm ekas {
                         halt
                 }           
                 else if (decision == 'e') {
-                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like you are leaving us. Guess you just couldn't handle it.")
                         halt
                 }
                 else if (decision == '(') {
