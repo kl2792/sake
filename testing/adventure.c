@@ -23,7 +23,7 @@ int main() {
     }
 
     if (output.result == 2) {
-        printf("Thanks for playing :)"):
+        printf("Thanks for playing :)");
     }
 
 
