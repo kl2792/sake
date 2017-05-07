@@ -2,6 +2,7 @@ input[int i]
 output[int out]
 
 fsm switchCase {
+        int p = 4
 
         switch(i) {
                 case 0: out = 42
