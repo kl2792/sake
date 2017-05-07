@@ -81,7 +81,7 @@ Check() {
         if [ $keep -eq 0 ] ; then
             rm -f $generatedfiles
         fi
-        echo "OK - Stories over :)"
+        echo "OK - Story over :)"
         echo "###### SUCCESS" 1>&2
     else 
         echo "###### FAILED" 1>&2
