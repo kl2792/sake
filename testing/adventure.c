@@ -7,6 +7,7 @@ int main() {
     struct adventure_output output;
     struct adventure_state states;
 
+    adventure_tick(&states, NULL, NULL);
     // TODO run tick with null values to do the reset
     output.result = 0;
 
@@ -14,27 +15,22 @@ int main() {
 
     while (output.result == 0) {
         printf("Press s to start the adventure: ");
-        scanf("%s", user_input);
-        input.decision = user_input[0];
-        printf("user input: %c\n", input.decision);
+        scanf("%s", (user_input));
+        input.decision = *user_input;
+        printf("\n");
         adventure_tick(&states, &input, &output);
-        printf("after tick\n\n");
     }
-
-    printf("After first state moving onto main loop");
 
     while (output.result == 1) {
         printf("Press the corresponding letter on your keyboard to make your choice: ");
         scanf("%s", (user_input));
         input.decision = *user_input;
-
-
-        //scanf("%c", &(input.decision));
+        printf("\n");
         adventure_tick(&states, &input, &output);
     }
 
     if (output.result == 2) {
-        printf("Thanks for playing :)");
+        printf("\nThanks for playing :) This story was brought to you by SAKE: Don't drink if you underage.");
     }
 
 

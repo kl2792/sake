@@ -5,41 +5,44 @@ fsm ekas {
 
         state Sone
                 if (decision == 's') {
-                        printf("%s\n", "It’s May 9th and your PLT presentation is due tomorrow. Suddenly, you realize that your language sucks. What do you do?")
+                        printf("\n%s\n", "Welcome to the story of the PLT presentation :)")
+                        printf("%s\n\n", "If at anytime you wish to leave simply press e instead of having the courage to make a choice!")
+                        printf("%s\n%s\n\n", "It’s May 9th and your PLT presentation is due tomorrow. Suddenly, you realize that your language sucks.", "What do you do?")
                         printf("%s\n", "a. Go to Edwards and beg for an extension.")
-                        printf("%s\n", "b. Sell your soul to Satan in the hopes he will help you pass.")
+                        printf("%s\n\n", "b. Sell your soul to Satan in the hopes he will help you pass.")
                         result = 1
                         goto Stwo
                 }
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
                 else {
                         printf("%s\n", "Don't just sit there. Get moving!")
                         result = 0
-                        goto Stwo
+                        goto Sone
                 }
         state Stwo
                 if (decision == 'a') {
                         printf("%s\n", "Seriously? You're asking me for an extension? Seriously?, Edwards says with a look of incredulity.")
-                        printf("%s\n", "I, ummm, I, nope, jk. Bye!!! You run out the room. What do you do next?")
+                        printf("%s\n", "I, ummm, I, nope, jk. Bye!!! You run out the room.")
+                        printf("%s\n\n", "What do you do next?")
                         printf("%s\n", "a. Give up, go back to your room, and fall asleep.")
-                        printf("%s\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
+                        printf("%s\n\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
                         result = 1
                         goto Sthree
                 }
                 else if (decision == 'b') {
-                        printf("%s\n", "You go to Central Park Zoo to kidnap the nearest goat to make your blood sacrifice. Unfortunately the gate is locked! What should you do?")
+                        printf("%s\n%s\n\n", "You go to Central Park Zoo to kidnap the nearest goat to make your blood sacrifice. Unfortunately the gate is locked!", "What should you do?")
                         printf("%s\n", "a. With your PLT skillz you think you can hack into the security system and open the doors.")
                         printf("%s\n", "b. Give up and decide to beg Edwards for an extension.")
-                        printf("%s\n", "c. Decide to sacrifice one of your group mates instead.") 
+                        printf("%s\n\n", "c. Decide to sacrifice one of your group mates instead.") 
                         result = 1
                         goto Sfour  
                 }                            
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just could not handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just could not handle it.")
                         result = 2
                         goto Sone 
                 }
@@ -58,15 +61,15 @@ fsm ekas {
                 }
                 else if (decision == 'b') {
                         printf("%s\n", "You've kidnapped all your groupmates and locked them in your room. But for some reason they do not seem to")
-                        printf("%s\n", "be getting much done! What do you do?") 
+                        printf("%s\n\n", "be getting much done! What do you do?") 
                         printf("%s\n", "a. Offer them Sake to get the creative juices flowing.")
                         printf("%s\n", "b. Decide that it’s better to sacrifice one of them to Satan. After all, what good are they if they cannot work?")
-                        printf("%s\n", "c. Give a motivational speech based off the one in the movie Independence Day.")
+                        printf("%s\n\n", "c. Give a motivational speech based off the one in the movie Independence Day.")
                         result = 1
                         goto Sfive 
                 } 
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
@@ -78,30 +81,30 @@ fsm ekas {
         state Sfour
                 if (decision == 'a') {
                         printf("%s\n", "Realizing that PLT is not a security class and that you actually suck at hacking into anything.")
-                        printf("%s\n", "You get caught within thirty seconds of trying to break in. As the police question you, what do you do? ")
+                        printf("%s\n\n", "You get caught within thirty seconds of trying to break in. As the police question you, what do you do? ")
                         printf("%s\n", "a. Admit everything")
-                        printf("%s\n", "b. Admit nothing")
+                        printf("%s\n\n", "b. Admit nothing")
                         result = 1
                         goto Ssix 
                 }
                 else if (decision == 'b') { 
                         printf("%s\n", "Seriously? You're asking me for an extension? Seriously?, Edwards says with a look of incredulity.")
-                        printf("%s\n", "I, ummm, I, nope, jk. Bye!!! You run out the room. What do you do next?")
+                        printf("%s\n\n", "I, ummm, I, nope, jk. Bye!!! You run out the room. What do you do next?")
                         printf("%s\n", "a. Give up, go back to your room, and fall asleep.")
-                        printf("%s\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
+                        printf("%s\n\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
                         result = 1
                         goto Sthree              
                 }                
                 else if (decision == 'c') {
-                        printf("%s\n", "But which group mate to sacrifice?")
+                        printf("%s\n\n", "But which group mate to sacrifice?")
                         printf("%s\n", "a. Shalva")
                         printf("%s\n", "b. Shalva")
-                        printf("%s\n", "c. Shalva") 
+                        printf("%s\n\n", "c. Shalva") 
                         result = 1
                         goto Sseven
                 }
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
@@ -113,30 +116,31 @@ fsm ekas {
         state Sfive
                 if (decision == 'a') {
                         printf("%s\n", "One of your group mates refuses to drink because he’s under age. You ignore his attempts to sway the group against")
-                        printf("%s\n", "drinking too and go ahead. Pleasantly drunk, your group decides to...")
+                        printf("%s\n\n", "drinking too and go ahead. Pleasantly drunk, your group decides to...")
                         printf("%s\n", "a. Spend the rest of the night watching the anime Evangelion as homage to Japan (and Edwards).")
-                        printf("%s\n", "b. Go to starbucks, waste all their respective tuition payments on Venti Vanilla Lattes and in the midst of a caffeine buzz work on the project all night.")
+                        printf("%s\n", "b. Go to starbucks, waste all their respective tuition payments on Venti Vanilla Lattes and in the midst of a ")
+                        printf("\t%s\n\n", "caffeine buzz work on the project all night.")
                         result = 1
                         goto Seight
                 }
                 else if (decision == 'b') {
-                        printf("%s\n", "But which group mate to sacrifice?")
+                        printf("%s\n\n", "But which group mate to sacrifice?")
                         printf("%s\n", "a. Shalva")
                         printf("%s\n", "b. Shalva")
-                        printf("%s\n", "c. Shalva") 
+                        printf("%s\n\n", "c. Shalva") 
                         result = 1
                         goto Sseven
                 }                
                 else if (decision == 'c') {
                         printf("%s\n", "Your teammates are inspired. You work all night. You get a ton done, and the next morning realise your language")
                         printf("%s\n", "does not suck after all. As you present to Edwards, he is impressed and surprised you actually managed to survive")
-                        printf("%s\n", " the semester. He had serious doubts. As he looks on, you feel proud and happy it's all over. Then your face drops ")
+                        printf("%s\n", "the semester. He had serious doubts. As he looks on, you feel proud and happy it's all over. Then your face drops ")
                         printf("%s\n", "as you all realise you have more finals. But on the plus side you got a good grade.")
                         result = 2
                         goto Sone
                 }
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
@@ -148,24 +152,24 @@ fsm ekas {
         state Ssix
                 if (decision == 'a') {
                         printf("%s\n", "After looking at sorry looking college student in front of them, the police decide to let you go.")
-                        printf("%s\n", "As you are walking back to college you debate your options. What do you do?")
+                        printf("%s\n\n", "As you are walking back to college you debate your options. What do you do?")
                         printf("%s\n", "a. Decide to write a tell all book about your PLT adventures.")
                         printf("%s\n", "b. Decide to sacrifice one of your group mates instead.")
                         printf("%s\n", "c. Try to break into the Zoo again because you think Satan will like a goat sacrifice more than a human one.") 
-                        printf("%s\n", "d. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
+                        printf("%s\n\n", "d. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
                         result = 1
                         goto Sten
                 }
                 else if (decision == 'b') {
                         printf("%s\n", "The police, taking none too kindly to the silent college student in front of them, decide to lock you up for the night.")
-                        printf("%s\n", "The next morning they let you out right before your presentation. What do you do?")
+                        printf("%s\n\n", "The next morning they let you out right before your presentation. What do you do?")
                         printf("%s\n", "a. Ditch your group mates.")
-                        printf("%s\n", "b. Decide to go to the presentation and help them present your sucky language.")
+                        printf("%s\n\n", "b. Decide to go to the presentation and help them present your sucky language.")
                         result = 1
                         goto Seleven
                 }                
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone 
                 }
@@ -176,15 +180,15 @@ fsm ekas {
                 }
         state Sseven
                 if (decision == 'a' || decision == 'b' || decision == 'c') {
-                        printf("%s\n", "Satan looks at Shalva and denies to take the offering. She is already spreading evil in the world.")
-                        printf("%s\n", "There is no need to sacrifice her. But I commend you ability to sacrifice your ‘loved’ ones. I will")
+                        printf("%s", "Satan looks at Shalva and denies to take the offering. She is already spreading evil in the world.")
+                        printf("%s", "There is no need to sacrifice her. But I commend you ability to sacrifice your ‘loved’ ones. I will")
                         printf("%s\n", "give you the choice of two gifts in acknowledgement of your heartlessness.")
-                        printf("%s\n", "Press a or b to recieve a suprise gift")
+                        printf("%s\n\n", "Press a or b to recieve a suprise gift")
                         result = 1
                         goto Snine
                 }            
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone 
                 }
@@ -210,7 +214,7 @@ fsm ekas {
                         goto Sone
                 }                
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
@@ -223,7 +227,7 @@ fsm ekas {
                 if (decision == 'a') {
                         printf("%s\n", "As Fluffles descends you look on in shock. He bellows in an awesome voice GREETINGS YOUNG TRAVELER.")
                         printf("%s\n", "YOU ARE THE CHOSEN ONE WHO WILL HELP ME RID THIS WORLD OF EVIL. JOIN ME ON MY QUEST TO FIGHT THE EVIL")
-                        printf("%s\n", "WIZARD, KERFKLIPKATSTEIN")
+                        printf("%s\n\n", "WIZARD, KERFKLIPKATSTEIN. What do you do?")
                         printf("%s\n", "a. Decide not to join FLuffles on his quest.")
                         printf("%s\n", "b. Decide to join Fluffles on his quest.")
                         result = 1
@@ -231,13 +235,13 @@ fsm ekas {
                 }
                 else if (decision == 'b') {
                         printf("%s\n", "You are given a seemingly perfectly working project. What do you do?")
-                        printf("%s\n", "Yay, you’re done! Time to sleep for the presentation tomorrow.")
-                        printf("%s\n", "You decide to not trust Satan, because duh Satan, and run the project one time to make sure it works.")
+                        printf("%s\n", "a. Yay, you’re done! Time to sleep for the presentation tomorrow.")
+                        printf("%s\n\n", "b. You decide to not trust Satan, because duh Satan, and run the project one time to make sure it works.")
                         result = 1
                         goto Sthirteen
                 }                  
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
@@ -255,10 +259,10 @@ fsm ekas {
                         goto Sone
                 }
                 else if (decision == 'b') {
-                        printf("%s\n", "But which group mate to sacrifice?")
+                        printf("%s\n\n", "But which group mate to sacrifice?")
                         printf("%s\n", "a. Shalva")
                         printf("%s\n", "b. Shalva")
-                        printf("%s\n", "c. Shalva") 
+                        printf("%s\n\n", "c. Shalva") 
                         result = 1
                         goto Sseven
                 }    
@@ -271,15 +275,15 @@ fsm ekas {
                 }  
                 else if (decision == 'd') {
                         printf("%s\n", "You've kidnapped all your groupmates and locked them in your room. But for some reason they don’t seem to be getting much done!")
-                        printf("%s\n", "What do you do?") 
+                        printf("%s\n\n", "What do you do?") 
                         printf("%s\n", "a. Offer them Sake to get the creative juices flowing.")
                         printf("%s\n", "b. Decide that it’s better to sacrifice one of them to Satan. After all, what good are they if they can’t work?")
-                        printf("%s\n", "c. Give a motivational speech based off the one in the movie Independence Day.")
+                        printf("%s\n\n", "c. Give a motivational speech based off the one in the movie Independence Day.")
                         result = 1
                         goto Sfive 
                 }                  
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone 
                 }
@@ -308,7 +312,7 @@ fsm ekas {
                         goto Sone
                 }
                 else {
-                        printf("%s\n", "Don't just sit there. Get moving!")
+                        printf("\n%s\n", "Don't just sit there. Get moving!")
                         result = 1
                         goto Seleven
                 }
@@ -331,7 +335,7 @@ fsm ekas {
                         goto Sone
                 }
                 else {
-                        printf("%s\n", "Don't just sit there. Get moving!")
+                        printf("\n%s\n", "Don't just sit there. Get moving!")
                         result = 1
                         goto Stwelve
                 }
@@ -344,15 +348,15 @@ fsm ekas {
                 }
                 else if (decision == 'b') {
                         printf("%s\n", "As you delve into your code, your ‘amazing’ tester discovers millions of hidden bugs Satan has hidden in your code.")
-                        printf("%s\n", "What do you do?")
+                        printf("%s\n\n", "What do you do?")
                         printf("%s\n", "a. Go to Edwards and beg for an extension.")
                         printf("%s\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
-                        printf("%s\n", "c. Realize the numbers of cares you give is smaller than your IQ and decide to present it anyway. It cannot be too bad, right?")
+                        printf("%s\n\n", "c. Realize the numbers of cares you give is smaller than your IQ and decide to present it anyway. It cannot be too bad, right?")
                         result = 1
                         goto Sfourteen
                 }                
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
@@ -364,18 +368,18 @@ fsm ekas {
         state Sfourteen
                 if (decision == 'a') {
                         printf("%s\n", "Seriously? You're asking me for an extension? Seriously?, Edwards says with a look of incredulity.")
-                        printf("%s\n", "I, ummm, I, nope, jk. Bye!!! You run out the room. What do you do next?")
+                        printf("%s\n\n", "I, ummm, I, nope, jk. Bye!!! You run out the room. What do you do next?")
                         printf("%s\n", "a. Give up, go back to your room, and fall asleep.")
-                        printf("%s\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
+                        printf("%s\n\n", "b. Kidnap all your groupmates, lock them in room until the presentation, and only feed them if they code.")
                         result = 1
                         goto Sthree                     
                 }
                 else if (decision == 'b') {
                         printf("%s\n", "You've kidnapped all your groupmates and locked them in your room. But for some reason they don’t seem to be getting much done!")
-                        printf("%s\n", "What do you do?") 
+                        printf("%s\n\n", "What do you do?") 
                         printf("%s\n", "a. Offer them Sake to get the creative juices flowing.")
                         printf("%s\n", "b. Decide that it’s better to sacrifice one of them to Satan. After all, what good are they if they can’t work?")
-                        printf("%s\n", "c. Give a motivational speech based off the one in the movie Independence Day.")
+                        printf("%s\n\n", "c. Give a motivational speech based off the one in the movie Independence Day.")
                         result = 1
                         goto Sfive
                 }     
@@ -386,7 +390,7 @@ fsm ekas {
                         goto Sone
                 }           
                 else if (decision == 'e') {
-                        printf("%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
+                        printf("\n%s\n", "Looks like your leaving us. Guess you just couldn't handle it.")
                         result = 2
                         goto Sone
                 }
