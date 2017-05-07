@@ -51,7 +51,7 @@ let rec find_val vl ind = function (* start at 1 *)
 let look_for vl type_dec=
     find_val vl 1 type_dec.A.type_values
 
-let is_there_res = function
+let rec is_there_res = function
   | [] -> (-1)
   | [x] -> if(x = (-1)) then is_there_res [] else x
   | x::tl -> if(x = (-1)) then is_there_res tl else x
