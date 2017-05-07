@@ -14,7 +14,7 @@ fsm tlOne {
                 }
         state Y1
                 outOne = 'y'
-                goto R1
+                goto Y1
         state G1
                 if (inOne == 0) {
                         outOne = 'y'
