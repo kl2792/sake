@@ -1,5 +1,6 @@
 module A = Ast
 module S = Sast
+open Printf
 
 module StringMap = Map.Make(String)
 
