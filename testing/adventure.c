@@ -12,26 +12,29 @@ int main() {
     output.result = 0;
 
     char user_input[50];
+    printf("\033[H\033[J");
 
     while (output.result == 0) {
         printf("Press s to start the adventure: ");
         scanf("%s", (user_input));
         input.decision = *user_input;
         printf("\n");
+        printf("\033[H\033[J");
         adventure_tick(&states, &input, &output);
     }
 
-    while (output.result == 1) {
+    while (output.result == 1) { 
         printf("Press the corresponding letter on your keyboard to make your choice: ");
         scanf("%s", (user_input));
         input.decision = *user_input;
         printf("\n");
+        printf("\033[H\033[J");
         adventure_tick(&states, &input, &output);
     }
-
-    if (output.result == 2) {
-        printf("\nThanks for playing :) This story was brought to you by SAKE: Don't drink if you underage.");
-    }
+    
+    
+    printf("\nThanks for playing :) This story was brought to you by SAKE: Don't drink if you underage.");
+    
 
 
 }
