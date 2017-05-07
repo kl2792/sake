@@ -87,7 +87,7 @@ let rec do_stmt program = function (* stmts *)
 | A.If(pred,sta,stb) -> S.If((get_expr program pred),(do_stmt program sta),(do_stmt program stb))
 | A.For(str,na,nb,nc,stm) -> S.For(str,(na,nb,nc),(do_stmt program stm))
 | A.While(pred,stm) -> S.While((get_expr program pred),(do_stmt program stm))
-| A.Switch(exp, cases) -> S.Switch((get_expr program exp),(get_cases cases))
+| A.Switch(exp, cases) -> S.Switch((get_expr program exp),(get_cases program cases))
 | A.Expr(e) -> S.Expr(get_expr program e)
 | A.Goto(label) -> S.Goto(label)
 | A.Halt -> S.Halt
