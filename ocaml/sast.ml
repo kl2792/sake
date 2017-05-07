@@ -24,6 +24,7 @@ type stmt =
   | Switch of expr * (expr * stmt list) list
   | Expr of expr
   | Goto of string (* for FSM transitions *)
+  | Halt
 type type_decl = {
   type_name   : string;
   type_values : string list;
@@ -42,18 +43,11 @@ type program = {
   types : type_decl list;
   fsms  : fsm_decl list;
 }
-
-
-
 type variable_decl = (string * dtype)
-
 type symbol_table = {
   parent : symbol_table option;
   mutable variables : variable_decl list
 }
-
-
-  
 type translation_environment = {
   scope : symbol_table;   (* symbol table for vars *)
 (*  in_switch : bool;
@@ -62,4 +56,3 @@ type translation_environment = {
   state_labels : label list ref; (* labels on statements *)
   forward_gotos : label list ref; (* forward goto destinations *) *)
 }
-
