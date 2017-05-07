@@ -40,15 +40,15 @@ let get_op = function (* A.op *)
 
 
 
-let rec find_val val ind = function (* start at 1 *)
+let rec find_val vl ind = function (* start at 1 *)
   | [] -> (-1)
-  | [x] -> if(x=val) then ind else find_val val (ind+1) []
-  | x::tl -> if(x=val) then ind else find_val val (ind+1) tl
+  | [x] -> if(x=vl) then ind else find_val vl (ind+1) []
+  | x::tl -> if(x=vl) then ind else find_val vl (ind+1) tl
   | _ -> (-1)
 
 
-let look_for val type_dec=
-    find_val val 1 type_dec.A.type_values
+let look_for vl type_dec=
+    find_val vl 1 type_dec.A.type_values
 
 let is_there_res = function
   | [] -> (-1)
@@ -62,13 +62,13 @@ let rec get_expr = function (* A.expr *)
 | A.IntLit(num) -> S.IntLit(num)
 | A.StringLit(name) -> S.StringLit(name)
 | A.Variable(name) -> S.Variable(name)
-| A.EnumLit(val) -> 
+| A.EnumLit(vl) -> 
   let result =
     let enum_search =
-      List.map (look_for val) A.types
+      List.map (look_for vl) A.types
     in
     is_there_res enum_search
-  in if (result=-1) then (wrong_enum_error val) else S.IntLit(result)
+  in if (result=-1) then (wrong_enum_error vl) else S.IntLit(result)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
 | A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr exp))
 | A.Binop(e1,o,e2) -> S.Binop((get_expr e1), (get_op o) ,(get_expr e2))
