@@ -1,3 +1,9 @@
+(* 
+ * The function translate converts a Sast.program to a string.
+ *
+ * Authors: Kai-Zhan Lee, Emma Etherington
+ *)
+
 module A = Sast
 
 exception Error_thing
@@ -68,8 +74,8 @@ let structs_of_ast name ast =
 
 (* generate prototype of tick function, given a name *)
 let tick_prototype name =
-  Printf.sprintf "int %s_tick(struct %s_state *, struct %s_input *, struct %s_output *);\n" 
-    name name name name
+  Printf.sprintf "struct %s_state *%s_tick(struct %s_state *, struct %s_input *, struct %s_output *);\n" 
+    name name name name name
 
 (* the ifdef ... endif guard *)
 let header_guard name macros structs tick =

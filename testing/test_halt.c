@@ -22,7 +22,7 @@ int main(){
 
     i.p = 1;
     i.q = "Emma"; //print Emma's world
-    test_halt_tick(&s, &i, NULL)
+    test_halt_tick(&s, &i, NULL);
 
     if (test_halt_tick(&s, &i, NULL) == NULL) {
        printf("And we halted");
