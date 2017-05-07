@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "test_trafficLight.h"
+#include "test_trafficLightTL.h"
 
 int main() {
-	struct test_trafficLight_input in;
-	struct test_trafficLight_state s;
-	struct test_trafficLight_output o;
+	struct test_trafficLightTL_input in;
+	struct test_trafficLightTL_state s;
+	struct test_trafficLightTL_output o;
 
-	test_trafficLight_tick(&s, NULL, NULL); 
+	test_trafficLightTL_tick(&s, NULL, NULL); 
 
         char *input = "00011111000";
              
@@ -17,9 +17,9 @@ int main() {
             temp[0] = input[0];
             in.i = atoi(temp);
 
-            test_trafficLight_tick(&s, &in, &o);
+            test_trafficLightTL_tick(&s, &in, &o);
 
-            printf("%c\n", o.out);
+            printf("Light color: %c\n", o.out);
 
             input++;
         }

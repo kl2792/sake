@@ -16,7 +16,7 @@ int main() {
                 temp[0] = input[0];
                 in.inOne = atoi(temp);
                 test_unreachableTL_tick(&s, &in, &o);
-                printf("%c\n", o.outOne);
+                printf("Light color: %c\n", o.outOne);
                 input++;
         }
 
