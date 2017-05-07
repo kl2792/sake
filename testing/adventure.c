@@ -8,7 +8,6 @@ int main() {
     struct adventure_state states;
 
     adventure_tick(&states, NULL, NULL);
-    // TODO run tick with null values to do the reset
     output.result = 0;
 
     char user_input[50];
@@ -38,7 +37,4 @@ int main() {
     
     
     printf("\nThanks for playing :) This story was brought to you by SAKE: Don't drink if you underage.");
-    
-
-
 }
