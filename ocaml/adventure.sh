@@ -122,7 +122,7 @@ then
     files=$@
 else
     #Check this path 
-    files="../testing/aold.sk"
+    files="../testing/adventure.sk"
 fi
 
 # RUN CHECKS 
@@ -130,7 +130,7 @@ fi
 for file in $files 
 do
     case $file in 
-        *aold*)
+        *adventure*)
             Check $file 2>> $globallog 
             ;;
         *)
