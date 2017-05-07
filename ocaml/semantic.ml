@@ -57,7 +57,7 @@ let rec is_there_res = function
   | x::tl -> if(x = (-1)) then is_there_res tl else x
   | _ -> (-1)
 
-let rec get_expr = function (* A.expr *)
+let rec get_expr program = function (* A.expr *)
 | A.BoolLit(bl) -> S.BoolLit(bl)
 | A.CharLit(ch) -> S.CharLit(ch)
 | A.IntLit(num) -> S.IntLit(num)
@@ -71,32 +71,32 @@ let rec get_expr = function (* A.expr *)
     is_there_res enum_search
   in if (result=-1) then (wrong_enum_error vl) else S.IntLit(result)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
-| A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr exp))
-| A.Binop(e1,o,e2) -> S.Binop((get_expr e1), (get_op o) ,(get_expr e2))
-| A.Assign(name,exp) -> S.Assign(name,(get_expr exp))
-| A.Printf(fmt, lst) -> S.Printf(fmt, (get_e_list lst))
+| A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr program exp))
+| A.Binop(e1,o,e2) -> S.Binop((get_expr program e1), (get_op o) ,(get_expr program e2))
+| A.Assign(name,exp) -> S.Assign(name,(get_expr program exp))
+| A.Printf(fmt, lst) -> S.Printf(fmt, (get_e_list program lst))
 | A.Empty -> S.Empty
-and get_e_list = function (* expr list *)
+and get_e_list program = function (* expr list *)
 [] -> []
-| exp::tl -> (get_expr exp)::(get_e_list tl)
+| exp::tl -> (get_expr program exp)::(get_e_list program tl)
 
 
-let rec do_stmt = function (* stmts *)
-| A.Block(s_list) -> S.Block(take_stmts s_list)
+let rec do_stmt program = function (* stmts *)
+| A.Block(s_list) -> S.Block(take_stmts program s_list)
 | A.State(name) -> S.State(name)
-| A.If(pred,sta,stb) -> S.If((get_expr pred),(do_stmt sta),(do_stmt stb))
-| A.For(str,na,nb,nc,stm) -> S.For(str,(na,nb,nc),(do_stmt stm))
-| A.While(pred,stm) -> S.While((get_expr pred),(do_stmt stm))
-| A.Switch(exp, cases) -> S.Switch((get_expr exp),(get_cases cases))
-| A.Expr(e) -> S.Expr(get_expr e)
+| A.If(pred,sta,stb) -> S.If((get_expr pred),(do_stmt program sta),(do_stmt program stb))
+| A.For(str,na,nb,nc,stm) -> S.For(str,(na,nb,nc),(do_stmt program stm))
+| A.While(pred,stm) -> S.While((get_expr program pred),(do_stmt program stm))
+| A.Switch(exp, cases) -> S.Switch((get_expr program exp),(get_cases cases))
+| A.Expr(e) -> S.Expr(get_expr program e)
 | A.Goto(label) -> S.Goto(label)
 | A.Halt -> S.Halt
-and take_stmts = function (*stmt list*)
+and take_stmts program = function (*stmt list*)
 [] -> []
-| stm::tl -> (do_stmt stm)::(take_stmts tl)
-and get_cases = function (* (expr * stmt) list *)
+| stm::tl -> (do_stmt program stm)::(take_stmts program tl)
+and get_cases program = function (* (expr * stmt) list *)
 [] -> []
-| (e,s_list)::tl -> ((get_expr e),(take_stmts s_list))::(get_cases tl)
+| (e,s_list)::tl -> ((get_expr program e),(take_stmts program s_list))::(get_cases program tl)
 
 
 let rec take_in = function
@@ -135,10 +135,10 @@ let rec get_states num = function (* body: stmt list *)
 | A.State(name)::tl -> (name,num):: (get_states (num+1) tl)
 | _::tl -> get_states num tl
 
-let rec take_fsm = function
+let rec take_fsm program = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
-    -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts body)}::(take_fsm tl)
+    -> { S.fsm_name = name; S.fsm_locals = (copy_locals local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts program body)}::(take_fsm program tl)
 
 
 let rec take_pubs name = function (*(dtype * string * expr) list*)
@@ -158,8 +158,8 @@ let convert = function
 {A.input = i; A.output=o; A.types = typs; A.fsms = fsms} -> {S.input = take_in i; S.output = take_out o; S.public = S.public(get_pubs fsms); S.types = take_typ typs; S.fsms = take_fsm fsms}
 | _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
 *)
-let convert i o typs fsms = function
-[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs fsms; S.types = take_typ typs; S.fsms = take_fsm fsms}
+let convert i o typs fsms program = function
+[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs fsms; S.types = take_typ typs; S.fsms = take_fsm program fsms}
 (*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
 
 
@@ -173,7 +173,7 @@ let convert i o typs fsms = function
 
 
 let check program =
-  convert program.A.input program.A.output program.A.types program.A.fsms []
+  convert program.A.input program.A.output program.A.types program.A.fsms program []
 (* or convert program *)
 
 
