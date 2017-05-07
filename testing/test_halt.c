@@ -21,7 +21,9 @@ int main(){
     test_halt_tick(&s, &i, NULL); 
 
     i.p = 1;
-    i.q = "Emma"; //print Emma's world 
+    i.q = "Emma"; //print Emma's world
+    test_halt_tick(&s, &i, NULL)
+
     if (test_halt_tick(&s, &i, NULL) == NULL) {
        printf("And we halted");
     } 
