@@ -1,5 +1,5 @@
 input[char decision]
-output[char result]
+output[int result]
 
 fsm ekas {
 
