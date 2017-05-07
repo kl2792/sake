@@ -61,7 +61,7 @@ Check() {
     #echo $wrapper 
     #echo "../testing/$wrapper"
 
-    echo -n "$basename..."
+    echo "$basename..."
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
 
@@ -81,7 +81,7 @@ Check() {
         if [ $keep -eq 0 ] ; then
             rm -f $generatedfiles
         fi
-        echo "OK"
+        echo "OK - Stories over :)"
         echo "###### SUCCESS" 1>&2
     else 
         echo "###### FAILED" 1>&2
