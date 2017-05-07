@@ -1,1 +1,1 @@
-Fatal error: exception Llvm_generator.Bug("No variable: i")
+Fatal error: exception Semant.SemanticError("undeclared identifier i")
