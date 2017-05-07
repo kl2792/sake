@@ -3,7 +3,13 @@ module S = Sast
 
 module StringMap = Map.Make(String)
 
+exception SemanticError of string
 
+
+
+let wrong_enum_error name =
+    let msg = sprintf "undeclared enum value %s" name in
+    raise (SemanticError msg)
 
 
 let convert_type = function (* A.dtype *)
@@ -33,12 +39,36 @@ let get_op = function (* A.op *)
 | A.Or -> S.Or
 
 
+
+let rec find_val val ind = function (* start at 1 *)
+  | [] -> (-1)
+  | [x] -> if(x=val) then ind else find_val val (ind+1) []
+  | x::tl -> if(x=val) then ind else find_val val (ind+1) tl
+  | _ -> (-1)
+
+
+let look_for val type_dec=
+    find_val val 1 type_dec.A.type_values
+
+let is_there_res = function
+  | [] -> (-1)
+  | [x] -> if(x = (-1)) then is_there_res [] else x
+  | x::tl -> if(x = (-1)) then is_there_res tl else x
+  | _ -> (-1)
+
 let rec get_expr = function (* A.expr *)
 | A.BoolLit(bl) -> S.BoolLit(bl)
 | A.CharLit(ch) -> S.CharLit(ch)
 | A.IntLit(num) -> S.IntLit(num)
 | A.StringLit(name) -> S.StringLit(name)
 | A.Variable(name) -> S.Variable(name)
+| A.EnumLit(val) -> 
+  let result =
+    let enum_search =
+      List.map (look_for val) A.types
+    in
+    is_there_res enum_search
+  in if (result=-1) then (wrong_enum_error val) else S.IntLit(result)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
 | A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr exp))
 | A.Binop(e1,o,e2) -> S.Binop((get_expr e1), (get_op o) ,(get_expr e2))
