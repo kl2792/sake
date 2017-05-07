@@ -141,14 +141,14 @@ let rec take_fsm program = function
     -> { S.fsm_name = name; S.fsm_locals = (copy_locals program local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts program body)}::(take_fsm program tl)
 
 
-let rec take_pubs name = function (*(dtype * string * expr) list*)
+let rec take_pubs program name = function (*(dtype * string * expr) list*)
 [] -> []
-| (typ,var_name,expr)::tl -> ((convert_type typ),name ^ "_" ^ var_name,(get_expr expr)):: (take_pubs name tl)
+| (typ,var_name,expr)::tl -> ((convert_type typ),name ^ "_" ^ var_name,(get_expr program expr)):: (take_pubs program name tl)
 
-let rec get_pubs = function
+let rec get_pubs program = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
-    -> (take_pubs name pubs) @ (get_pubs tl)
+    -> (take_pubs program name pubs) @ (get_pubs program tl)
 
 
 
@@ -159,7 +159,7 @@ let convert = function
 | _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
 *)
 let convert i o typs fsms program = function
-[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs fsms; S.types = take_typ typs; S.fsms = take_fsm program fsms}
+[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs program fsms; S.types = take_typ typs; S.fsms = take_fsm program fsms}
 (*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
 
 
