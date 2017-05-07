@@ -59,6 +59,7 @@ let rec do_stmt = function (* stmts *)
 | A.Switch(exp, cases) -> S.Switch((get_expr exp),(get_cases cases))
 | A.Expr(e) -> S.Expr(get_expr e)
 | A.Goto(label) -> S.Goto(label)
+| A.Halt -> S.Halt
 and take_stmts = function (*stmt list*)
 [] -> []
 | stm::tl -> (do_stmt stm)::(take_stmts tl)
