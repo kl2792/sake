@@ -51,8 +51,7 @@ let translate filename program =
   let abc = L.append_block context in
 
   let zero = L.const_int i32_t 0
-  and pos1 = L.const_int i32_t 1
-  and neg1 = L.const_int i32_t (-1) in
+  and pos1 = L.const_int i32_t 1 in
   
   (* New types *)
   let input_t =
