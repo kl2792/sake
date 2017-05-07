@@ -4,11 +4,12 @@ output [int p]
 fsm conjunctions {
         int q = 4
 
-        if (v == 5 || q == 4) {
+        if (v == 5) {
                 p = 6
         }
-        else if (v == 7) {
+        else if (v == 7 || q == 4) {
                 p = 89
+                q = 10
         }
         else if (v == 123) {
                 p = 21
