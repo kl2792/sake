@@ -13,7 +13,7 @@ fsm hello {
                 }
         state World
                 if (p == 1) {
-                        printf("%s %s\n", q, "'s World")
+                        printf("%s%s\n", q, "'s World")
                         goto Hello
                 }
                 else {

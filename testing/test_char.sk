@@ -1,0 +1,7 @@
+fsm ekas {
+        char decision = 's'
+
+        if (decision == 's') {
+                printf("%c\n", decision)
+        }
+}

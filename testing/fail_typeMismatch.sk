@@ -1,0 +1,8 @@
+input[char decision]
+output[char result]
+
+fsm ekas {
+
+        state Sone
+                result = 1
+}

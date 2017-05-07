@@ -24,7 +24,7 @@ type stmt =
   | Switch of expr * (expr * stmt list) list
   | Expr of expr
   | Goto of string (* for FSM transitions *)
-  | Halt 
+  | Halt
 type type_decl = {
   type_name   : string;
   type_values : string list;

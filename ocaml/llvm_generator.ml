@@ -73,16 +73,21 @@ let translate filename program =
   let printf =
     let ftype = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
     L.declare_function "printf" ftype sake in
-  let debug = false in
-  let lldebug s l builder =
-    let args = Array.of_list (L.build_global_stringptr s "fmt" builder :: l) in
-    if debug then ignore (L.build_call printf args "" builder) else () in
-  let gsp s = L.build_global_stringptr s "debug" in
   let memcpy =
     let state_t_ptr = L.pointer_type state_t in
     let args = [| state_t_ptr; state_t_ptr; i64_t |] in
-    let ftype = L.function_type (L.pointer_type state_t) args in
+    let ftype = L.function_type void_t args in
     L.declare_function "memcpy" ftype sake in
+
+  (* Debugging *)
+  let debug = false in
+  let gsp s = L.build_global_stringptr s s in
+  let lldebug s l builder =
+    if debug then
+      let args = gsp ("\027[31m"^s^"\027[0m") builder :: l in
+      List.iter L.dump_value args;
+      ignore (L.build_call printf (Array.of_list args) "" builder)
+    else () in
 
   (* Variable maps *)
   let imap =
@@ -105,17 +110,18 @@ let translate filename program =
     try StringMap.find name !locals with
       Not_found ->
         let fa = L.params fn in
-        let pub_ptr = if io == input then fa.(1) else fa.(0) in
-        let io_ptr = if io == input then fa.(2) else fa.(3) in
         try
-          let pub_val =
+          let pub_ptr = if io == input then fa.(1) else fa.(0)
+          and pub_val =
             try StringMap.find ((L.value_name fn) ^ "_" ^ name) public with
-              Not_found -> StringMap.find name public in
+            Not_found -> StringMap.find name public in
+          lldebug "lookup %s: public[%d]\n" [gsp name builder; L.const_int i32_t pub_val] builder;
           L.build_struct_gep pub_ptr pub_val name builder with
         Not_found ->
-          let io_val = try StringMap.find name io with
+          let io_ptr = if io == input then fa.(2) else fa.(3)
+          and io_val = try StringMap.find name io with
             Not_found -> raise (Bug (Printf.sprintf "No variable: %s" name)) in
-          lldebug "io for %s: %d\n" [gsp name builder; L.const_int i32_t io_val] builder;
+          lldebug "lookup %s: %s[%d]\n" [gsp name builder; gsp (if io == input then "input" else "output") builder; L.const_int i32_t io_val] builder;
           L.build_struct_gep io_ptr io_val name builder in              
 
   (* Expression builder *)
@@ -139,8 +145,8 @@ let translate filename program =
         (llop op) (expr fn builder e1) (expr fn builder e2) "tmp" builder
     | A.Assign (s, e) ->
         let e = expr fn builder e in
-        lldebug "assign %s: %d\n" [gsp s builder; e] builder;
-        ignore (L.build_store e (lookup fn output s builder) builder); e in
+        ignore (L.build_store e (lookup fn output s builder) builder);
+        lldebug "assign %s: %d\n" [gsp s builder; e] builder; e in
 
   let add_terminal builder f =
     match L.block_terminator (L.insertion_block builder) with
@@ -190,17 +196,18 @@ let translate filename program =
         let body = A.Block [body; increment] in
         let body = A.Block [init; A.While (cond, body)] in
         stmt fn builder body
-    | A.State name ->
-        let block, _ = try StringMap.find name !states with
-          Not_found -> raise (Bug (Printf.sprintf "No SAST state: %s" name)) in
-        add_terminal builder (L.build_br block);
-        bae block;
+    | A.State state ->
+        let block, _ = try StringMap.find state !states with
+          Not_found -> raise (Bug (Printf.sprintf "No state: %s" state)) in
+        add_terminal (stmt fn builder (A.Goto state)) L.build_ret_void;
+        bae block
     | A.Goto state ->
         let _, value = try StringMap.find state !states with
           Not_found -> raise (Bug (Printf.sprintf "No state: %s" state)) in
-        let pub = lookup fn output (L.value_name fn) builder in
-        lldebug "goto %s: %d\n" [gsp state builder; value] builder;
-        ignore (L.build_store value pub builder);
+        let name = L.value_name fn in
+        let pub = lookup fn output name builder in
+        lldebug "goto %s: %d\n" [gsp state builder; L.const_int i32_t value] builder;
+        ignore (expr fn builder (A.Assign (name, A.IntLit value)));
         bae (L.insertion_block builder) in
 
   (* FSM functions *)
@@ -212,34 +219,38 @@ let translate filename program =
         let pointers = Array.of_list (List.map L.pointer_type types) in
         let ftype = L.function_type void_t pointers in
         L.define_function fsm.A.fsm_name ftype sake in
-
-      (* Halt if invalid state; use unique names for blocks *)
       let init = abc "*init" fn and halt = abc "*halt" fn in
-      let builder = bae halt in
-      let ptr = L.build_struct_gep (L.params fn).(0) 0 "ptr" builder in
-      ignore (L.build_store zero ptr builder);
-      add_terminal builder (L.build_ret_void);
 
       (* Generate mapping of state name -> block / index *)
-      let add_state m (n, i) = (* Generated block for state *)
-        StringMap.add n (abc n fn, L.const_int i32_t i) m in
+      let add_state m (n, i) = StringMap.add n (abc n fn, i) m in
       states := List.fold_left add_state StringMap.empty fsm.A.fsm_states;
+
+      (* Halt if invalid state; use unique names for blocks *)
+      let builder = bae halt in
+      let ptr = L.build_struct_gep (L.params fn).(0) 0 "ptr" builder in
+      lldebug "halting from %s\n" [gsp (L.value_name fn) builder] builder;
+      (*ignore (L.build_store zero ptr builder);*)
+      add_terminal builder (L.build_ret_void);
 
       (* Allocate locals and jump to the correct state *) 
       let builder = bae (L.entry_block fn) in
       let add_local m (t, n, e) = (* Local variable allocation *)
-        let local = L.build_alloca (lltype t) n builder in
-        ignore (L.build_store (expr fn builder e) local builder);
+        let local = L.build_alloca (lltype t) n builder
+        and e = expr fn builder e in
+        lldebug "local %s: %d" [gsp n builder; e] builder;
+        ignore (L.build_store e local builder);
         StringMap.add n local m in
       locals := List.fold_left add_local StringMap.empty fsm.A.fsm_locals;
       let bindings = StringMap.bindings !states in
       let switch =
         let value = lookup fn input (L.value_name fn) builder in
         let value = L.build_load value (L.value_name fn) builder in
-        lldebug "state: %d\n" [value] builder;
+        lldebug "state %s: %d\n" [gsp (L.value_name fn) builder; value] builder;
         L.build_switch value halt (List.length bindings) builder in
-      let build_case (_, (block, value)) = L.add_case switch value block in
-      List.iter build_case (("", (init, zero)) :: bindings);
+      let build_case (_, (block, value)) =
+        let value = L.const_int i32_t value in
+        L.add_case switch value block in
+      List.iter build_case (("", (init, 0)) :: bindings);
 
       (* Build the function body; start with dead, loop in last state *)
       let body = A.Block fsm.A.fsm_body in
@@ -254,10 +265,9 @@ let translate filename program =
     let ftype = L.function_type i32_t args in
     L.define_function (filename ^ "_tick") ftype sake in
   let ta = L.params tick in
-  let reset = abc "reset" tick
-  and check = abc "check" tick
-  and update = abc "update" tick
-  and halted = abc "halted" tick in
+  let reset  = abc "reset"  tick and check  = abc "check"  tick
+  and update = abc "update" tick and halted = abc "halted" tick in
+
 
   (* Reset if input is NULL; otherwise, proceed as normal *)
   let builder = bae (L.entry_block tick) in
@@ -275,42 +285,33 @@ let translate filename program =
   store 0 pos1; (* the _running variable *)
   List.iteri (fun i _ -> store (i + 1) zero) program.A.fsms; (* FSM states *)
   List.iteri pub_iter program.A.public; (* public variables *)
-  add_terminal builder (L.build_ret pos1);
+  add_terminal builder (L.build_ret zero);
 
   (* Check if halted *)
   let builder = bae check in
-  (*Printf.printf "STATE STRUCT: %s\n" (L.string_of_llvalue ta.(0));
-  Printf.printf "INPUT STRUCT: %s\n" (L.string_of_llvalue ta.(1));
-  Printf.printf "OUPUT STRUCT: %s\n" (L.string_of_llvalue ta.(2));
-  let print_sm str sm =
-    let sm = StringMap.bindings sm in
-    Printf.printf "LIST OF %s (%d): %s\n" str (List.length sm) (List.fold_left (fun a (k, i) -> a ^ " " ^ (Printf.sprintf "(%s, %d)" k i)) "" sm) in
-  print_sm "PUBLIC" public;
-  print_sm "INPUT" input;
-  print_sm "OUTPUT" output;*)
   let halt =
     let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
     let halt = L.build_load state "state" builder in
     (llop A.Eq) halt neg1 "halt" builder in
   add_terminal builder (L.build_cond_br halt halted update);
 
-  (* State allocation, modification, and updating *)
+  (* Allocate, initialize, modify, and update FSM state *)
   let builder = bae update in
   let state = L.build_alloca state_t "state" builder in
-  let fa = Array.of_list (state :: (Array.to_list ta)) in
-  let ma = [| ta.(0); state; L.size_of state_t |] in
+  let fa = Array.of_list (state :: (Array.to_list ta)) in (* FSM args *)
+  L.build_call memcpy [| state; ta.(0); L.size_of state_t |] "" builder; 
   List.iter (fun fsm -> ignore (L.build_call fsm fa "" builder)) fsms;
-  ignore (L.build_call memcpy ma "" builder);
+  L.build_call memcpy [| ta.(0); state; L.size_of state_t |] "" builder;
   add_terminal builder (L.build_ret pos1);
 
   (* Halted: return 0 iff halted before tick was called *)
   let builder = bae halted in
-  let halt =
+  let ret =
     let state = L.build_struct_gep ta.(0) 0 "ptr" builder in
     let halt = L.build_load state "state" builder in
-    (llop A.Eq) halt zero "halt" builder in
-  let cast = L.build_zext_or_bitcast halt i32_t "ext" builder in
-  add_terminal builder (L.build_ret cast);
+    let ret = (llop A.Eq) halt zero "halt" builder in
+    L.build_intcast ret i32_t "cast" builder in
+  add_terminal builder (L.build_ret ret);
 
   (* Enjoy :) *)
   sake
