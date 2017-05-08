@@ -7,7 +7,7 @@
 %token INT BOOL VOID CHAR STRING
 %token EOF
 
-/*tokens specific to our language */
+/* tokens specific to our language */
 %token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT PUBLIC
 %token PRINTF HALT
 
@@ -25,7 +25,7 @@
 %left MUL DIV
 %right NOT NEG
 
-/*literals */
+/* literals */
 %token <int> INTLIT
 %token <char> CHARLIT
 %token <string> STRINGLIT
@@ -39,19 +39,18 @@
 %%
 /* grammar */
 dtype:
-BOOL { Bool }
+|BOOL { Bool }
 | INT { Int }
 | CHAR { Char }
 | STRING { String }
-//| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
-| TYPENAME { Enum($1) }  /*Q: Not sure if this is correct */
+| TYPENAME { Enum($1) }  
 
 lvalue:
  dtype ID { $1, $2 }
 
-/*expressions*/
+/* expressions */
 expr:
-INTLIT { IntLit($1) }
+|INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
@@ -77,9 +76,9 @@ INTLIT { IntLit($1) }
 | PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3 ^ "\n", List.rev $5) }
 | ID DOT ID { Access($1, $3) }
 
-/*statements*/
+/* statements */
 stmt:
-LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
+|LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE TYPENAME NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
@@ -91,7 +90,7 @@ LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | HALT NLINE { Halt }
 
 stexpr:
-  ID expr {$1, $2}
+ID expr {$1, $2}
 
 cstmt:
   CASE expr COLON stmt_list {$2, List.rev $4}
@@ -113,13 +112,14 @@ fsm_decl:
 }} 
 
 program:
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
+| INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
     types = $12;
     fsms = List.rev $13;
   }}
+
 /* No input output */
 | type_opt fsm_list EOF
   {{
@@ -130,64 +130,63 @@ program:
   }}
 
 
-/*list definitions */
-
+/* list definitions */
 actuals_list:
-  expr { [$1] }
+| expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1} 
 
 stexpr_list:
-  stexpr { [$1] }
+| stexpr { [$1] }
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  /*nothing*/ { [] }
+| /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
 cstmt_list: 
-  NLINE { [] }
+| NLINE { [] }
 | cstmt_list cstmt {  $2 :: $1 }
 
 string_opt:
-  /* nothing */ { [] }
+| /* nothing */ { [] }
 | string_list { List.rev $1 }
 
 string_list:
-  TYPENAME { [$1] }
+| TYPENAME { [$1] }
 | string_list BAR TYPENAME { $3 :: $1 }
 
 lvalue_list:
-  lvalue { [$1] }
+| lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 dstexpr:
- dtype ID ASSIGN expr { $1, $2, $4 }
+| dtype ID ASSIGN expr { $1, $2, $4 }
 | dtype ID { $1, $2, Empty}
 
 public_opt:
- /*nothing*/ { [] }
+| /*nothing*/ { [] }
 | public_list NLINE {List.rev $1}
 
 public_list:
- PUBLIC dstexpr { [$2] }
+| PUBLIC dstexpr { [$2] }
 | public_list NLINE PUBLIC dstexpr {$4 :: $1}
 
 local_opt:
-/*nothing*/ { [] }
+| /*nothing*/ { [] }
 | local_list NLINE {List.rev $1}
 
 local_list:
-dstexpr { [$1] }
+| dstexpr { [$1] }
 | local_list NLINE dstexpr { $3 :: $1 }
 
 type_opt:
-/*nothing*/ {[] }
+| /*nothing*/ {[] }
 | type_list NLINE NLINE { List.rev $1 }
 
 type_list:
-type_decl { [] }
+| type_decl { [] }
 | type_list type_decl { $2 :: $1}
 
 fsm_list:
-/* nothing */ { [] }
+| /* nothing */ { [] }
 | fsm_list fsm_decl { $2 :: $1}
