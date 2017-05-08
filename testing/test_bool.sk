@@ -1,7 +1,20 @@
-input [int i, int o, bool pumpkins, char l]
-output [int p, int q]
+input [bool i]
+output [bool o]
 
-fsm headerTest {
-        public int p = 23
-        public bool l = 22
+fsm test {
+        ~ publics 
+        public bool l = false
+
+        if (l) {
+                printf("%s\n", "L is true")
+        }
+        else {
+                printf("%s\n", "L is false")
+        }
+        if (i) {
+                printf("%s\n", "i is true")
+        }
+        else {
+                printf("%s\n", "i is false")
+        } 
 }

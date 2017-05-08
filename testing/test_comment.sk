@@ -1,4 +1,7 @@
-fsm variables {
+fsm comments {
         ~ int i = 4 
         ~ public int k = 4
+        
+	printf("%s", "Line comment sandwich")
+        ~ hello there
 }

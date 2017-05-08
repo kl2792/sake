@@ -1,0 +1,12 @@
+fsm ifTest {
+        int n = 4
+        int m = 5
+
+        if (n == 4) {
+                n = n + 5
+                if (m == 5) {
+                        m = m + 4
+                }
+        }
+        printf("%s %d\n%s %d", "n:", n, "m:", m)
+}

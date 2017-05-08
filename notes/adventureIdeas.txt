@@ -1,0 +1,16 @@
+Choice ideas:
+
+Left or right? 
+        - pick left -> 
+        - pick right -> 
+
+Drink wine or juice? 
+        - wine is poisoned and kills you
+        - juice is great and your still alive
+
+
+
+
+
+
+

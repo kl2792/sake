@@ -92,8 +92,10 @@ Check() {
 
         echo "#include <stdio.h>" > ../testing/${basename}.c
         echo "#include \"${basename}.h\"\n" >> ../testing/${basename}.c
-        echo "int main() {\n\t ${basename}_tick(NULL, NULL, NULL);\n}" >> ../testing/${basename}.c
-        
+        echo "int main() {\n\tstruct ${basename}_input i;" >> ../testing/${basename}.c
+        echo "\tstruct ${basename}_state s;" >> ../testing/${basename}.c
+        echo "\n\t${basename}_tick(&s, NULL, NULL); \n\t${basename}_tick(&s, &i, NULL); \n\n\treturn 0;\n}" >> ../testing/${basename}.c
+
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" && 
         Run "$SAKE" " " $1 ${basename} &&
         Run "mv ${basename}.h ../testing/" &&

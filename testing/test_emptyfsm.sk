@@ -1,2 +1,6 @@
-fsm hi {
+input [int i]
+output [bool k]
+
+fsm empty {
+
 }

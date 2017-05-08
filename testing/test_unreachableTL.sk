@@ -1,0 +1,27 @@
+input[int inOne]
+output[char outOne] 
+
+fsm tlOne {
+
+        state R1
+                if (inOne == 1) {
+                        outOne = 'g' 
+                        goto G1
+                }
+                else {
+                        outOne = 'r'
+                        goto R1
+                }
+        state Y1
+                outOne = 'y'
+                goto Y1
+        state G1
+                if (inOne == 0) {
+                        outOne = 'y'
+                        goto Y1 
+                }
+                else {
+                        outOne = 'g'
+                        goto G1
+                }    
+}

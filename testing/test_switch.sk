@@ -1,6 +1,10 @@
+input[int i]
+output[int o]
+
 fsm switchCase {
-        switch(1) {
-                case 0: print("%d", 0)
-		case 1: print("%d", 1)
+
+        switch(i) {
+                case 0: o = 42
+		case 1: o = 24
         }
 }

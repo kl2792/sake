@@ -1,4 +1,22 @@
+input[int i]
+output[int o]
+
 fsm one {
+        public int j = 4
+        int r = two.k
+
+        state DependK
+                r = two.k 
+                printf("%d\n", r) 
+                goto DependK
 }
 fsm two {
+        public int k = 3
+        
+	state SetK
+                if (i == 2) { 
+                        k = 45
+                }
+                printf("%d\n", k)
+                goto SetK
 }

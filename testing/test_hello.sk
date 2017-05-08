@@ -1,10 +1,11 @@
 fsm hello {
-        print ("%d", 1*1)
-        print ("%d", 2 * 3 - 4)
-        print ("%d", 3)
-        print ("%d", 5*4-16)
-        print ("%d", 4+1)
-        print ("%d", 6-0)
-        print ("%d", 1+1+1+1+1+1+1)
-        print ("%d", 1+2-3+4+4)
+        
+	printf("%d\n", 1*1)
+        printf("%d\n", 2 * 3 - 4)
+        printf("%d\n", 3)
+        printf("%d\n", 5*4-16)
+        printf("%d\n", 4+1)
+        printf("%d\n", 6-0)
+        printf("%d\n", 1+1+1+1+1+1+1)
+        printf("%d\n", 1+2-3+4+4)
 }

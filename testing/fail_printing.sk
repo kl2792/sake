@@ -1,0 +1,5 @@
+fsm printing {
+        char c = 'e'
+
+        printf("%c %s\n", c+1, " is the coolest letter!") 
+}

@@ -1,0 +1,14 @@
+fsm bc {
+        /~ block comment ~/
+        /~ block
+         ~ comments
+         ~ on 
+         ~ multiple 
+         ~ lines 
+         ~/
+        
+	printf("%s", "I successfully navigated a block comment!")
+        /~ block
+           comment
+         ~/
+}

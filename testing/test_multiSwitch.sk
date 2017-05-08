@@ -1,0 +1,15 @@
+input[int i]
+output[int out]
+
+fsm switchCase {
+        int p = 0
+
+        switch(i) {
+                case 0: out = 42
+                        p = 24
+                        printf("%d\n", p)
+		case 1: out = 24
+                        p = 42
+                        printf("%d\n", p)
+        }
+}

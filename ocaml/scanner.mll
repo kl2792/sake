@@ -1,4 +1,7 @@
-{ open Parser }
+{ open Parser 
+  let unescape u =
+	Scanf.sscanf("\"" ^ u ^ "\"") "%S%!" (fun x -> x)
+}
 
 let spc = [' ' '\t']
 let cap = ['A'-'Z']
@@ -9,12 +12,11 @@ let aln = (ltr | dgt)
 
 rule token = parse
     spc { token lexbuf }
-  | "(~" { comment lexbuf }
-  | "~" { line_comment lexbuf }
+  | "/~" { comment lexbuf }
+  | '~' { line_comment lexbuf }
   | '.' { DOT }
   | '_' { UNDER }
   | '|' { BAR }
-  | '?' { QUESMARK }
   | '\n'     { NLINE }
   | '('      { LPAREN }
   | ')'      { RPAREN }
@@ -45,9 +47,6 @@ rule token = parse
   | "for"    { FOR }
   | "in"     { IN }
   | "while"  { WHILE }
-  | "return" { RETURN }
-  | "continue"   { CONTINUE }
-  | "break"   { BREAK }
   | "int"    { INT }
   | "bool"   { BOOL }
   | "void"   { VOID }
@@ -55,10 +54,8 @@ rule token = parse
   | "string"   { STRING }
   | "true"   { TRUE }
   | "false"  { FALSE }
-  | "print"  { PRINT }
+  | "printf"  { PRINTF }
   | "fsm" { FSM }
-  | "tick"   { TICK }
-  | "reset"   { RESET }
   | "type" { TYPE }
   | "goto" { GOTO }
   | "switch" { SWITCH }
@@ -68,15 +65,14 @@ rule token = parse
   | "start" { START }
   | "input" { INPUT }
   | "output" { OUTPUT }
-  | "sysin" { SYSIN }
   | "public" { PUBLIC }
+  | "halt" { HALT }
   | cap aln*  as lxm { TYPENAME (lxm) }
   | low aln* as lxm { ID (lxm) }
   | dgt+ as num { INTLIT (int_of_string num) }
-  | ':'dgt+ as num { RTOK (int_of_string num) }
   | '''([^''']  as ch_litr)'''            { CHARLIT(ch_litr)}
-  | '''(['\\']['\\' ''' '"' 't' 'n'] as esc_ch)'''    { ESCAPE(esc_ch)}
-  | '"'([^'"']* as st_litr)'"'            { STRINGLIT(st_litr)}
+  | '"'([^'"']* as st_litr)'"'            { STRINGLIT(unescape st_litr)}
+(*  | '"'([^'"']* as esc_litr)'\n' '"'    { ESCAPE(esc_litr)}*)
 (*
   | dgt+ as lxm { INTLIT(int_of_string lxm) }
   | cap axn* as lxm { ENUM(lxm) }
@@ -84,9 +80,8 @@ rule token = parse
   *)
   | eof { EOF }
   | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
-
 and comment = parse
-    "~)" { token lexbuf }
+    "~/\n" { token lexbuf }
   | _    { comment lexbuf }
 and line_comment = parse
     '\n' { token lexbuf }

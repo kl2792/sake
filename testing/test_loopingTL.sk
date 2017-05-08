@@ -1,0 +1,65 @@
+input[int inTwo]
+output[char outOne, char outTwo] 
+
+fsm tlOne {
+        public int turnOne = 1        
+        int count = 0
+        
+        state R1
+                if (tlTwo.turnTwo == 1) {
+                        outOne = 'r'
+                        count = 0
+                        goto R1
+                }
+                else {        
+                        if (count < 1) { 
+                                count = count + 1
+                                outOne = 'r'
+                                goto R1
+                        }
+                        count = 0
+                        outOne = 'g'
+                        goto G1    
+                }    
+        state Y1               
+                outOne = 'r'
+                count = 0
+                goto R1
+        state G1
+                if (tlTwo.turnTwo == 0) {
+                        outOne = 'g'
+                        goto G1
+                }
+                outOne = 'y'
+                goto Y1 
+}
+fsm tlTwo {
+        public int turnTwo = 0 
+        int count = 0 
+        
+        state R2
+                if (inTwo == 1) {
+                        turnTwo = 1
+                }
+                if (turnTwo == 1 && tlOne == R1) {
+                        outTwo = 'g' 
+                        count = 0 
+                        goto G2
+                }
+                else {
+                        outTwo = 'r'
+                        goto R2
+                }
+        state Y2
+                outTwo = 'r'
+                turnTwo = 0
+                goto R2
+        state G2
+                while (count < 10) {
+                        count = count + 1
+                        outTwo = 'g'
+                        goto G2
+                } 
+                outTwo = 'y'
+                goto Y2 
+}

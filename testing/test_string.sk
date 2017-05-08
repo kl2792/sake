@@ -1,3 +1,6 @@
 fsm stringlit {
-        "Hello World"
+
+        printf("%s\n", "Hello World")
+        printf("\t%s\n", "Hello World")
+        printf("\t\t%s", "Hello World")
 }

@@ -1,0 +1,22 @@
+input[int p, string q]
+output[int k]
+
+fsm hello {
+        
+	state Hello
+                if (i == 1) {
+                        printf("%s", "Hello")
+                        goto World
+                }
+                else {
+                        goto Hello
+                }
+        state World
+                if (i == 1) {
+                        printf("%s%s\n", q, "'s World")
+                        goto Hello
+                }
+                else {
+                        goto World
+                }
+}

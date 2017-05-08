@@ -1,0 +1,28 @@
+input[int p, string q]
+output[int k]
+
+type Emma = Shalva | Ac | Kc
+
+fsm hello {
+        Emma x = Shalva
+
+	state Hello
+                if (p == 1) {
+                        x = Ac
+                }
+                if (x == Ac) {
+                        printf("%s", "Hello ")
+                        goto World
+                }
+                else {
+                        goto Hello
+                }
+        state World
+                if (p == 1) {
+                        printf("%s%s\n", q, "'s World")
+                        goto Hello
+                }
+                else {
+                        goto World
+                }
+}

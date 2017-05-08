@@ -1,16 +1,15 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES QUESMARK DOT LSQUARE RSQUARE NLINE UNDER
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES DOT LSQUARE RSQUARE NLINE UNDER
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT TRUE FALSE
-%token RETURN IF ELSE ELIF FOR WHILE IN
+%token IF ELSE FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
-%token CONTINUE BREAK
 %token EOF
 
-/*tokens specific to our language */
-%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
-%token TICK RESET PRINT
+/* tokens specific to our language */
+%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT PUBLIC
+%token PRINTF HALT
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -26,9 +25,8 @@
 %left MUL DIV
 %right NOT NEG
 
-/*literals */
+/* literals */
 %token <int> INTLIT
-%token <int> RTOK
 %token <char> CHARLIT
 %token <string> STRINGLIT
 %token <string> ESCAPE
@@ -41,25 +39,24 @@
 %%
 /* grammar */
 dtype:
-BOOL { Bool }
+|BOOL { Bool }
 | INT { Int }
 | CHAR { Char }
-| dtype LSQUARE INTLIT RSQUARE { Array($1, $3) }  /*??  ast as well */
-| ID { Enum($1) }  /*Q: Not sure if this is correct */
+| STRING { String }
+| TYPENAME { Enum($1) }  
 
 lvalue:
  dtype ID { $1, $2 }
 
+/* expressions */
 expr:
-INTLIT { IntLit($1) }
+|INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
 | STRINGLIT { StringLit ($1) }
-| ESCAPE { Escape ($1) }
-| RTOK RTOK INTLIT { Range($1, $2, $3) }
-//| actuals_list { ArrayLit(List.rev $1) } /*see list definitions below */
 | ID { Variable($1) }
+| TYPENAME { EnumLit($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
 | NOT expr { Uop(Not, $2) }
 | expr ADD expr { Binop($1, Add, $3) }
@@ -75,114 +72,121 @@ INTLIT { IntLit($1) }
 | expr AND expr { Binop($1, And, $3) }
 | expr OR expr { Binop($1, Or, $3) }
 | ID ASSIGN expr { Assign($1, $3) }
-| dtype ID ASSIGN expr { Assign($2, $4) }
-//| ID UNDER TICK LPAREN actuals_opt RPAREN { Fsm_call($1, Tick, $5) }
-| PRINT LPAREN STRINGLIT COMMA actuals_opt RPAREN { Print($3, $5) }
-// Can solve with Associativity | expr QUESMARK expr COLON expr { Cond($1, $3, $5) }
+| PRINTF LPAREN STRINGLIT COMMA actuals_list RPAREN { Printf($3, List.rev $5) }
+| PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3 ^ "\n", List.rev $5) }
+| ID DOT ID { Access($1, $3) }
 
+/* statements */
 stmt:
-LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
-| STATE ID NLINE { State($2) }
+|LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
+| STATE TYPENAME NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
 | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
-| FOR LPAREN ID IN expr RPAREN stmt { For($3, $5, $7) }
+| FOR ID IN LPAREN INTLIT COLON INTLIT COLON INTLIT RPAREN stmt { For($2, $5, $7, $9, $11) }  
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 | expr NLINE{ Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
-| GOTO ID NLINE { Goto ($2) }
-| dtype stexpr_list NLINE{Ldecl($1, List.rev $2)}
+| GOTO TYPENAME NLINE { Goto ($2) }
+| HALT NLINE { Halt }
 
 stexpr:
-  ID expr {$1, $2}
+ID expr {$1, $2}
 
 cstmt:
-  CASE expr COLON stmt {$2, $4}
+  CASE expr COLON stmt_list {$2, List.rev $4}
 
 type_decl:
-  TYPE ID ASSIGN string_opt NLINE 
+  TYPE TYPENAME ASSIGN string_opt 
   {{
     type_name = $2;
     type_values = $4;
   }}
 
 fsm_decl:
-  FSM ID LBRACE NLINE public_opt stmt_list RBRACE NLINE
+  FSM ID LBRACE NLINE public_opt local_opt NLINE stmt_list RBRACE NLINE
 {{
   fsm_name = $2;
-  fsm_public = $5;
-  fsm_states = ["start"];
-  fsm_body = List.rev $6;
-}}
+  fsm_public = List.rev $5;
+  fsm_locals = List.rev $6;
+  fsm_body = List.rev $8;
+}} 
 
 program:
-  INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE public_opt type_list fsm_list EOF
+| INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
-    public = $12;
-    types = List.rev $13;
-    fsms = List.rev $14;
+    types = $12;
+    fsms = List.rev $13;
   }}
-/* MAXIMUM JANKNESS */
-| public_opt type_list fsm_list EOF
+
+/* No input output */
+| type_opt fsm_list EOF
   {{
     input = [];
     output = [];
-    public = $1;
-    types = List.rev $2;
-    fsms = List.rev $3;
+    types = $1;
+    fsms = List.rev $2;
   }}
 
 
-/*list definitions */
-
-actuals_opt:
-  /* nothing */ { [] }
-| actuals_list { List.rev $1 }
-
+/* list definitions */
 actuals_list:
-  expr { [$1] }
-| actuals_list COMMA expr { $3 :: $1}
+| expr { [$1] }
+| actuals_list COMMA expr { $3 :: $1} 
 
 stexpr_list:
-  stexpr { [$1] }
+| stexpr { [$1] }
 | stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
-  /*nothing*/ { [] }
+| /*nothing*/ { [] }
 | stmt_list stmt { $2 :: $1 }
 
-cstmt_list: //BUG: NLINE NLINE after switch statement
-  NLINE { [] }
+cstmt_list: 
+| NLINE { [] }
 | cstmt_list cstmt {  $2 :: $1 }
 
 string_opt:
-  /* nothing */ { [] }
+| /* nothing */ { [] }
 | string_list { List.rev $1 }
 
 string_list:
-  TYPENAME { [$1] }
+| TYPENAME { [$1] }
 | string_list BAR TYPENAME { $3 :: $1 }
 
 lvalue_list:
-  lvalue { [$1] }
+| lvalue { [$1] }
 | lvalue_list COMMA lvalue { $3 :: $1 }
 
 dstexpr:
- PUBLIC dtype ID ASSIGN expr { $2, $3, $5 }
+| dtype ID ASSIGN expr { $1, $2, $4 }
+| dtype ID { $1, $2, Empty}
 
 public_opt:
- /*nothing*/ { [] }
-| public_list NLINE NLINE{List.rev $1}
+| /*nothing*/ { [] }
+| public_list NLINE {List.rev $1}
 
 public_list:
- dstexpr { [$1] }
-| public_list NLINE dstexpr {$3 :: $1}
+| PUBLIC dstexpr { [$2] }
+| public_list NLINE PUBLIC dstexpr {$4 :: $1}
+
+local_opt:
+| /*nothing*/ { [] }
+| local_list NLINE {List.rev $1}
+
+local_list:
+| dstexpr { [$1] }
+| local_list NLINE dstexpr { $3 :: $1 }
+
+type_opt:
+| /*nothing*/ {[] }
+| type_list NLINE NLINE { List.rev $1 }
 
 type_list:
-/* nothing */ { [] }
+| type_decl { [] }
 | type_list type_decl { $2 :: $1}
 
 fsm_list:
-/* nothing */ { [] }
+| /* nothing */ { [] }
 | fsm_list fsm_decl { $2 :: $1}
