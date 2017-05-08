@@ -47,8 +47,6 @@ rule token = parse
   | "for"    { FOR }
   | "in"     { IN }
   | "while"  { WHILE }
-  | "continue"   { CONTINUE }
-  | "break"   { BREAK }
   | "int"    { INT }
   | "bool"   { BOOL }
   | "void"   { VOID }
@@ -58,8 +56,6 @@ rule token = parse
   | "false"  { FALSE }
   | "printf"  { PRINTF }
   | "fsm" { FSM }
-  | "tick"   { TICK }
-  | "reset"   { RESET }
   | "type" { TYPE }
   | "goto" { GOTO }
   | "switch" { SWITCH }
@@ -69,7 +65,6 @@ rule token = parse
   | "start" { START }
   | "input" { INPUT }
   | "output" { OUTPUT }
-  | "sysin" { SYSIN }
   | "public" { PUBLIC }
   | "halt" { HALT }
   | cap aln*  as lxm { TYPENAME (lxm) }

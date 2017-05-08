@@ -3,14 +3,13 @@
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES DOT LSQUARE RSQUARE NLINE UNDER
 %token ADD SUB MUL DIV
 %token EQ NEQ LT LE GT GE AND OR NEG NOT TRUE FALSE
-%token IF ELSE ELIF FOR WHILE IN
+%token IF ELSE FOR WHILE IN
 %token INT BOOL VOID CHAR STRING
-%token CONTINUE BREAK
 %token EOF
 
 /*tokens specific to our language */
-%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT SYSIN PUBLIC
-%token TICK RESET PRINTF HALT
+%token TYPE SWITCH CASE GOTO FSM STATE START INPUT OUTPUT PUBLIC
+%token PRINTF HALT
 
 /* ASSOCIATIVITY */
 %nonassoc NOELSE
@@ -50,6 +49,7 @@ BOOL { Bool }
 lvalue:
  dtype ID { $1, $2 }
 
+/*expressions*/
 expr:
 INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
@@ -77,6 +77,7 @@ INTLIT { IntLit($1) }
 | PRINTF LPAREN ESCAPE COMMA actuals_list RPAREN { Printf($3 ^ "\n", List.rev $5) }
 | ID DOT ID { Access($1, $3) }
 
+/*statements*/
 stmt:
 LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE TYPENAME NLINE { State($2) }
@@ -110,34 +111,6 @@ fsm_decl:
   fsm_locals = List.rev $6;
   fsm_body = List.rev $8;
 }} 
-/*| FSM ID LBRACE NLINE local_list NLINE NLINE stmt_list RBRACE NLINE
-{{
-  fsm_name = $2;
-  fsm_public = [];
-  fsm_locals = List.rev $5;
-  fsm_body = List.rev $8;
-}} 
-| FSM ID LBRACE NLINE public_list NLINE NLINE stmt_list RBRACE NLINE
-{{
-  fsm_name = $2;
-  fsm_public = List.rev $5;
-  fsm_locals = [];
-  fsm_body = List.rev $8;
-}}
-| FSM ID LBRACE NLINE NLINE stmt_list RBRACE NLINE 
-{{
-  fsm_name = $2;
-  fsm_public = [];
-  fsm_locals = [];
-  fsm_body = List.rev $6;
-}}
-| FSM ID LBRACE NLINE local_list RBRACE NLINE
-{{
-  fsm_name = $2;
-  fsm_public = [];
-  fsm_locals = List.rev $5;
-  fsm_body = []
-}} */
 
 program:
   INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
