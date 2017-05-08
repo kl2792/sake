@@ -17,7 +17,7 @@ SAKE="_build/sake.native"
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=alltests.log
+globallog=trafficLights.log
 rm -f $globallog
 error=0
 globalerror=0
@@ -67,10 +67,7 @@ Check() {
                              s/.sk//'`
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
-
-    #echo $wrapper 
-    #echo "../testing/$wrapper"
-
+  
     echo "\n\n$basename..."
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
@@ -78,22 +75,8 @@ Check() {
     generatedfiles="" 
 
     if [ ! -f "../testing/${basename}.c" ]; then
-        #error=2
-        #echo "FAILED NO WRAPPER"  
-
-        echo "#include <stdio.h>" > ../testing/${basename}.c
-        echo "#include \"${basename}.h\"\n" >> ../testing/${basename}.c
-        echo "int main() {\n\tstruct ${basename}_input i;" >> ../testing/${basename}.c
-        echo "\tstruct ${basename}_state s;" >> ../testing/${basename}.c
-        echo "\n\t${basename}_tick(&s, NULL, NULL); \n\t${basename}_tick(&s, &i, NULL); \n\n\treturn 0;\n}" >> ../testing/${basename}.c
-
-        generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" && 
-        Run "$SAKE" " " $1 ${basename} &&
-        Run "mv ${basename}.h ../testing/" &&
-        Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-        Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
-        Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
-        Run "./${basename}.exe" 
+        error=2
+        echo "FAILED - NO WRAPPER"  
     else
         generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out ${basename}.o" &&     
         Run "$SAKE" " " $1 ${basename} &&

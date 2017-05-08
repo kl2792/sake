@@ -17,7 +17,7 @@ SAKE="_build/sake.native"
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=alltests.log
+globallog=adventureStory.log
 rm -f $globallog
 error=0
 globalerror=0
@@ -57,9 +57,6 @@ Check() {
                              s/.sk//'`
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
-
-    #echo $wrapper 
-    #echo "../testing/$wrapper"
 
     echo "$basename..."
     echo 1>&2     
