@@ -112,7 +112,7 @@ report_duplicate (fun n -> "duplicate type " ^ n )
   (List.map (fun (name,_) -> name) types);
 
 List.map (fun lst -> report_duplicate (fun n -> "duplicate type " ^ n ) lst)
-  (List.map (fun (_,vals) -> vals) types);
+  (List.map (fun (_,vals) -> vals) types)
 
 let check_fsm_locals fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
