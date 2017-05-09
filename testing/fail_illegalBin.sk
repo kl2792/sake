@@ -3,7 +3,7 @@ output[int k]
 
 fsm hello {
         int x = 6
-        char y = 9 
+        char y = 'a' 
  
 	state Hello
                 if (p == 1) {
