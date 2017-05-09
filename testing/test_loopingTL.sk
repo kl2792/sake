@@ -9,16 +9,23 @@ fsm tlOne {
                 if (tlTwo.turnTwo == 1) {
                         outOne = 'r'
                         count = 0
+                        printf("%d\n", count)
                         goto R1
                 }
-                else {        
-                        if (count < 1) { 
+                else {    
+                        ~ printf("%s\n", "two is not running") 
+                        printf("%s%d\n", "Count before check:", count)  
+                        if (count < 1) {
+                                ~ printf("%s","entering loop\n") 
                                 count = count + 1
                                 outOne = 'r'
+                                printf("%s%d\n", "Count increased: ", count)
                                 goto R1
                         }
+                        ~printf("%s", "where am i")
                         count = 0
                         outOne = 'g'
+                        ~printf("%s %s", "here", count)
                         goto G1    
                 }    
         state Y1               
@@ -48,11 +55,11 @@ fsm tlTwo {
                 }
                 else {
                         outTwo = 'r'
+                        ~printf("%s\n", "red looping here")
                         goto R2
                 }
         state Y2
                 outTwo = 'r'
-                turnTwo = 0
                 goto R2
         state G2
                 while (count < 10) {
@@ -61,5 +68,6 @@ fsm tlTwo {
                         goto G2
                 } 
                 outTwo = 'y'
+                turnTwo = 0
                 goto Y2 
 }
