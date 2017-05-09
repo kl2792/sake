@@ -54,24 +54,24 @@ let undeclared_identifier_error name =
     let msg = sprintf "undeclared identifier %s" name in
     raise (SemanticError msg)
 
-let illegal_assignment_error l =
-    let msg = sprintf "illegal assignment" in
+let illegal_assignment_error = function
+  | _ ->  let msg = sprintf "illegal assignment" in
     raise (SemanticError msg)
 
 
-let illegal_unary_operation_error l =
-    let msg = sprintf "illegal unary operator" in
+let illegal_unary_operation_error = function
+  | _ ->  let msg = sprintf "illegal unary operator" in
     raise (SemanticError msg)
 
 
-let illegal_binary_operation_error l =
-    let msg = sprintf "illegal binary operator" in
+let illegal_binary_operation_error = function
+  | _ ->  let msg = sprintf "illegal binary operator" in
     raise (SemanticError msg)
 
 
 let check_assign lvaluet rvaluet = match lvaluet with
           S.Bool when rvaluet = S.Int -> lvaluet
-        | S.Enum(name) when  rvaluet = S.Int -> lvaluet
+        | S.Enum(_) when  rvaluet = S.Int -> lvaluet
        (* | S.Bool when rvaluet = Int_t -> lvaluet *)
         | _ -> if lvaluet == rvaluet then lvaluet else 
             illegal_assignment_error []
@@ -243,7 +243,7 @@ let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
     with Not_found ->
     ignore(env.S.scope.variables <- (str,Int)::env.S.scope.variables); (str,S.Int));
     
-    ignore(require_integer (get_expr fsm env (S.IntLit(na)))); ignore(require_integer (get_expr fsm env (S.IntLit(nb)))); ignore(require_integer (get_expr fsm env (S.IntLit(nc)))); (check_stmt env fsm stm)
+    ignore(require_integer (get_expr fsm env (S.IntLit(na))) "Non-integer used in for loop"); ignore(require_integer (get_expr fsm env (S.IntLit(nb))) "Non-integer used in for loop"); ignore(require_integer (get_expr fsm env (S.IntLit(nc))) "Non-integer used in for loop"); (check_stmt env fsm stm)
 
 | S.While(pred,stm) -> 
     let e = get_expr fsm env pred in
@@ -271,7 +271,7 @@ and check_cases env fsm = function (* (expr * stmt) list *)
       let scope' =
         { S.parent = Some(env.S.scope); S.variables = env.S.scope.variables }
       in
-      { env with scope = scope' }
+      { eS.scope = scope' }
     in
     List.map (fun s -> check_stmt env' fsm s) s_list
   in sl  
@@ -284,7 +284,7 @@ let check_body env fsm =
 let check_semant env fsm =
   let env' =
     let local_sym = { env.S.scope with variables = (add_local_vars fsm.S.fsm_locals env) @ env.S.scope.variables }in
-    { env with scope = local_sym}
+    { S.scope = local_sym}
 (*  let states_list = List.map (fun (name,ind) -> name) fsm.fsm_states *)
   in
   check_fsm_locals fsm; ignore(check_body env' fsm)
