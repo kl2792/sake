@@ -187,6 +187,8 @@ let t1 = get_expr fsm env e1  and t2 = get_expr fsm env e2 in
 ( match op with 
   | S.Add | S.Sub | S.Mul | S.Div when t1 = S.Int && t2 = S.Int -> S.Int
   | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = t2 -> S.Bool
+  | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t1 = S.Int && t2 = S.Enum(name) -> S.Bool
+  | S.Eq | S.Neq | S.Lt | S.Le | S.Gt | S.Ge when t2 = S.Int && t1 = S.Enum(name) -> S.Bool
   | S.And | S.Or when t1 = S.Bool && t2 = S.Bool -> S.Bool
   | _  -> illegal_binary_operation_error []
 )
