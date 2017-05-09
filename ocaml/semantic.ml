@@ -57,10 +57,10 @@ let rec is_there_res = function
   | x::tl -> if(x = (-1)) then is_there_res tl else x
   | _ -> (-1)
 
-let look_in_states val ind = function
+let look_in_states vl ind = function
   | [] -> (-1)
-  | [(name,num)] -> if (name=val) then num else look_in_states []
-  | [(name,num)]::tl ->  if (name=val) then num else look_in_states tl
+  | [(name,num)] -> if (name=vl) then num else look_in_states []
+  | [(name,num)]::tl ->  if (name=vl) then num else look_in_states tl
   | _ -> (-1)
 
 let rec get_expr sts program = function (* A.expr *)
@@ -76,7 +76,7 @@ let rec get_expr sts program = function (* A.expr *)
     in
     is_there_res enum_search
   in if (result <> (-1)) then S.IntLit(result) else
-  let is_state = look_in_states val sts in
+  let is_state = look_in_states vl sts in
   if (is_state <> (-1)) then is_state else (wrong_enum_error vl)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
 | A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr sts program exp))
