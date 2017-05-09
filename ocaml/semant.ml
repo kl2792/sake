@@ -71,12 +71,13 @@ let check_enums types =
   List.map (fun lst -> report_duplicate (fun n -> "duplicate type " ^ n ) lst)
     (List.map (fun t -> t.S.type_values) types)
 
-let check_fsm_locals fsm =
+let check_fsm_locals fsm env =
   (* Check FSM INSTANCE VARS: public and states *)
   report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
     (List.map fst fsm.S.fsm_states);
   report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
-    (List.map (fun (_,s,_) -> s) fsm.S.fsm_locals)
+    (List.map (fun (_,s,_) -> s) fsm.S.fsm_locals);
+  List.map (fun (typ,name,exp) -> check_assign (typ) (get_expr fsm env exp) ) fsm.S.fsm_locals
 
 let add_local_vars vars env =
   report_duplicate (fun n -> "duplicate local " ^ n )
@@ -194,7 +195,7 @@ let check_semant env fsm =
   let env' =
     let local_sym = { env.S.scope with variables = (add_local_vars fsm.S.fsm_locals env) @ env.S.scope.variables} in
     { S.scope = local_sym } in
-  check_fsm_locals fsm; ignore(check_body env' fsm)
+  check_fsm_locals fsm env; ignore(check_body env' fsm)
 
 let check program =
   let all_fsm_names = List.map (fun fsm_dec -> (fsm_dec.S.fsm_name,S.Int) ) program.S.fsms in
