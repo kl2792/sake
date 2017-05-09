@@ -236,7 +236,7 @@ fsm ekas {
                 }
         state Snine
                 if (decision == 'a') {
-                        printf("%s\n", "As the might dragon, Fluffles descends you look on in shock. He bellows in an awesome voice GREETINGS YOUNG TRAVELER.")
+                        printf("%s\n", "As the mighty dragon, Fluffles descends you look on in shock. He bellows in an awesome voice GREETINGS YOUNG TRAVELER.")
                         printf("%s\n", "YOU ARE THE CHOSEN ONE WHO WILL HELP ME RID THIS WORLD OF EVIL. JOIN ME ON MY QUEST TO FIGHT THE")
                         printf("%s\n\n", "EVIL WIZARD, KERFKLIPKATSTEIN. What do you do?")
                         printf("%s\n", "a. Decide not to join FLuffles on his quest.")
