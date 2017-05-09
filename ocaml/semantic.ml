@@ -142,7 +142,7 @@ let rec get_states num = function (* body: stmt list *)
 
 let rec take_fsm sts program = function
 [] -> []
-| {A.fsm_name = name; A.fsm_locals = local; A.fsm_body =  body}::tl
+| {A.fsm_name = name; A.fsm_public = _ ; A.fsm_locals = local; A.fsm_body =  body}::tl
     -> { S.fsm_name = name; S.fsm_locals = (copy_locals sts program local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts sts program body)}::(take_fsm sts program tl)
 
 
