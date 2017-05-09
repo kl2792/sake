@@ -286,9 +286,13 @@ let check_semant env fsm =
   check_fsm_locals fsm; ignore(check_body env' fsm)
 
 
+let build_fsm_list 
+
 
 let check program =
-  let sym_tab = {S.parent = None; S.variables = [] }
+  let all_fsm_names = List.map (fun fsm_dec -> (fsm_dec.S.fsm_name,S.Int) ) program.S.fsms
+in
+  let sym_tab = {S.parent = None; S.variables = all_fsm_names }
 in
   let env = {S.scope=sym_tab} in
   let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env}
