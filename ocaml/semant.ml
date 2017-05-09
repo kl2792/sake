@@ -107,6 +107,16 @@ report_duplicate (fun n -> "duplicate fsm " ^ n)
 (List.map (fun fd -> fd.S.fsm_name) fsms)
 
 
+let check_enums types =
+report_duplicate (fun n -> "duplicate type " ^ n )
+  (List.map (fun (name,_) -> name) types);
+
+List.map (fun lst -> report_duplicate (fun n -> "duplicate type " ^ n ) lst)
+  (List.map (fun (_,vals) -> vals) types);
+
+ List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.S.scope.variables pubs
+
+
 let check_fsm_locals fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
 report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
@@ -121,9 +131,6 @@ let add_local_vars vars env =
 report_duplicate (fun n -> "duplicate local " ^ n )
   (List.map (fun (_,s,_) -> s) vars);
  List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.S.scope.variables vars
-
-
-
 
 let check_pubs pubs env =
 report_duplicate (fun n -> "duplicate public " ^ n )
@@ -296,11 +303,11 @@ in
 in
   let env1 = { env with scope=new_syms} in
 
-
   let new_syms1 = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
   (* ignore(print_list new_syms1.S.variables); *)
   let env2 = { env1 with scope=new_syms1} in
+  ignore(check_enums program.S.types);
   ignore(check_fsm_decl program.S.fsms);
   ignore(List.iter (check_semant env2) program.S.fsms)
 
