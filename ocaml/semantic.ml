@@ -69,7 +69,7 @@ let rec get_expr program = function (* A.expr *)
       List.map (look_for vl) program.A.types
     in
     is_there_res enum_search
-  in if (result= (-1)) then (wrong_enum_error vl) else S.IntLit(result)
+  in ignore(sprintf "Running away!"); if (result= (-1)) then (wrong_enum_error vl) else S.IntLit(result)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
 | A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr program exp))
 | A.Binop(e1,o,e2) -> S.Binop((get_expr program e1), (get_op o) ,(get_expr program e2))
