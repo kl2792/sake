@@ -4,7 +4,7 @@ let name = (*String.lowercase_ascii *) Sys.argv.(2) in
   let in_channel = open_in Sys.argv.(1) in 
   let lexbuf = Lexing.from_channel in_channel in  
   let ast = Parser.program Scanner.token lexbuf in
-  let sast = Semantic.check ast in
+  let sast = Restruct.transform ast in
   Semant.check sast;
   let header = Header_generator.translate name sast (* sast *)
      and llvm = Llvm_generator.translate name sast (* sast *) in
