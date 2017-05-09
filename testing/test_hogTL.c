@@ -21,7 +21,7 @@ int main() {
             temp[0] = inputTwo[0];
             i.inTwo = atoi(temp);
 
-            test_trafficLight_tick(&s, &i, &o);
+            test_hogTL_tick(&s, &i, &o);
 
             printf("TL 1: %c\n", o.outOne);
             printf("TL 2: %c\n", o.outTwo);

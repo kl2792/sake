@@ -13,7 +13,7 @@ int main() {
                
         char temp[1];
 
-        while (*inputOne) {
+        while (*inputTwo) {
             temp[0] = inputTwo[0];
             i.inTwo = atoi(temp);
 
