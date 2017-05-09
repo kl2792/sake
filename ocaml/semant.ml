@@ -109,10 +109,10 @@ report_duplicate (fun n -> "duplicate fsm " ^ n)
 
 let check_enums types =
 report_duplicate (fun n -> "duplicate type " ^ n )
-  (List.map (fun (name,_) -> name) types);
+  (List.map (fun t -> t.S.type_name) types);
 
 List.map (fun lst -> report_duplicate (fun n -> "duplicate type " ^ n ) lst)
-  (List.map (fun (_,vals) -> vals) types)
+  (List.map (fun t -> t.S.type_values) types)
 
 let check_fsm_locals fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
