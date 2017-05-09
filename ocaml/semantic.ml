@@ -57,7 +57,7 @@ let rec is_there_res = function
   | x::tl -> if(x = (-1)) then is_there_res tl else x
   | _ -> (-1)
 
-let look_in_states vl ind = function
+let rec look_in_states vl ind = function
   | [] -> (-1)
   | [(name,num)] -> if (name=vl) then num else look_in_states []
   | (name,num)::tl ->  if (name=vl) then num else look_in_states tl
