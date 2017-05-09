@@ -286,9 +286,6 @@ let check_semant env fsm =
   check_fsm_locals fsm; ignore(check_body env' fsm)
 
 
-let build_fsm_list 
-
-
 let check program =
   let all_fsm_names = List.map (fun fsm_dec -> (fsm_dec.S.fsm_name,S.Int) ) program.S.fsms
 in
