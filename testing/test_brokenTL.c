@@ -17,7 +17,6 @@ int main() {
         int count = 0;
 
         while (*inputOne) {
-
             if (count != 0) {
                 sleep(1);
             }
