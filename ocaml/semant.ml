@@ -114,9 +114,6 @@ report_duplicate (fun n -> "duplicate type " ^ n )
 List.map (fun lst -> report_duplicate (fun n -> "duplicate type " ^ n ) lst)
   (List.map (fun (_,vals) -> vals) types);
 
- List.fold_left (fun lst (typ,name,_) -> (name,typ)::lst) env.S.scope.variables pubs
-
-
 let check_fsm_locals fsm =
 (**** Check FSM INSTANCE VARS: public and states ****)
 report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
