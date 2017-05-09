@@ -271,7 +271,7 @@ and check_cases env fsm = function (* (expr * stmt) list *)
       let scope' =
         { S.parent = Some(env.S.scope); S.variables = env.S.scope.variables }
       in
-      { eS.scope = scope' }
+      { S.scope = scope' }
     in
     List.map (fun s -> check_stmt env' fsm s) s_list
   in sl  
