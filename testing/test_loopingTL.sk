@@ -3,29 +3,22 @@ output[char outOne, char outTwo]
 
 fsm tlOne {
         public int turnOne = 1        
-        int count = 0
+        public int count = 0
         
         state R1
                 if (tlTwo.turnTwo == 1) {
                         outOne = 'r'
                         count = 0
-                        printf("%d\n", count)
                         goto R1
                 }
                 else {    
-                        ~ printf("%s\n", "two is not running") 
-                        printf("%s%d\n", "Count before check:", count)  
                         if (count < 1) {
-                                ~ printf("%s","entering loop\n") 
                                 count = count + 1
                                 outOne = 'r'
-                                printf("%s%d\n", "Count increased: ", count)
                                 goto R1
                         }
-                        ~printf("%s", "where am i")
                         count = 0
                         outOne = 'g'
-                        ~printf("%s %s", "here", count)
                         goto G1    
                 }    
         state Y1               
@@ -42,7 +35,7 @@ fsm tlOne {
 }
 fsm tlTwo {
         public int turnTwo = 0 
-        int count = 0 
+        public int count = 0 
         
         state R2
                 if (inTwo == 1) {
@@ -55,7 +48,6 @@ fsm tlTwo {
                 }
                 else {
                         outTwo = 'r'
-                        ~printf("%s\n", "red looping here")
                         goto R2
                 }
         state Y2

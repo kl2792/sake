@@ -9,8 +9,7 @@ int main() {
 
 	test_loopingTL_tick(&s, NULL, NULL); 
         
-        char *inputTwo = "000000000000010100";
-        //char *inputTwo = "00001001110000000000000000111100";
+        char *inputTwo = "00001001110000000000000000111100";
                
         char temp[1];
 
