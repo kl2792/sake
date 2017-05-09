@@ -137,7 +137,7 @@ report_duplicate (fun n -> "duplicate public " ^ n )
 
 
 
-let rec type_of_identifier fsm scope name =
+let type_of_identifier fsm scope name =
     let vdecl = try
       find_variable scope name
     with Not_found -> 
@@ -212,7 +212,7 @@ let sl =
     let scope' =
       { S.parent = Some(env.S.scope); S.variables = env.S.scope.variables }
     in
-    { env with scope = scope' }
+    { scope = scope' }
   in
   List.map (fun s -> check_stmt env' fsm s) s_list
 in ignore(sl);
