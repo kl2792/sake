@@ -77,7 +77,7 @@ let rec get_expr sts program = function (* A.expr *)
     is_there_res enum_search
   in if (result <> (-1)) then S.IntLit(result) else
   let is_state = look_in_states vl sts in
-  if (is_state <> (-1)) then is_state else (wrong_enum_error vl)
+  if (is_state <> (-1)) then S.IntLit(is_state) else (wrong_enum_error vl)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
 | A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr sts program exp))
 | A.Binop(e1,o,e2) -> S.Binop((get_expr sts program e1), (get_op o) ,(get_expr sts program e2))
