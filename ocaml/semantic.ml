@@ -49,7 +49,7 @@ let rec find_val vl ind = function (* start at 1 *)
 
 
 let look_for vl type_dec=
-    ignore(print_string "looking for "; print_string vl); find_val vl 1 type_dec.A.type_values
+    print_string vl); find_val vl 1 type_dec.A.type_values
 
 let rec is_there_res = function
   | [] -> (-1)
@@ -69,7 +69,7 @@ let rec get_expr program = function (* A.expr *)
       List.map (look_for vl) program.A.types
     in
     is_there_res enum_search
-  in ignore(print_string "Running away!"); if (result= (-1)) then (wrong_enum_error vl) else S.IntLit(result)
+  in if (result= (-1)) then (wrong_enum_error vl) else S.IntLit(result)
 | A.Access (outer,inner) -> S.Variable(outer ^ "_" ^ inner)
 | A.Uop(u,exp) -> S.Uop((get_uop u),(get_expr program exp))
 | A.Binop(e1,o,e2) -> S.Binop((get_expr program e1), (get_op o) ,(get_expr program e2))
