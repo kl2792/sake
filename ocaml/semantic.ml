@@ -152,14 +152,13 @@ let rec take_pubs sts program name = function (*(dtype * string * expr) list*)
 
 let rec get_pubs sts program = function
 [] -> []
-| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
+| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = _ ; A.fsm_body =  _ }::tl
     -> (take_pubs sts program name pubs) @ (get_pubs sts program tl)
 
 let rec muddle_it_all = function
   | [] -> []
   | [l1] -> l1
   | l1::tl -> l1 @ muddle_it_all tl
-  | _ -> []
 
 let yank_out_states fsm =
   get_states 1 fsm.A.fsm_body
