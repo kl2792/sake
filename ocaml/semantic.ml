@@ -60,7 +60,7 @@ let rec is_there_res = function
 let rec look_in_states vl = function
   | [] -> (-1)
   | [(name,num)] -> if (name=vl) then num else look_in_states vl []
-  | (name,num)::tl ->  if (name=vl) then num else look_in_states vl tl
+  | (name,num)::tl ->  if (name=vl) then num else ignore(print_string "not state "; print_string name); look_in_states vl tl
   | _ -> (-1)
 
 let rec get_expr sts program = function (* A.expr *)
