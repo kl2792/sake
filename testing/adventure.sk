@@ -5,7 +5,7 @@ fsm ekas {
 
         state Sone
                 if (decision == 's') {
-                        printf("\n%s\n", "Welcome to the story of the PLT presentation :)")
+                        printf("%s\n", "Welcome to the story of the PLT presentation :)")
                         printf("%s\n\n", "If at anytime you wish to leave, simply press e instead of having the courage to make a choice!")
                         printf("%s\n%s\n\n", "It’s May 9th, and your PLT presentation is due tomorrow. Suddenly, you realize that your language", "sucks. What do you do?")
                         printf("%s\n", "a. Go to Edwards and beg for an extension.")
