@@ -45,7 +45,6 @@ let rec find_val vl ind = function (* start at 1 *)
   | [] -> (-1)
   | [x] -> if(x=vl) then ind else find_val vl (ind+1) []
   | x::tl -> if(x=vl) then ind else find_val vl (ind+1) tl
-  | _ -> (-1)
 
 
 let look_for vl type_dec=
@@ -55,13 +54,11 @@ let rec is_there_res = function
   | [] -> (-1)
   | [x] -> if(x = (-1)) then is_there_res [] else x
   | x::tl -> if(x = (-1)) then is_there_res tl else x
-  | _ -> (-1)
 
 let rec look_in_states vl = function
   | [] -> (-1)
   | [(name,num)] -> if (name=vl) then num else look_in_states vl []
   | (name,num)::tl -> if (name=vl) then num else look_in_states vl tl
-  | _ -> (-1)
 
 let rec get_expr sts program = function (* A.expr *)
 | A.BoolLit(bl) -> S.BoolLit(bl)
@@ -145,7 +142,7 @@ let rec get_states num = function (* body: stmt list *)
 
 let rec take_fsm sts program = function
 [] -> []
-| {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
+| {A.fsm_name = name; A.fsm_locals = local; A.fsm_body =  body}::tl
     -> { S.fsm_name = name; S.fsm_locals = (copy_locals sts program local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts sts program body)}::(take_fsm sts program tl)
 
 
@@ -181,9 +178,8 @@ let convert = function
 | _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
 *)
 let convert i o typs fsms program = function
-[] -> let all_sts = get_all_states fsms in {S.input = take_in i; S.output = take_out o; S.public = get_pubs [("",0)] program fsms; S.types = take_typ typs; S.fsms = take_fsm all_sts program fsms}
+  | _ -> let all_sts = get_all_states fsms in {S.input = take_in i; S.output = take_out o; S.public = get_pubs [("",0)] program fsms; S.types = take_typ typs; S.fsms = take_fsm all_sts program fsms}
 (*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
-
 
 
 

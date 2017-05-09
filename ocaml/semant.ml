@@ -151,10 +151,10 @@ let type_of_identifier fsm scope name =
 
 
 let rec get_expr fsm env = function (* A.expr *)
-| S.BoolLit(bl) -> S.Bool
-| S.CharLit(ch) -> S.Char
-| S.IntLit(num) -> S.Int
-| S.StringLit(name) -> S.String
+| S.BoolLit(_) -> S.Bool
+| S.CharLit(_) -> S.Char
+| S.IntLit(_) -> S.Int
+| S.StringLit(_) -> S.String
 | S.Variable(name) -> 
 (*
     let (_,vl) =
@@ -200,7 +200,7 @@ let t1 = get_expr fsm env e1  and t2 = get_expr fsm env e2 in
     let lt = type_of_identifier fsm env.scope name and rt = get_expr fsm env exp in
     check_assign lt rt
   
-| S.Printf(fmt, lst) -> ignore(List.map (get_expr fsm env) lst); S.Int
+| S.Printf(_, lst) -> ignore(List.map (get_expr fsm env) lst); S.Int
 | S.Empty -> S.Int
 
 (* OURS *)
@@ -228,7 +228,7 @@ let env' = { env with scope = scope' } in
 let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
 *)
 
-| S.State(name) -> ()
+| S.State(_) -> ()
 | S.If(pred,sta,stb) -> 
     let e = get_expr fsm env pred in
     ignore((match e with
@@ -298,7 +298,7 @@ in
   let env = {S.scope=sym_tab} in
   let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env}
 in
-  let env1 = { S.scope=new_syms} in
+(*  let env1 = { S.scope=new_syms} in *)
 
   let new_syms1 = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
