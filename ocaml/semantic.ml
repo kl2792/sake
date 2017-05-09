@@ -49,7 +49,7 @@ let rec find_val vl ind = function (* start at 1 *)
 
 
 let look_for vl type_dec=
-    find_val vl 1 type_dec.A.type_values
+    ignore(sprintf "looking for %s" vl); find_val vl 1 type_dec.A.type_values
 
 let rec is_there_res = function
   | [] -> (-1)
