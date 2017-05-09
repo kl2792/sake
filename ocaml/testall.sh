@@ -91,6 +91,8 @@ Check() {
         #echo "FAILED NO WRAPPER"  
 
         echo "#include <stdio.h>" > ../testing/${basename}.c
+        echo "#include <stdlib.h>" >> ../testing/${basename}.c
+        echo "#include <unistd.h>" >> ../testing/${basename}.c
         echo "#include \"${basename}.h\"\n" >> ../testing/${basename}.c
         echo "int main() {\n\tstruct ${basename}_input i;" >> ../testing/${basename}.c
         echo "\tstruct ${basename}_state s;" >> ../testing/${basename}.c
