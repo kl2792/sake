@@ -71,14 +71,6 @@ let check_enums types =
   List.map (fun lst -> report_duplicate (fun n -> "duplicate type " ^ n ) lst)
     (List.map (fun t -> t.S.type_values) types)
 
-let check_fsm_locals fsm env =
-  (* Check FSM INSTANCE VARS: public and states *)
-  report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
-    (List.map fst fsm.S.fsm_states);
-  report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
-    (List.map (fun (_,s,_) -> s) fsm.S.fsm_locals);
-  List.map (fun (typ,name,exp) -> check_assign (typ) (get_expr fsm env exp) ) fsm.S.fsm_locals
-
 let add_local_vars vars env =
   report_duplicate (fun n -> "duplicate local " ^ n )
     (List.map (fun (_,s,_) -> s) vars);
@@ -187,6 +179,14 @@ and check_cases env fsm = function (* (expr * stmt) list *)
         { S.scope = scope' } in
       List.map (fun s -> check_stmt env' fsm s) s_list in
     sl); ignore(check_cases env fsm tl)
+
+let check_fsm_locals fsm env =
+  (* Check FSM INSTANCE VARS: public and states *)
+  report_duplicate (fun n -> "duplicate state " ^ n ^ " in " ^ fsm.S.fsm_name)
+    (List.map fst fsm.S.fsm_states);
+  report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ fsm.S.fsm_name)
+    (List.map (fun (_,s,_) -> s) fsm.S.fsm_locals);
+  List.map (fun (typ,name,exp) -> check_assign (typ) (get_expr fsm env exp) ) fsm.S.fsm_locals
 
 let check_body env fsm =
   check_stmt env fsm (S.Block(fsm.fsm_body))
