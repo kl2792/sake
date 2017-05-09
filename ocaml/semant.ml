@@ -18,14 +18,6 @@ let rec print_list = function
 [] -> ()
 | (s,t)::l -> print_string "(" ; print_string s ; print_string "," ; print_string (string_of_type t) ; print_string ")" ; print_string " " ; print_list l
 
-
-(*
-type t =
-  | Bool_t | Int_t | Char_t | String_t
-  | Enum_t of string (* just the name of the enum *)
-  | Exception of string
-*)
-
 let rec find_variable scope name =
 try
   List.find (fun (s, _) -> s = name) scope.S.variables
@@ -72,7 +64,6 @@ let illegal_binary_operation_error = function
 let check_assign lvaluet rvaluet = match lvaluet with
           S.Bool when rvaluet = S.Int -> lvaluet
         | S.Enum(_) when  rvaluet = S.Int -> lvaluet
-       (* | S.Bool when rvaluet = Int_t -> lvaluet *)
         | _ -> if lvaluet == rvaluet then lvaluet else 
             illegal_assignment_error []
 
@@ -85,21 +76,6 @@ let check_globals inp outp env =
   let globals = inp @ outp in
 report_duplicate (fun n -> "duplicate global " ^ n) (List.map snd globals);
  List.fold_left (fun lst (typ,name) -> (name,typ)::lst) env.S.scope.variables globals
-
-(**** Checking Functions ****)
-
-(*  if List.mem "print" (List.map (fun fd -> fd.fsm_name) fsms)
-then raise (Failure ("function print may not be defined")) else (); *)
-
-(* Function declaration for a named function *)
-(*  let built_in_decls =  StringMap.add "print"
- { typ = Void; fname = "print"; formals = [(Int, "x")];
-   locals = []; body = [] } (StringMap.add "printb"
- { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-   locals = []; body = [] } (StringMap.singleton "printbig"
- { typ = Void; fname = "printbig"; formals = [(Int, "x")];
-   locals = []; body = [] }))
-in *)
 
 
 let check_fsm_decl fsms =
@@ -156,15 +132,6 @@ let rec get_expr fsm env = function (* A.expr *)
 | S.IntLit(_) -> S.Int
 | S.StringLit(_) -> S.String
 | S.Variable(name) -> 
-(*
-    let (_,vl) =
-      let var = try
-          find_variable env.scope name
-      with Not_found ->
-          raise (SemanticError("undeclared identifier " ^ name))
-      in
-    var; vl
-*)
     let var = try
         find_variable env.S.scope name
     with Not_found ->
@@ -172,11 +139,8 @@ let rec get_expr fsm env = function (* A.expr *)
             find_variable env.S.scope (fsm.S.fsm_name ^ "_" ^ name)
           with Not_found ->
               raise (SemanticError("undeclared identifier " ^ name))
-
     in 
       let (_,vl) = var in vl
-
-(*        else ignore(env.scope.S.variables <- decl::env.scope.S.variables); S.Variable(name) *)
 
 | S.Uop(op, e) ->
     let t = get_expr fsm env e in
@@ -203,7 +167,7 @@ let t1 = get_expr fsm env e1  and t2 = get_expr fsm env e2 in
 | S.Printf(_, lst) -> ignore(List.map (get_expr fsm env) lst); S.Int
 | S.Empty -> S.Int
 
-(* OURS *)
+
 let rec check_stmt env fsm = function (* stmts *)
 | S.Block(s_list) ->
 
@@ -216,17 +180,6 @@ let sl =
   in
   List.map (fun s -> check_stmt env' fsm s) s_list
 in ignore(sl);
-
-
-(*
-(* New scopes: parent is the existing scope, start out empty *)
-let scope' = { parent = Some(env.scope); variables = [] } 
- in
-         (* New environment: same, but with new symbol tables *)
-let env' = { env with scope = scope' } in
-         (* Check all the statements in the block *)
-let s_list = List.map (fun s -> check_stmt env' fsm s) s_list
-*)
 
 | S.State(_) -> ()
 | S.If(pred,sta,stb) -> 
@@ -285,7 +238,6 @@ let check_semant env fsm =
   let env' =
     let local_sym = { env.S.scope with variables = (add_local_vars fsm.S.fsm_locals env) @ env.S.scope.variables }in
     { S.scope = local_sym}
-(*  let states_list = List.map (fun (name,ind) -> name) fsm.fsm_states *)
   in
   check_fsm_locals fsm; ignore(check_body env' fsm)
 
@@ -298,35 +250,9 @@ in
   let env = {S.scope=sym_tab} in
   let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env}
 in
-(*  let env1 = { S.scope=new_syms} in *)
-
   let new_syms1 = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
-  (* ignore(print_list new_syms1.S.variables); *)
   let env2 = { S.scope=new_syms1} in
   ignore(check_enums program.S.types);
   ignore(check_fsm_decl program.S.fsms);
   ignore(List.iter (check_semant env2) program.S.fsms)
-
-
-
-(*
-
-
-let check program =
-  let checked =
-      let env2 =
-          let new_syms1 = 
-              let env1 = 
-                  let new_syms = 
-                      let env = 
-                          let sym_tab = 
-                              {S.parent = None; S.variables = [] } in
-                          {S.scope=sym_tab} in
-                      {env.S.scope with variables = check_globals program.S.input program.S.output env} in
-                  { env with scope=new_syms} in
-              {env1.S.scope with variables = check_pubs program.S.public env1} in
-          { env1 with scope=new_syms1} in
-      check_fsm_decl program.S.fsms in
-    List.iter (check_semant env2) program.S.fsms in ()
-*)
