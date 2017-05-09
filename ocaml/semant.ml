@@ -212,7 +212,7 @@ let sl =
     let scope' =
       { S.parent = Some(env.S.scope); S.variables = env.S.scope.variables }
     in
-    { scope = scope' }
+    { S.scope = scope' }
   in
   List.map (fun s -> check_stmt env' fsm s) s_list
 in ignore(sl);
@@ -298,12 +298,12 @@ in
   let env = {S.scope=sym_tab} in
   let new_syms = {sym_tab with variables = check_globals program.S.input program.S.output env}
 in
-  let env1 = { env with scope=new_syms} in
+  let env1 = { S.scope=new_syms} in
 
   let new_syms1 = {new_syms with variables = (check_pubs program.S.public env) @ (new_syms.S.variables)}
 in
   (* ignore(print_list new_syms1.S.variables); *)
-  let env2 = { env1 with scope=new_syms1} in
+  let env2 = { S.scope=new_syms1} in
   ignore(check_enums program.S.types);
   ignore(check_fsm_decl program.S.fsms);
   ignore(List.iter (check_semant env2) program.S.fsms)
