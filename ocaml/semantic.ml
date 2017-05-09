@@ -167,7 +167,7 @@ let convert = function
 | _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
 *)
 let convert i o typs fsms program = function
-[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs sts program fsms; S.types = take_typ typs; S.fsms = take_fsm program fsms}
+[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs [("",0)] program fsms; S.types = take_typ typs; S.fsms = take_fsm program fsms}
 (*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
 
 
