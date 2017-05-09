@@ -203,7 +203,9 @@ fi
 
 for file in $files 
 do
-    case $file in 
+    case $file in
+        *test_*TL*) 
+            ;; # Don't run the traffic light programs becuase they have sleeps in 
         *test_*)
             Check $file 2>> $globallog 
             ;;
