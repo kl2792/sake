@@ -184,7 +184,7 @@ type_opt:
 | type_list NLINE NLINE { List.rev $1 }
 
 type_list:
-| type_decl { [] }
+| type_decl { [$1] }
 | type_list type_decl { $2 :: $1 }
 
 fsm_list:
