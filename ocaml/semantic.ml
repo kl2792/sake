@@ -143,10 +143,10 @@ let rec get_states num = function (* body: stmt list *)
 | A.State(name)::tl -> (name,num):: (get_states (num+1) tl)
 | _::tl -> get_states num tl
 
-let rec take_fsm program = function
+let rec take_fsm sts program = function
 [] -> []
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
-    -> let sts = (get_states 1 body) in { S.fsm_name = name; S.fsm_locals = (copy_locals sts program local); S.fsm_states = sts; S.fsm_body = (take_stmts sts program body)}::(take_fsm program tl)
+    -> { S.fsm_name = name; S.fsm_locals = (copy_locals sts program local); S.fsm_states = (get_states 1 body); S.fsm_body = (take_stmts sts program body)}::(take_fsm sts program tl)
 
 
 let rec take_pubs sts program name = function (*(dtype * string * expr) list*)
@@ -158,7 +158,21 @@ let rec get_pubs sts program = function
 | {A.fsm_name = name; A.fsm_public = pubs; A.fsm_locals = local; A.fsm_body =  body}::tl
     -> (take_pubs sts program name pubs) @ (get_pubs sts program tl)
 
+let rec muddle_it_all = function
+  | [] -> []
+  | [l1] -> l1
+  | l1::tl -> l1 @ muddle_it_all tl
+  | _ -> []
 
+let yank_out_states fsm =
+  get_states 1 fsm.A.fsm_body
+
+
+let get_all_states fsms =
+  let state_fam =
+    List.map (yank_out_states) fsms
+  in
+  muddle_it_all state_fam
 
 
 (*
@@ -167,7 +181,7 @@ let convert = function
 | _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}
 *)
 let convert i o typs fsms program = function
-[] -> {S.input = take_in i; S.output = take_out o; S.public = get_pubs [("",0)] program fsms; S.types = take_typ typs; S.fsms = take_fsm program fsms}
+[] -> let all_sts = get_all_states fsms in {S.input = take_in i; S.output = take_out o; S.public = get_pubs [("",0)] program fsms; S.types = take_typ typs; S.fsms = take_fsm all_sts program fsms}
 (*| _ -> {S.input = (); S.output = (); S.public = (); S.types = (); S.fsms = ()}*)
 
 
