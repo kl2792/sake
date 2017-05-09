@@ -81,10 +81,10 @@ stmt:
 | LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE TYPENAME NLINE { State($2) }
 | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  
-| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
+| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /* with else */
 | FOR ID IN LPAREN INTLIT COLON INTLIT COLON INTLIT RPAREN stmt { For($2, $5, $7, $9, $11) }  
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
-| expr NLINE{ Expr($1) }
+| expr NLINE { Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO TYPENAME NLINE { Goto ($2) }
 | HALT NLINE { Halt }
@@ -112,15 +112,15 @@ fsm_decl:
 }} 
 
 program:
-| INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
+| INPUT LSQUARE lvalue_list RSQUARE NLINE
+  OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE
+  type_opt fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
     types = $12;
     fsms = List.rev $13;
   }}
-
-/* No input output */
 | type_opt fsm_list EOF
   {{
     input = [];
@@ -180,13 +180,13 @@ local_list:
 | local_list NLINE dstexpr { $3 :: $1 }
 
 type_opt:
-| /* nothing */ {[] }
+| /* nothing */ { [] }
 | type_list NLINE NLINE { List.rev $1 }
 
 type_list:
 | type_decl { [] }
-| type_list type_decl { $2 :: $1}
+| type_list type_decl { $2 :: $1 }
 
 fsm_list:
 | /* nothing */ { [] }
-| fsm_list fsm_decl { $2 :: $1}
+| fsm_list fsm_decl { $2 :: $1 }
