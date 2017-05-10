@@ -1,5 +1,7 @@
-(* AST *)
-(* Authors: Kai-Zhan Lee and Shalva Kohen *)
+(* AST
+ * Author: Kai-Zhan Lee
+ * Credzz: Shalva Kohen for critical additions for proper parsing
+ *)
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
@@ -25,7 +27,7 @@ type stmt =
   | If of expr * stmt * stmt
   | For of string * int * int * int * stmt
   | While of expr * stmt
-  | Switch of expr * (expr * stmt list) list (*CHANGE MADE HERE*)
+  | Switch of expr * (expr * stmt list) list
   | Expr of expr
   | Goto of string (* for FSM transitions *)
   | Halt 
