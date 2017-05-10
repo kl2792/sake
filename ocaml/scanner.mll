@@ -1,3 +1,8 @@
+(* 
+ * scanner.mll to scan in tokens
+ *
+ * Authors: Arunavha Chanda and Shalva Kohen
+ *)
 { open Parser 
   let unescape u =
 	Scanf.sscanf("\"" ^ u ^ "\"") "%S%!" (fun x -> x)

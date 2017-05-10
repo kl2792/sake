@@ -1,3 +1,6 @@
+# Adventure test script
+# Author: Emma Etherington
+
 #!/bin/sh
 
 # Path to the LLVM interpreter

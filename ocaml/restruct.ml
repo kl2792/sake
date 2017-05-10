@@ -1,3 +1,10 @@
+(* 
+ * restruct.ml to restructure AST into SAST form
+ * and do first round fo semantic checking
+ *
+ * Author: Arunavha Chanda
+ *)
+
 module A = Ast
 module S = Sast
 open Printf

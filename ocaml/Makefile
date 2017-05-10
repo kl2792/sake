@@ -1,7 +1,7 @@
 all : clean sake.native print.o
 
 sake.native :
-	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 sake.native
+	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4-40..42 sake.native
 
 OBJS = ast.cmx sast.cmx header_generator.cmx llvm_generator.cmx parser.cmx scanner.cmx sake.cmx
 
