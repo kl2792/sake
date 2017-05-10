@@ -89,9 +89,6 @@ stmt:
 | GOTO TYPENAME NLINE { Goto ($2) }
 | HALT NLINE { Halt }
 
-stexpr:
-ID expr { $1, $2 }
-
 cstmt:
   CASE expr COLON stmt_list { $2, List.rev $4 }
 
@@ -134,10 +131,6 @@ program:
 actuals_list:
 | expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1} 
-
-stexpr_list:
-| stexpr { [$1] }
-| stexpr_list COMMA stexpr { $3 :: $1}
 
 stmt_list:
 | /* nothing */ { [] }
