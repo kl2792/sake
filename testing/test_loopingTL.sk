@@ -3,7 +3,7 @@ output[char outOne, char outTwo]
 
 fsm tlOne {
         public int turnOne = 1        
-        int count = 0
+        public int count = 0
         
         state R1
                 if (tlTwo.turnTwo == 1) {
@@ -11,8 +11,8 @@ fsm tlOne {
                         count = 0
                         goto R1
                 }
-                else {        
-                        if (count < 1) { 
+                else {    
+                        if (count < 1) {
                                 count = count + 1
                                 outOne = 'r'
                                 goto R1
@@ -35,7 +35,7 @@ fsm tlOne {
 }
 fsm tlTwo {
         public int turnTwo = 0 
-        int count = 0 
+        public int count = 0 
         
         state R2
                 if (inTwo == 1) {
@@ -52,7 +52,6 @@ fsm tlTwo {
                 }
         state Y2
                 outTwo = 'r'
-                turnTwo = 0
                 goto R2
         state G2
                 while (count < 10) {
@@ -61,5 +60,6 @@ fsm tlTwo {
                         goto G2
                 } 
                 outTwo = 'y'
+                turnTwo = 0
                 goto Y2 
 }

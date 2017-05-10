@@ -1,3 +1,4 @@
+(* Author: Shalva Kohen *)
 %{ open Ast %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA ASSIGN BAR COLON QUOTES DOT LSQUARE RSQUARE NLINE UNDER
@@ -39,7 +40,7 @@
 %%
 /* grammar */
 dtype:
-|BOOL { Bool }
+| BOOL { Bool }
 | INT { Int }
 | CHAR { Char }
 | STRING { String }
@@ -50,11 +51,11 @@ lvalue:
 
 /* expressions */
 expr:
-|INTLIT { IntLit($1) }
+| INTLIT { IntLit($1) }
 | TRUE { BoolLit(true) }
 | FALSE { BoolLit(false) }
 | CHARLIT { CharLit($1) }
-| STRINGLIT { StringLit ($1) }
+| STRINGLIT { StringLit($1) }
 | ID { Variable($1) }
 | TYPENAME { EnumLit($1) }
 | SUB expr %prec NEG { Uop(Neg, $2) }
@@ -78,22 +79,19 @@ expr:
 
 /* statements */
 stmt:
-|LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
+| LBRACE NLINE stmt_list RBRACE NLINE { Block(List.rev $3) }
 | STATE TYPENAME NLINE { State($2) }
-| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  /*no else or elif */ /*is this needed? */
-| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /*with else */
+| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }  
+| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }  /* with else */
 | FOR ID IN LPAREN INTLIT COLON INTLIT COLON INTLIT RPAREN stmt { For($2, $5, $7, $9, $11) }  
 | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
-| expr NLINE{ Expr($1) }
+| expr NLINE { Expr($1) }
 | SWITCH LPAREN expr RPAREN LBRACE cstmt_list RBRACE NLINE { Switch($3, List.rev $6) }
 | GOTO TYPENAME NLINE { Goto ($2) }
 | HALT NLINE { Halt }
 
-stexpr:
-ID expr {$1, $2}
-
 cstmt:
-  CASE expr COLON stmt_list {$2, List.rev $4}
+  CASE expr COLON stmt_list { $2, List.rev $4 }
 
 type_decl:
   TYPE TYPENAME ASSIGN string_opt 
@@ -112,15 +110,15 @@ fsm_decl:
 }} 
 
 program:
-| INPUT LSQUARE lvalue_list RSQUARE NLINE OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE type_opt fsm_list EOF
+| INPUT LSQUARE lvalue_list RSQUARE NLINE
+  OUTPUT LSQUARE lvalue_list RSQUARE NLINE NLINE
+  type_opt fsm_list EOF
   {{
     input = List.rev $3;
     output = List.rev $8;
     types = $12;
     fsms = List.rev $13;
   }}
-
-/* No input output */
 | type_opt fsm_list EOF
   {{
     input = [];
@@ -135,12 +133,8 @@ actuals_list:
 | expr { [$1] }
 | actuals_list COMMA expr { $3 :: $1} 
 
-stexpr_list:
-| stexpr { [$1] }
-| stexpr_list COMMA stexpr { $3 :: $1}
-
 stmt_list:
-| /*nothing*/ { [] }
+| /* nothing */ { [] }
 | stmt_list stmt { $2 :: $1 }
 
 cstmt_list: 
@@ -161,32 +155,32 @@ lvalue_list:
 
 dstexpr:
 | dtype ID ASSIGN expr { $1, $2, $4 }
-| dtype ID { $1, $2, Empty}
+| dtype ID { $1, $2, Empty }
 
 public_opt:
-| /*nothing*/ { [] }
-| public_list NLINE {List.rev $1}
+| /* nothing */ { [] }
+| public_list NLINE { List.rev $1 }
 
 public_list:
 | PUBLIC dstexpr { [$2] }
-| public_list NLINE PUBLIC dstexpr {$4 :: $1}
+| public_list NLINE PUBLIC dstexpr { $4 :: $1 }
 
 local_opt:
-| /*nothing*/ { [] }
-| local_list NLINE {List.rev $1}
+| /* nothing */ { [] }
+| local_list NLINE { List.rev $1 }
 
 local_list:
 | dstexpr { [$1] }
 | local_list NLINE dstexpr { $3 :: $1 }
 
 type_opt:
-| /*nothing*/ {[] }
+| /* nothing */ { [] }
 | type_list NLINE NLINE { List.rev $1 }
 
 type_list:
-| type_decl { [] }
-| type_list type_decl { $2 :: $1}
+| type_decl { [$1] }
+| type_list type_decl { $2 :: $1 }
 
 fsm_list:
 | /* nothing */ { [] }
-| fsm_list fsm_decl { $2 :: $1}
+| fsm_list fsm_decl { $2 :: $1 }

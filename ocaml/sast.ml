@@ -1,4 +1,5 @@
 (* SAST *)
+(* Author: Arunavha Chanda *)
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
@@ -39,7 +40,6 @@ type program = {
   input : (dtype * string) list;
   output: (dtype * string) list;
   public: (dtype * string * expr) list;
-(* types: (string * (string * int) list) list; *)
   types : type_decl list;
   fsms  : fsm_decl list;
 }
@@ -50,9 +50,4 @@ type symbol_table = {
 }
 type translation_environment = {
   scope : symbol_table;   (* symbol table for vars *)
-(*  in_switch : bool;
-  in_for : bool;
-  case_labels : list ref; (* known case labels *)
-  state_labels : label list ref; (* labels on statements *)
-  forward_gotos : label list ref; (* forward goto destinations *) *)
 }

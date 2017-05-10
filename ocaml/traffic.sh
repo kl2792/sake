@@ -1,3 +1,6 @@
+# Traffic test script
+# Author: Emma Etherington
+
 #!/bin/sh
 
 # Path to the LLVM interpreter
@@ -68,7 +71,7 @@ Check() {
     reffile=`echo $1 | sed 's/.sk$//'`    
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
   
-    echo "\n\n$basename..."
+    echo "$basename..."
     echo 1>&2     
     echo "###### Testing $basename" 1>&2
 
@@ -95,7 +98,7 @@ Check() {
         if [ $keep -eq 0 ] ; then
             rm -f $generatedfiles
         fi
-        echo "\nOK"
+        echo "OK\n"
         echo "###### SUCCESS" 1>&2
     else 
         echo "###### FAILED" 1>&2
