@@ -1,3 +1,9 @@
+(* 
+ * Main semantic checker
+ *
+ * Author: Arunavha Chanda
+ *)
+
 module A = Ast
 module S = Sast
 open Printf

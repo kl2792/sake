@@ -1,4 +1,5 @@
 (* AST *)
+(* Authors: Kai-Zhan Lee and Shalva Kohen *)
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
