@@ -81,10 +81,12 @@ Check() {
         if [ $keep -eq 0 ] ; then
             rm -f $generatedfiles
         fi
-        echo "\nThe adventure is over :)"
+		echo
+        echo "The adventure is over :)"
         echo "###### SUCCESS" 1>&2
     else 
-        echo "\nThe adventure is over :("
+		echo
+        echo "The adventure is over :("
         echo "###### FAILED" 1>&2
         globalerror=$error
     fi

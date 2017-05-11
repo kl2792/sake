@@ -36,5 +36,5 @@ int main() {
     }
     
     
-    printf("\nThanks for playing :) This story was brought to you by SAKE: Don't drink if you underage.");
+    printf("\nThanks for playing :) This story was brought to you by SAKE: Don't drink if you're underage.");
 }
