@@ -1,3 +1,5 @@
+Note: The script list_test.sh may be used to print out clean, labeled listings of each file, including itself.
+
 Test Details:
 
 test_42:
