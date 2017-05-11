@@ -192,7 +192,7 @@ fsm ekas {
                         printf("%s\n", "Satan looks at Shalva and denies to take the offering. He says that she is already spreading evil in the world and ")
                         printf("%s\n", "that there is no need to sacrifice her. But he commends your ability to sacrifice your loved ones. He ")
                         printf("%s\n\n", "gives you the choice of two gifts in acknowledgement of your heartlessness. ")
-                        printf("%s\n\n", "Press a or b to recieve a suprise gift")
+                        printf("%s\n\n", "Press a or b to recieve a surprise gift")
                         result = 1
                         goto Snine
                 }            
