@@ -1,4 +1,6 @@
-(* AST
+(*
+ * Abstract syntax tree for the Sake language
+ *
  * Author: Kai-Zhan Lee
  * Credzz: Shalva Kohen, critical additions for proper parsing
  *)
