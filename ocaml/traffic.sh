@@ -1,6 +1,3 @@
-# Traffic test script
-# Author: Emma Etherington
-
 #!/bin/sh
 
 # Path to the LLVM interpreter
@@ -87,7 +84,7 @@ Check() {
         Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
         Run "$CC" "-c" "../testing/${basename}.c ../testing/${basename}.h" && 
         Run "$CC" "-o" "${basename}.exe" "${basename}.s" "${basename}.o" "print.o" &&                    
-        Run "./${basename}.exe &&  
+        Run "./${basename}.exe" &&
         Run "./${basename}.exe" > "${basename}.out" &&
         Compare ${basename}.out ${reffile}.out ${basename}.diff
     fi
@@ -98,7 +95,7 @@ Check() {
         if [ $keep -eq 0 ] ; then
             rm -f $generatedfiles
         fi
-        echo "OK"
+        echo "OK\n"
         echo "###### SUCCESS" 1>&2
     else 
         echo "###### FAILED" 1>&2
