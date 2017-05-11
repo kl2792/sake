@@ -26,8 +26,16 @@ function list {
 # Print the script itself (it's in the testing directory, after all!)
 list $0
 
+# Print listings for adventure
+list adventure.{sk,c}
+
+# Print listings for traffic light FSMs
+for file in test_*TL.sk; do list "${file%.*}".{sk,c,out}; done
+
 # Print listings for positive test files
+GLOBIGNORE="*TL.sk"
 for file in test_*.sk; do list "${file%.*}".{sk,c,out}; done
+unset GLOBIGNORE
 
 # Print listings for negative fail files
 for file in fail_*.sk; do list "${file%.*}".{sk,err}; done
