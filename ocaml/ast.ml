@@ -1,12 +1,12 @@
 (* AST
  * Author: Kai-Zhan Lee
- * Credzz: Shalva Kohen for critical additions for proper parsing
+ * Credzz: Shalva Kohen, critical additions for proper parsing
  *)
 type op = Add | Sub | Mul | Div | Eq | Neq | Lt | Le | Gt | Ge | And | Or
 type uop = Neg | Not
 type dtype = (* built-in primitives + custom user type *)
   | Bool | Int | Char | String
-  | Enum of string (* just the name of the enum *)
+  | Enum of string (* enum typename *)
 type lvalue = dtype * string
 type expr =
   | BoolLit of bool
