@@ -2,23 +2,20 @@
 
 A simple and powerful language for building finite-state automata for execution.
 
-# Sample Code
+# Demo!
 
-```
+1. In the `ocaml` folder, run `make` to compile the compiler.
+2. Run `./adventure.sh` to go off on an adventure!
+3. Run `./traffic.sh` to see a more realistic application of our language: modeling an FSM to deal with traffic flow.
 
-```
+# General Usage
 
-# Features
+1. In the `ocaml` folder, run `make` to compile our compiler.
+2. Run `./sake.native input.sk output` (note that `output` has no extension)
 
-Comments:
-```
-~ this is a line comment 
-```
-```
-/~ 
- ~ this is a block comment
- ~/
-```
+# Language structure
+
+Check out the slides on our language for more info!
 
 # About Us
 
